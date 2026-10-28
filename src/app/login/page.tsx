@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import {
   Card,
@@ -8,9 +9,11 @@ import {
 } from "@/components/ui/card";
 import { LoginForm } from "./login-form";
 
+export const metadata: Metadata = { title: "Sign in" };
+
 export default function LoginPage() {
   return (
-    <main className="flex flex-1 items-center justify-center px-4">
+    <main id="main" className="flex flex-1 items-center justify-center px-4">
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle>Sign in to DevGuide AI</CardTitle>

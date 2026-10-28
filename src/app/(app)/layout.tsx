@@ -1,9 +1,8 @@
+import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { Suspense } from "react";
-import { redirect } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import { TopBar } from "@/components/layout/top-bar";
 import { createClient } from "@/lib/supabase/server";
-import { signOut } from "./actions";
 
 // proxy.ts only does an optimistic redirect. The real check happens here, on the server,
 // behind Suspense because reading the session is a request-time read.
@@ -16,25 +15,26 @@ async function AuthGate({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <header className="flex items-center justify-between border-b px-6 py-3">
-        <span className="font-semibold">DevGuide AI</span>
-        <form action={signOut} className="flex items-center gap-3">
-          <span className="text-muted-foreground text-sm">
-            {data.user.email}
-          </span>
-          <Button type="submit" variant="outline" size="sm">
-            Sign out
-          </Button>
-        </form>
-      </header>
+      <TopBar email={data.user.email ?? ""} />
       {children}
     </>
   );
 }
 
+// Same height as the real bar, so nothing jumps when the session resolves.
+function TopBarFallback() {
+  return (
+    <header className="bg-surface sticky top-0 z-40 flex h-14 items-center border-b px-4 sm:px-6">
+      <span className="text-base font-semibold tracking-tight">
+        DevGuide AI
+      </span>
+    </header>
+  );
+}
+
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <Suspense>
+    <Suspense fallback={<TopBarFallback />}>
       <AuthGate>{children}</AuthGate>
     </Suspense>
   );

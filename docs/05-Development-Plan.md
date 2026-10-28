@@ -36,8 +36,8 @@
 - [x] Create Supabase project; enable `vector` extension; set up migrations folder. *(done locally with the Supabase CLI + Docker: `supabase start`; hosted project is created at the deploy step)*
 - [x] Supabase Auth: GitHub + email magic link; protected `(app)` routes via middleware. *(magic link, session refresh in `src/proxy.ts` (Next 16 name for middleware) and server-side check in the `(app)` layout verified locally; GitHub provider enabled locally; redirect to GitHub verified, final sign-in done by the user)*
 - [x] `.env.example` with all variables from 03-Architecture §9; typed env loader (zod). *(`src/lib/env.schema.ts`, `env.client.ts`, `env.ts`; only Supabase keys are required now, other keys are enforced by `requireEnv()` where used)*
-- [ ] Base layout: top bar, theme tokens (light/dark), fonts.
-- [ ] Set up LangSmith and Sentry projects; keys in env.
+- [x] Base layout: top bar, theme tokens (light/dark), fonts. *(tokens from 04-UI-UX §7 in `globals.css`; Geist Sans/Mono; next-themes with system default + toggle; top bar with `/` search shortcut, Library, account menu; Library and Settings are placeholder pages)*
+- [x] Set up LangSmith and Sentry projects; keys in env. *(Sentry wired for server, edge and browser, off unless a DSN is set, with URL/cookie/body scrubbing, verified against a local stand-in; both projects created and keys are in `.env.local` and pass the env schema. Not yet confirmed end to end: a real event in the Sentry dashboard and a real LangSmith trace, which arrives with the agent graphs in M3)*
 - [ ] Deploy to Vercel (or Railway); confirm sign-in works in production.
 - [ ] GitHub repo with CI: typecheck + lint + test on PR.
 

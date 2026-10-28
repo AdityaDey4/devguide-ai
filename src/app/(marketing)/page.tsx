@@ -4,7 +4,10 @@ import { buttonVariants } from "@/components/ui/button";
 // Placeholder landing page; real content comes in M8.
 export default function LandingPage() {
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col items-start justify-center gap-6 px-6">
+    <main
+      id="main"
+      className="mx-auto flex w-full max-w-2xl flex-1 flex-col items-start justify-center gap-6 px-6"
+    >
       <h1 className="text-4xl font-semibold tracking-tight">
         Learn any technology from its official docs, in minutes.
       </h1>

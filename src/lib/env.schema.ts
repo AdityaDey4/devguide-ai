@@ -12,6 +12,8 @@ const optional = <T extends z.ZodType>(schema: T) =>
 export const publicSchema = z.object({
   NEXT_PUBLIC_SUPABASE_URL: z.url(),
   NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
+  // Browser error reporting. A DSN is not a secret; same value as SENTRY_DSN.
+  NEXT_PUBLIC_SENTRY_DSN: optional(z.url()),
 });
 
 // Server only. Needed from M0: Supabase service key and DATABASE_URL.
@@ -38,6 +40,7 @@ export const serverSchema = z.object({
   UPSTASH_REDIS_REST_TOKEN: optional(z.string().min(1)),
 
   LANGSMITH_API_KEY: optional(z.string().min(1)),
+  LANGSMITH_PROJECT: z.string().min(1).default("devguide-ai"),
   LANGSMITH_TRACING: z.preprocess(
     emptyToUndefined,
     z.stringbool().default(false),

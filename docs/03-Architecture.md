@@ -102,7 +102,9 @@ devguide-ai/
 │  │  ├─ clean/       index.ts (the recipe: the 5 steps in order) · removeJunk.ts pickContent.ts
 │  │  │               codeBlocks.ts markdown.ts normalizeMarkdown.ts plainText.ts title.ts
 │  │  │               shared.ts types.ts
-│  │  └─ discover/    (M1.5)
+│  │  ├─ discover/    index.ts (llms.txt, then sitemap, then crawl) · fromLlmsTxt.ts
+│  │  │               fromSitemap.ts fromCrawl.ts readLinks.ts scope.ts config.ts shared.ts types.ts
+│  │  └─ limiter.ts   (runs at most N async jobs at the same time)
 │  ├─ mcp/  client.ts (Context7)  server.ts (v1.1)
 │  ├─ db/   supabase.ts queries/*.ts types.ts
 │  ├─ pdf/  render.ts

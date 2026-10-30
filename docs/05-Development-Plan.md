@@ -48,10 +48,10 @@
 ## M1. Fetch & ingest pipeline (P0)
 
 **Tasks**
-- [ ] Migration: `technologies`, `sources`, `chunks` (with `fts` generated column, HNSW + GIN indexes).
-- [ ] `lib/fetch/ssrfGuard.ts`: DNS resolve + block private/loopback/link-local/metadata IPs; http(s) only.
-- [ ] `lib/fetch/fetchPage.ts`: 10 s timeout, 2 MB cap, 3 redirects, 1 retry with backoff.
-- [ ] `lib/fetch/clean.ts`: Readability + Turndown → Markdown.
+- [x] Migration: `technologies`, `sources`, `chunks` (with `fts` generated column, HNSW + GIN indexes). *(`20261030044956_knowledge_tables.sql`; RLS on, read for signed-in users, writes via service role only; `chunks.guide_id` gets its foreign key in M3)*
+- [x] `lib/fetch/ssrfGuard/`: DNS resolve + block private/loopback/link-local/metadata IPs; http(s) only. *(`assertSafeUrl()` for every hop plus `safeLookup` for connect-time checks against DNS rebinding; also blocks credentials in URLs, ports other than 80/443, internal hostnames and IPv4-mapped IPv6; attack-tested with 76 checks, formal unit tests come in M1.10)*
+- [x] `lib/fetch/fetchPage/`: 10 s timeout, 2 MB cap, 3 redirects, 1 retry with backoff. *(guard checked on every hop, fresh connection per request via `safeLookup`; cap counts decompressed bytes; gzip/br/deflate; text types only; `createFetchPage(deps)` exists only so tests can swap the guard; 34 behaviour checks passed against a local test server and live sites)*
+- [x] `lib/fetch/clean/` (entry `index.ts`): Readability + Turndown → Markdown. *(one small file per step, structure in 03-Architecture §3; prefers the page's `<main>`/`<article>` and uses Readability only when there is none, because Readability drops callouts and code from docs; keeps hidden tab panels' code; handles Shiki, Docusaurus, Expressive Code and Sphinx code blocks; passes through Markdown/MDX; tested on 8 live docs sites with 28 checks. Open points: some sites mark no code language; pages over 2 MB such as zod.dev/api need a decision in M1.9; tiny "Redirecting..." pages should be skipped)*
 - [ ] `lib/fetch/discover.ts`: `llms.txt` → `sitemap.xml` (incl. sitemap index) → nav-link crawl (depth 2, max 100).
 - [ ] `lib/rag/chunker.ts`: heading-aware, 500–800 tokens, 15% overlap, code blocks intact, `heading_path`.
 - [ ] `lib/rag/embedder.ts`: batched embeddings (≤ 100/call).

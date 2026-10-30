@@ -94,7 +94,15 @@ devguide-ai/
 │  │  ├─ edit/      graph.ts ...
 │  │  └─ shared/    llm.ts budget.ts events.ts
 │  ├─ rag/  chunker.ts embedder.ts retriever.ts reranker.ts store.ts
-│  ├─ fetch/  discover.ts fetchPage.ts clean.ts ssrfGuard.ts
+│  ├─ fetch/
+│  │  ├─ ssrfGuard/   index.ts · assertSafeUrl.ts safeLookup.ts blockedAddresses.ts
+│  │  │               blockedHostnames.ts errors.ts
+│  │  ├─ fetchPage/   index.ts · fetchOnce.ts createFetchPage.ts openRequest.ts readBody.ts
+│  │  │               redirects.ts contentType.ts errors.ts config.ts types.ts
+│  │  ├─ clean/       index.ts (the recipe: the 5 steps in order) · removeJunk.ts pickContent.ts
+│  │  │               codeBlocks.ts markdown.ts normalizeMarkdown.ts plainText.ts title.ts
+│  │  │               shared.ts types.ts
+│  │  └─ discover/    (M1.5)
 │  ├─ mcp/  client.ts (Context7)  server.ts (v1.1)
 │  ├─ db/   supabase.ts queries/*.ts types.ts
 │  ├─ pdf/  render.ts
@@ -104,6 +112,11 @@ devguide-ai/
 ├─ evals/  retrieval.jsonl  run-evals.ts
 └─ .env.example
 ```
+
+Notes:
+
+- In the repository, `app/`, `lib/` and `components/` live inside `src/` (the `@/` import alias points there).
+- Convention for `lib/`: one file, one job. A multi-step module is a folder whose `index.ts` only calls its steps in order, one line per step (see everything under `fetch/`). A file that grows past about 150 lines is split.
 
 ---
 

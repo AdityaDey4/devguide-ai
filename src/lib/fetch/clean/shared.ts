@@ -7,9 +7,12 @@ export const MAIN_SELECTOR = "main, article, [role='main']";
 export const text = (el: Element | null | undefined) =>
   (el?.textContent ?? "").replace(/\s+/g, " ").trim();
 
-/** If the line opens or closes a fenced code block, returns its ``` or ~~~ run. */
+/**
+ * If the line opens or closes a fenced code block, returns its ``` or ~~~ run.
+ * Any indentation counts: a code block inside a list item is indented ("    ```python").
+ */
 export function fenceMarker(line: string): string | undefined {
-  return line.match(/^\s{0,3}(`{3,}|~{3,})/)?.[1];
+  return line.match(/^\s*(`{3,}|~{3,})/)?.[1];
 }
 
 /** True if `marker` closes a fence that was opened with `open`. */

@@ -93,7 +93,14 @@ devguide-ai/
 │  │  ├─ chat/      graph.ts state.ts nodes/*.ts prompts.ts
 │  │  ├─ edit/      graph.ts ...
 │  │  └─ shared/    llm.ts budget.ts events.ts
-│  ├─ rag/  chunker.ts embedder.ts retriever.ts reranker.ts store.ts
+│  ├─ rag/
+│  │  ├─ chunker/     index.ts (the recipe: the 4 steps) · parseBlocks.ts buildUnits.ts splitLarge.ts
+│  │  │               pack.ts text.ts headingPath.ts tokens.ts config.ts types.ts
+│  │  ├─ embedder/    index.ts (the recipe: the 5 steps) · batches.ts client.ts config.ts
+│  │  │               errors.ts types.ts
+│  │  ├─ store/       index.ts (the recipe: the 5 steps) · chunks.ts sources.ts technologies.ts
+│  │  │               hash.ts expiry.ts config.ts errors.ts types.ts
+│  │  └─ retriever.ts  reranker.ts
 │  ├─ fetch/
 │  │  ├─ ssrfGuard/   index.ts · assertSafeUrl.ts safeLookup.ts blockedAddresses.ts
 │  │  │               blockedHostnames.ts errors.ts
@@ -102,11 +109,12 @@ devguide-ai/
 │  │  ├─ clean/       index.ts (the recipe: the 5 steps in order) · removeJunk.ts pickContent.ts
 │  │  │               codeBlocks.ts markdown.ts normalizeMarkdown.ts plainText.ts title.ts
 │  │  │               shared.ts types.ts
-│  │  ├─ discover/    index.ts (llms.txt, then sitemap, then crawl) · fromLlmsTxt.ts
-│  │  │               fromSitemap.ts fromCrawl.ts readLinks.ts scope.ts config.ts shared.ts types.ts
-│  │  └─ limiter.ts   (runs at most N async jobs at the same time)
+│  │  └─ discover/    index.ts (llms.txt, then sitemap, then crawl) · fromLlmsTxt.ts
+│  │                  fromSitemap.ts fromCrawl.ts readLinks.ts scope.ts config.ts shared.ts types.ts
+│  ├─ limiter.ts      (runs at most N async jobs at the same time; used by the crawl and the embedder)
 │  ├─ mcp/  client.ts (Context7)  server.ts (v1.1)
-│  ├─ db/   supabase.ts queries/*.ts types.ts
+│  ├─ supabase/   client.ts server.ts proxy.ts (sign-in clients) · service.ts (service-role client,
+│  │              server only) · database.types.ts (generated)
 │  ├─ pdf/  render.ts
 │  └─ limits/ ratelimit.ts
 ├─ components/  guide/ chat/ progress/ editor/ ui/
@@ -118,6 +126,7 @@ devguide-ai/
 Notes:
 
 - In the repository, `app/`, `lib/` and `components/` live inside `src/` (the `@/` import alias points there).
+- `lib/supabase/database.types.ts` is generated from the database. After a migration, regenerate it with `npx supabase gen types typescript --local > src/lib/supabase/database.types.ts`.
 - Convention for `lib/`: one file, one job. A multi-step module is a folder whose `index.ts` only calls its steps in order, one line per step (see everything under `fetch/`). A file that grows past about 150 lines is split.
 
 ---

@@ -1,4 +1,4 @@
-import { createLimiter } from "../limiter";
+import { createLimiter } from "../../limiter";
 import { CONCURRENCY, CRAWL_MAX_DEPTH, CRAWL_MAX_PAGES } from "./config";
 import { readLinks } from "./readLinks";
 import type { Scope } from "./scope";

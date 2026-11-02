@@ -1,0 +1,2235 @@
+[
+  {
+    "question": {
+      "id": "zod-01",
+      "technology": "zod",
+      "question": "How do I get the TypeScript type from a Zod schema?",
+      "expectedUrls": [
+        "https://zod.dev/basics"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 11,
+        "top5": [
+          "https://zod.dev/packages/zod",
+          "https://zod.dev/api",
+          "https://zod.dev/",
+          "https://zod.dev/library-authors",
+          "https://zod.dev/v4"
+        ]
+      },
+      "keyword": {
+        "rank": null,
+        "top5": [
+          "https://zod.dev/json-schema",
+          "https://zod.dev/library-authors",
+          "https://zod.dev/library-authors",
+          "https://zod.dev/packages/mini",
+          "https://zod.dev/ecosystem"
+        ]
+      },
+      "hybrid": {
+        "rank": null,
+        "top5": [
+          "https://zod.dev/library-authors",
+          "https://zod.dev/json-schema",
+          "https://zod.dev/json-schema",
+          "https://zod.dev/json-schema",
+          "https://zod.dev/ecosystem"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": null,
+        "top5": [
+          "https://zod.dev/library-authors",
+          "https://zod.dev/json-schema",
+          "https://zod.dev/json-schema",
+          "https://zod.dev/json-schema",
+          "https://zod.dev/ecosystem"
+        ]
+      }
+    },
+    "topRelevance": 0.4
+  },
+  {
+    "question": {
+      "id": "zod-02",
+      "technology": "zod",
+      "question": "What is the difference between parse and safeParse?",
+      "expectedUrls": [
+        "https://zod.dev/basics"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/basics",
+          "https://zod.dev/packages/core",
+          "https://zod.dev/compile",
+          "https://zod.dev/basics",
+          "https://zod.dev/compile"
+        ]
+      },
+      "keyword": {
+        "rank": 2,
+        "top5": [
+          "https://zod.dev/codecs",
+          "https://zod.dev/basics",
+          "https://zod.dev/error-customization",
+          "https://zod.dev/compile",
+          "https://zod.dev/v4"
+        ]
+      },
+      "hybrid": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/basics",
+          "https://zod.dev/codecs",
+          "https://zod.dev/error-customization",
+          "https://zod.dev/compile",
+          "https://zod.dev/error-customization"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 2,
+        "top5": [
+          "https://zod.dev/packages/core",
+          "https://zod.dev/basics",
+          "https://zod.dev/codecs",
+          "https://zod.dev/error-customization",
+          "https://zod.dev/compile"
+        ]
+      }
+    },
+    "topRelevance": 0.7
+  },
+  {
+    "question": {
+      "id": "zod-03",
+      "technology": "zod",
+      "question": "How do I validate a discriminated union?",
+      "expectedUrls": [
+        "https://zod.dev/api"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/api",
+          "https://zod.dev/api",
+          "https://zod.dev/v4",
+          "https://zod.dev/api",
+          "https://zod.dev/api"
+        ]
+      },
+      "keyword": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/api",
+          "https://zod.dev/api",
+          "https://zod.dev/api",
+          "https://zod.dev/v4",
+          "https://zod.dev/compile"
+        ]
+      },
+      "hybrid": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/api",
+          "https://zod.dev/v4",
+          "https://zod.dev/api",
+          "https://zod.dev/api",
+          "https://zod.dev/compile"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/api",
+          "https://zod.dev/v4",
+          "https://zod.dev/api",
+          "https://zod.dev/api",
+          "https://zod.dev/compile"
+        ]
+      }
+    },
+    "topRelevance": 1
+  },
+  {
+    "question": {
+      "id": "zod-04",
+      "technology": "zod",
+      "question": "How do I make a field optional or give it a default value?",
+      "expectedUrls": [
+        "https://zod.dev/api"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/api",
+          "https://zod.dev/api",
+          "https://zod.dev/api",
+          "https://zod.dev/json-schema",
+          "https://zod.dev/api"
+        ]
+      },
+      "keyword": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/api",
+          "https://zod.dev/v4",
+          "https://zod.dev/v4/changelog",
+          "https://zod.dev/packages/mini",
+          "https://zod.dev/api"
+        ]
+      },
+      "hybrid": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/api",
+          "https://zod.dev/api",
+          "https://zod.dev/v4/changelog",
+          "https://zod.dev/v4/changelog",
+          "https://zod.dev/api"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/api",
+          "https://zod.dev/api",
+          "https://zod.dev/v4/changelog",
+          "https://zod.dev/v4/changelog",
+          "https://zod.dev/api"
+        ]
+      }
+    },
+    "topRelevance": 1
+  },
+  {
+    "question": {
+      "id": "zod-05",
+      "technology": "zod",
+      "question": "Is z.nativeEnum still supported?",
+      "expectedUrls": [
+        "https://zod.dev/api",
+        "https://zod.dev/v4/changelog"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/v4/changelog",
+          "https://zod.dev/api",
+          "https://zod.dev/api",
+          "https://zod.dev/v4/changelog",
+          "https://zod.dev/api"
+        ]
+      },
+      "keyword": {
+        "rank": 2,
+        "top5": [
+          "https://zod.dev/v4/versioning",
+          "https://zod.dev/v4/changelog",
+          "https://zod.dev/library-authors",
+          "https://zod.dev/v4",
+          "https://zod.dev/v4"
+        ]
+      },
+      "hybrid": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/v4/changelog",
+          "https://zod.dev/v4/changelog",
+          "https://zod.dev/v4",
+          "https://zod.dev/api",
+          "https://zod.dev/v4/changelog"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/v4/changelog",
+          "https://zod.dev/api",
+          "https://zod.dev/v4/changelog",
+          "https://zod.dev/v4",
+          "https://zod.dev/api"
+        ]
+      }
+    },
+    "topRelevance": 1
+  },
+  {
+    "question": {
+      "id": "zod-06",
+      "technology": "zod",
+      "question": "How can I convert a Zod schema to JSON Schema?",
+      "expectedUrls": [
+        "https://zod.dev/json-schema"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/json-schema",
+          "https://zod.dev/v4",
+          "https://zod.dev/json-schema",
+          "https://zod.dev/packages/zod",
+          "https://zod.dev/json-schema"
+        ]
+      },
+      "keyword": {
+        "rank": 4,
+        "top5": [
+          "https://zod.dev/library-authors",
+          "https://zod.dev/ecosystem",
+          "https://zod.dev/packages/mini",
+          "https://zod.dev/json-schema",
+          "https://zod.dev/ecosystem"
+        ]
+      },
+      "hybrid": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/json-schema",
+          "https://zod.dev/ecosystem",
+          "https://zod.dev/json-schema",
+          "https://zod.dev/json-schema",
+          "https://zod.dev/library-authors"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/json-schema",
+          "https://zod.dev/v4",
+          "https://zod.dev/json-schema",
+          "https://zod.dev/json-schema",
+          "https://zod.dev/json-schema"
+        ]
+      }
+    },
+    "topRelevance": 1
+  },
+  {
+    "question": {
+      "id": "zod-07",
+      "technology": "zod",
+      "question": "How do I turn a schema into something an OpenAPI or LLM tool can read, and keep descriptions on it?",
+      "expectedUrls": [
+        "https://zod.dev/json-schema",
+        "https://zod.dev/metadata"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/json-schema",
+          "https://zod.dev/v4",
+          "https://zod.dev/library-authors",
+          "https://zod.dev/json-schema",
+          "https://zod.dev/basics"
+        ]
+      },
+      "keyword": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/json-schema",
+          "https://zod.dev/library-authors",
+          "https://zod.dev/metadata",
+          "https://zod.dev/json-schema",
+          "https://zod.dev/json-schema"
+        ]
+      },
+      "hybrid": {
+        "rank": 2,
+        "top5": [
+          "https://zod.dev/library-authors",
+          "https://zod.dev/json-schema",
+          "https://zod.dev/json-schema",
+          "https://zod.dev/json-schema",
+          "https://zod.dev/json-schema"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/json-schema",
+          "https://zod.dev/metadata",
+          "https://zod.dev/metadata",
+          "https://zod.dev/json-schema",
+          "https://zod.dev/json-schema"
+        ]
+      }
+    },
+    "topRelevance": 1
+  },
+  {
+    "question": {
+      "id": "zod-08",
+      "technology": "zod",
+      "question": "How do I attach custom metadata like a title or description to a schema?",
+      "expectedUrls": [
+        "https://zod.dev/metadata"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/metadata",
+          "https://zod.dev/metadata",
+          "https://zod.dev/json-schema",
+          "https://zod.dev/json-schema",
+          "https://zod.dev/json-schema"
+        ]
+      },
+      "keyword": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/metadata",
+          "https://zod.dev/json-schema",
+          "https://zod.dev/v4",
+          "https://zod.dev/metadata",
+          "https://zod.dev/json-schema"
+        ]
+      },
+      "hybrid": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/metadata",
+          "https://zod.dev/metadata",
+          "https://zod.dev/json-schema",
+          "https://zod.dev/json-schema",
+          "https://zod.dev/json-schema"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/metadata",
+          "https://zod.dev/json-schema",
+          "https://zod.dev/metadata",
+          "https://zod.dev/json-schema",
+          "https://zod.dev/json-schema"
+        ]
+      }
+    },
+    "topRelevance": 1
+  },
+  {
+    "question": {
+      "id": "zod-09",
+      "technology": "zod",
+      "question": "How do I customize the error message for a failed validation?",
+      "expectedUrls": [
+        "https://zod.dev/error-customization"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/error-customization",
+          "https://zod.dev/error-customization",
+          "https://zod.dev/error-formatting",
+          "https://zod.dev/error-customization",
+          "https://zod.dev/packages/mini"
+        ]
+      },
+      "keyword": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/error-customization",
+          "https://zod.dev/api",
+          "https://zod.dev/error-customization",
+          "https://zod.dev/error-customization",
+          "https://zod.dev/v4/changelog"
+        ]
+      },
+      "hybrid": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/error-customization",
+          "https://zod.dev/error-customization",
+          "https://zod.dev/api",
+          "https://zod.dev/error-customization",
+          "https://zod.dev/error-customization"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/error-customization",
+          "https://zod.dev/error-customization",
+          "https://zod.dev/error-customization",
+          "https://zod.dev/error-customization",
+          "https://zod.dev/api"
+        ]
+      }
+    },
+    "topRelevance": 1
+  },
+  {
+    "question": {
+      "id": "zod-10",
+      "technology": "zod",
+      "question": "Which error message wins when I set one on the schema and another one globally?",
+      "expectedUrls": [
+        "https://zod.dev/error-customization"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/error-customization",
+          "https://zod.dev/error-customization",
+          "https://zod.dev/json-schema",
+          "https://zod.dev/json-schema",
+          "https://zod.dev/json-schema"
+        ]
+      },
+      "keyword": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/error-customization",
+          "https://zod.dev/error-customization",
+          "https://zod.dev/error-customization",
+          "https://zod.dev/json-schema",
+          "https://zod.dev/api"
+        ]
+      },
+      "hybrid": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/error-customization",
+          "https://zod.dev/error-customization",
+          "https://zod.dev/json-schema",
+          "https://zod.dev/error-customization",
+          "https://zod.dev/api"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/error-customization",
+          "https://zod.dev/error-customization",
+          "https://zod.dev/error-customization",
+          "https://zod.dev/error-customization",
+          "https://zod.dev/json-schema"
+        ]
+      }
+    },
+    "topRelevance": 1
+  },
+  {
+    "question": {
+      "id": "zod-11",
+      "technology": "zod",
+      "question": "How do I print a Zod error in a human-readable way?",
+      "expectedUrls": [
+        "https://zod.dev/error-formatting"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/error-formatting",
+          "https://zod.dev/error-customization",
+          "https://zod.dev/error-customization",
+          "https://zod.dev/error-customization",
+          "https://zod.dev/error-formatting"
+        ]
+      },
+      "keyword": {
+        "rank": 18,
+        "top5": [
+          "https://zod.dev/error-customization",
+          "https://zod.dev/v4/versioning",
+          "https://zod.dev/v4/changelog",
+          "https://zod.dev/packages/mini",
+          "https://zod.dev/library-authors"
+        ]
+      },
+      "hybrid": {
+        "rank": 4,
+        "top5": [
+          "https://zod.dev/error-customization",
+          "https://zod.dev/v4/changelog",
+          "https://zod.dev/v4/changelog",
+          "https://zod.dev/error-formatting",
+          "https://zod.dev/ecosystem"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 2,
+        "top5": [
+          "https://zod.dev/error-customization",
+          "https://zod.dev/error-formatting",
+          "https://zod.dev/error-formatting",
+          "https://zod.dev/v4/changelog",
+          "https://zod.dev/v4/changelog"
+        ]
+      }
+    },
+    "topRelevance": 1
+  },
+  {
+    "question": {
+      "id": "zod-12",
+      "technology": "zod",
+      "question": "What are codecs and how do I encode a value back to its original form?",
+      "expectedUrls": [
+        "https://zod.dev/codecs"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/codecs",
+          "https://zod.dev/codecs",
+          "https://zod.dev/api",
+          "https://zod.dev/codecs",
+          "https://zod.dev/api"
+        ]
+      },
+      "keyword": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/codecs",
+          "https://zod.dev/codecs",
+          "https://zod.dev/packages/mini",
+          "https://zod.dev/v4",
+          "https://zod.dev/ecosystem"
+        ]
+      },
+      "hybrid": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/codecs",
+          "https://zod.dev/codecs",
+          "https://zod.dev/codecs",
+          "https://zod.dev/api",
+          "https://zod.dev/codecs"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/codecs",
+          "https://zod.dev/codecs",
+          "https://zod.dev/codecs",
+          "https://zod.dev/codecs",
+          "https://zod.dev/api"
+        ]
+      }
+    },
+    "topRelevance": 1
+  },
+  {
+    "question": {
+      "id": "zod-13",
+      "technology": "zod",
+      "question": "What changed in Zod 4 and what breaks when I upgrade from Zod 3?",
+      "expectedUrls": [
+        "https://zod.dev/v4/changelog",
+        "https://zod.dev/v4"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/v4/changelog",
+          "https://zod.dev/v4",
+          "https://zod.dev/v4/versioning",
+          "https://zod.dev/library-authors",
+          "https://zod.dev/v4/versioning"
+        ]
+      },
+      "keyword": {
+        "rank": 5,
+        "top5": [
+          "https://zod.dev/v4/versioning",
+          "https://zod.dev/library-authors",
+          "https://zod.dev/v4/versioning",
+          "https://zod.dev/library-authors",
+          "https://zod.dev/v4/changelog"
+        ]
+      },
+      "hybrid": {
+        "rank": 4,
+        "top5": [
+          "https://zod.dev/v4/versioning",
+          "https://zod.dev/library-authors",
+          "https://zod.dev/v4/versioning",
+          "https://zod.dev/v4/changelog",
+          "https://zod.dev/v4/changelog"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/v4/changelog",
+          "https://zod.dev/v4/changelog",
+          "https://zod.dev/v4/changelog",
+          "https://zod.dev/v4/changelog",
+          "https://zod.dev/v4/versioning"
+        ]
+      }
+    },
+    "topRelevance": 1
+  },
+  {
+    "question": {
+      "id": "zod-14",
+      "technology": "zod",
+      "question": "When should I use Zod Mini instead of regular Zod?",
+      "expectedUrls": [
+        "https://zod.dev/packages/mini"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/packages/mini",
+          "https://zod.dev/packages/mini",
+          "https://zod.dev/v4",
+          "https://zod.dev/v4",
+          "https://zod.dev/packages/zod"
+        ]
+      },
+      "keyword": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/packages/mini",
+          "https://zod.dev/library-authors",
+          "https://zod.dev/v4",
+          "https://zod.dev/v4/versioning",
+          "https://zod.dev/packages/mini"
+        ]
+      },
+      "hybrid": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/packages/mini",
+          "https://zod.dev/v4",
+          "https://zod.dev/packages/mini",
+          "https://zod.dev/v4",
+          "https://zod.dev/library-authors"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/packages/mini",
+          "https://zod.dev/packages/mini",
+          "https://zod.dev/packages/zod",
+          "https://zod.dev/v4",
+          "https://zod.dev/v4"
+        ]
+      }
+    },
+    "topRelevance": 1
+  },
+  {
+    "question": {
+      "id": "zod-15",
+      "technology": "zod",
+      "question": "How do I speed up validation by compiling a schema ahead of time?",
+      "expectedUrls": [
+        "https://zod.dev/compile"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/compile",
+          "https://zod.dev/compile",
+          "https://zod.dev/basics",
+          "https://zod.dev/compile",
+          "https://zod.dev/compile"
+        ]
+      },
+      "keyword": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/compile",
+          "https://zod.dev/compile",
+          "https://zod.dev/compile",
+          "https://zod.dev/ecosystem",
+          "https://zod.dev/library-authors"
+        ]
+      },
+      "hybrid": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/compile",
+          "https://zod.dev/compile",
+          "https://zod.dev/compile",
+          "https://zod.dev/basics",
+          "https://zod.dev/ecosystem"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/compile",
+          "https://zod.dev/compile",
+          "https://zod.dev/compile",
+          "https://zod.dev/basics",
+          "https://zod.dev/ecosystem"
+        ]
+      }
+    },
+    "topRelevance": 1
+  },
+  {
+    "question": {
+      "id": "zod-16",
+      "technology": "zod",
+      "question": "Which subpath should a library import from so it works with both Zod 3 and Zod 4?",
+      "expectedUrls": [
+        "https://zod.dev/library-authors",
+        "https://zod.dev/v4/versioning"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/library-authors",
+          "https://zod.dev/library-authors",
+          "https://zod.dev/v4/versioning",
+          "https://zod.dev/library-authors",
+          "https://zod.dev/v4/versioning"
+        ]
+      },
+      "keyword": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/library-authors",
+          "https://zod.dev/v4/versioning",
+          "https://zod.dev/library-authors",
+          "https://zod.dev/v4/versioning",
+          "https://zod.dev/v4/versioning"
+        ]
+      },
+      "hybrid": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/library-authors",
+          "https://zod.dev/library-authors",
+          "https://zod.dev/v4/versioning",
+          "https://zod.dev/v4/versioning",
+          "https://zod.dev/library-authors"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 1,
+        "top5": [
+          "https://zod.dev/library-authors",
+          "https://zod.dev/v4",
+          "https://zod.dev/packages/core",
+          "https://zod.dev/library-authors",
+          "https://zod.dev/v4/versioning"
+        ]
+      }
+    },
+    "topRelevance": 1
+  },
+  {
+    "question": {
+      "id": "langgraph-01",
+      "technology": "langgraph",
+      "question": "What is a checkpointer and what does it save?",
+      "expectedUrls": [
+        "https://docs.langchain.com/oss/python/langgraph/checkpointers",
+        "https://docs.langchain.com/oss/python/langgraph/persistence"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/checkpointers",
+          "https://docs.langchain.com/oss/python/langgraph/checkpointers",
+          "https://docs.langchain.com/oss/python/langgraph/checkpointers",
+          "https://docs.langchain.com/oss/python/langgraph/checkpointers",
+          "https://docs.langchain.com/oss/python/langgraph/checkpointers"
+        ]
+      },
+      "keyword": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/checkpointers",
+          "https://docs.langchain.com/oss/python/langgraph/checkpointers",
+          "https://docs.langchain.com/oss/python/langgraph/checkpointers",
+          "https://docs.langchain.com/oss/python/langgraph/checkpointers",
+          "https://docs.langchain.com/oss/python/langgraph/checkpointers"
+        ]
+      },
+      "hybrid": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/checkpointers",
+          "https://docs.langchain.com/oss/python/langgraph/checkpointers",
+          "https://docs.langchain.com/oss/python/langgraph/checkpointers",
+          "https://docs.langchain.com/oss/python/langgraph/checkpointers",
+          "https://docs.langchain.com/oss/python/langgraph/checkpointers"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/checkpointers",
+          "https://docs.langchain.com/oss/python/langgraph/checkpointers",
+          "https://docs.langchain.com/oss/python/langgraph/checkpointers",
+          "https://docs.langchain.com/oss/python/langgraph/checkpointers",
+          "https://docs.langchain.com/oss/python/langgraph/checkpointers"
+        ]
+      }
+    },
+    "topRelevance": 1
+  },
+  {
+    "question": {
+      "id": "langgraph-02",
+      "technology": "langgraph",
+      "question": "How do I pause a graph and wait for a human to approve something?",
+      "expectedUrls": [
+        "https://docs.langchain.com/oss/python/langgraph/interrupts"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/interrupts",
+          "https://docs.langchain.com/oss/python/langgraph/interrupts",
+          "https://docs.langchain.com/oss/python/langgraph/interrupts",
+          "https://docs.langchain.com/oss/python/langgraph/use-functional-api",
+          "https://docs.langchain.com/oss/python/langgraph/sql-agent"
+        ]
+      },
+      "keyword": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/interrupts",
+          "https://docs.langchain.com/oss/python/langgraph/interrupts",
+          "https://docs.langchain.com/oss/python/langgraph/interrupts",
+          "https://docs.langchain.com/oss/python/langgraph/use-subgraphs",
+          "https://docs.langchain.com/oss/python/langgraph/checkpointers"
+        ]
+      },
+      "hybrid": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/interrupts",
+          "https://docs.langchain.com/oss/python/langgraph/interrupts",
+          "https://docs.langchain.com/oss/python/langgraph/interrupts",
+          "https://docs.langchain.com/oss/python/langgraph/thinking-in-langgraph",
+          "https://docs.langchain.com/oss/python/langgraph/interrupts"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/interrupts",
+          "https://docs.langchain.com/oss/python/langgraph/interrupts",
+          "https://docs.langchain.com/oss/python/langgraph/use-functional-api",
+          "https://docs.langchain.com/oss/python/langgraph/interrupts",
+          "https://docs.langchain.com/oss/python/langgraph/interrupts"
+        ]
+      }
+    },
+    "topRelevance": 1
+  },
+  {
+    "question": {
+      "id": "langgraph-03",
+      "technology": "langgraph",
+      "question": "How do I resume a graph after an interrupt with Command(resume=...)?",
+      "expectedUrls": [
+        "https://docs.langchain.com/oss/python/langgraph/interrupts"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/interrupts",
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/interrupts",
+          "https://docs.langchain.com/oss/python/langgraph/interrupts",
+          "https://docs.langchain.com/oss/python/langgraph/interrupts"
+        ]
+      },
+      "keyword": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/interrupts",
+          "https://docs.langchain.com/oss/python/langgraph/interrupts",
+          "https://docs.langchain.com/oss/python/langgraph/interrupts",
+          "https://docs.langchain.com/oss/python/langgraph/use-time-travel",
+          "https://docs.langchain.com/oss/python/langgraph/interrupts"
+        ]
+      },
+      "hybrid": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/interrupts",
+          "https://docs.langchain.com/oss/python/langgraph/interrupts",
+          "https://docs.langchain.com/oss/python/langgraph/interrupts",
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/use-time-travel"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 4,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/use-time-travel",
+          "https://docs.langchain.com/oss/python/langgraph/functional-api",
+          "https://docs.langchain.com/oss/python/langgraph/interrupts",
+          "https://docs.langchain.com/oss/python/langgraph/use-functional-api"
+        ]
+      }
+    },
+    "topRelevance": 1
+  },
+  {
+    "question": {
+      "id": "langgraph-04",
+      "technology": "langgraph",
+      "question": "What stream modes are available when streaming a graph?",
+      "expectedUrls": [
+        "https://docs.langchain.com/oss/python/langgraph/streaming"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/streaming",
+          "https://docs.langchain.com/oss/python/langgraph/streaming",
+          "https://docs.langchain.com/oss/python/langgraph/streaming",
+          "https://docs.langchain.com/oss/python/langgraph/streaming",
+          "https://docs.langchain.com/oss/python/langgraph/streaming"
+        ]
+      },
+      "keyword": {
+        "rank": 3,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/event-streaming",
+          "https://docs.langchain.com/oss/python/langgraph/event-streaming",
+          "https://docs.langchain.com/oss/python/langgraph/streaming",
+          "https://docs.langchain.com/oss/python/langgraph/streaming",
+          "https://docs.langchain.com/oss/python/langgraph/streaming"
+        ]
+      },
+      "hybrid": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/streaming",
+          "https://docs.langchain.com/oss/python/langgraph/streaming",
+          "https://docs.langchain.com/oss/python/langgraph/event-streaming",
+          "https://docs.langchain.com/oss/python/langgraph/event-streaming",
+          "https://docs.langchain.com/oss/python/langgraph/streaming"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/streaming",
+          "https://docs.langchain.com/oss/python/langgraph/streaming",
+          "https://docs.langchain.com/oss/python/langgraph/streaming",
+          "https://docs.langchain.com/oss/python/langgraph/event-streaming",
+          "https://docs.langchain.com/oss/python/langgraph/event-streaming"
+        ]
+      }
+    },
+    "topRelevance": 1
+  },
+  {
+    "question": {
+      "id": "langgraph-05",
+      "technology": "langgraph",
+      "question": "How do I stream LLM tokens as they are generated?",
+      "expectedUrls": [
+        "https://docs.langchain.com/oss/python/langgraph/streaming",
+        "https://docs.langchain.com/oss/python/langgraph/event-streaming"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/streaming",
+          "https://docs.langchain.com/oss/python/langgraph/streaming",
+          "https://docs.langchain.com/oss/python/langgraph/streaming",
+          "https://docs.langchain.com/oss/python/langgraph/streaming",
+          "https://docs.langchain.com/oss/python/langgraph/streaming"
+        ]
+      },
+      "keyword": {
+        "rank": 2,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/workflows-agents",
+          "https://docs.langchain.com/oss/python/langgraph/streaming",
+          "https://docs.langchain.com/oss/python/langgraph/event-streaming",
+          "https://docs.langchain.com/oss/python/langgraph/workflows-agents",
+          "https://docs.langchain.com/oss/python/langgraph/workflows-agents"
+        ]
+      },
+      "hybrid": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/streaming",
+          "https://docs.langchain.com/oss/python/langgraph/streaming",
+          "https://docs.langchain.com/oss/python/langgraph/streaming",
+          "https://docs.langchain.com/oss/python/langgraph/workflows-agents",
+          "https://docs.langchain.com/oss/python/langgraph/workflows-agents"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/streaming",
+          "https://docs.langchain.com/oss/python/langgraph/streaming",
+          "https://docs.langchain.com/oss/python/langgraph/streaming",
+          "https://docs.langchain.com/oss/python/langgraph/streaming",
+          "https://docs.langchain.com/oss/python/langgraph/streaming"
+        ]
+      }
+    },
+    "topRelevance": 1
+  },
+  {
+    "question": {
+      "id": "langgraph-06",
+      "technology": "langgraph",
+      "question": "How do I define the state of a graph and combine updates with a reducer?",
+      "expectedUrls": [
+        "https://docs.langchain.com/oss/python/langgraph/graph-api"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/use-subgraphs"
+        ]
+      },
+      "keyword": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/graph-api"
+        ]
+      },
+      "hybrid": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/use-subgraphs",
+          "https://docs.langchain.com/oss/python/langgraph/use-subgraphs"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/graph-api"
+        ]
+      }
+    },
+    "topRelevance": 1
+  },
+  {
+    "question": {
+      "id": "langgraph-07",
+      "technology": "langgraph",
+      "question": "What is the recursion limit and how do I change it?",
+      "expectedUrls": [
+        "https://docs.langchain.com/oss/python/langgraph/graph-api"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/fault-tolerance",
+          "https://docs.langchain.com/oss/python/langgraph/use-time-travel"
+        ]
+      },
+      "keyword": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/backward-compatibility",
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/stores"
+        ]
+      },
+      "hybrid": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/backward-compatibility",
+          "https://docs.langchain.com/oss/python/langgraph/fault-tolerance"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/backward-compatibility",
+          "https://docs.langchain.com/oss/python/langgraph/fault-tolerance"
+        ]
+      }
+    },
+    "topRelevance": 1
+  },
+  {
+    "question": {
+      "id": "langgraph-08",
+      "technology": "langgraph",
+      "question": "How do I use entrypoint and task from the functional API?",
+      "expectedUrls": [
+        "https://docs.langchain.com/oss/python/langgraph/functional-api",
+        "https://docs.langchain.com/oss/python/langgraph/use-functional-api"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/functional-api",
+          "https://docs.langchain.com/oss/python/langgraph/functional-api",
+          "https://docs.langchain.com/oss/python/langgraph/use-functional-api",
+          "https://docs.langchain.com/oss/python/langgraph/backward-compatibility",
+          "https://docs.langchain.com/oss/python/langgraph/use-functional-api"
+        ]
+      },
+      "keyword": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/functional-api",
+          "https://docs.langchain.com/oss/python/langgraph/choosing-apis",
+          "https://docs.langchain.com/oss/python/langgraph/use-functional-api",
+          "https://docs.langchain.com/oss/python/langgraph/use-functional-api",
+          "https://docs.langchain.com/oss/python/langgraph/choosing-apis"
+        ]
+      },
+      "hybrid": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/functional-api",
+          "https://docs.langchain.com/oss/python/langgraph/functional-api",
+          "https://docs.langchain.com/oss/python/langgraph/choosing-apis",
+          "https://docs.langchain.com/oss/python/langgraph/use-functional-api",
+          "https://docs.langchain.com/oss/python/langgraph/use-functional-api"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/functional-api",
+          "https://docs.langchain.com/oss/python/langgraph/use-functional-api",
+          "https://docs.langchain.com/oss/python/langgraph/use-functional-api",
+          "https://docs.langchain.com/oss/python/langgraph/choosing-apis",
+          "https://docs.langchain.com/oss/python/langgraph/functional-api"
+        ]
+      }
+    },
+    "topRelevance": 1
+  },
+  {
+    "question": {
+      "id": "langgraph-09",
+      "technology": "langgraph",
+      "question": "Should I pick the Graph API or the Functional API?",
+      "expectedUrls": [
+        "https://docs.langchain.com/oss/python/langgraph/choosing-apis"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/choosing-apis",
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/choosing-apis",
+          "https://docs.langchain.com/oss/python/langgraph/functional-api",
+          "https://docs.langchain.com/oss/python/langgraph/choosing-apis"
+        ]
+      },
+      "keyword": {
+        "rank": 2,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/functional-api",
+          "https://docs.langchain.com/oss/python/langgraph/choosing-apis",
+          "https://docs.langchain.com/oss/python/langgraph/choosing-apis",
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/use-subgraphs"
+        ]
+      },
+      "hybrid": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/choosing-apis",
+          "https://docs.langchain.com/oss/python/langgraph/functional-api",
+          "https://docs.langchain.com/oss/python/langgraph/choosing-apis",
+          "https://docs.langchain.com/oss/python/langgraph/choosing-apis",
+          "https://docs.langchain.com/oss/python/langgraph/graph-api"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/choosing-apis",
+          "https://docs.langchain.com/oss/python/langgraph/choosing-apis",
+          "https://docs.langchain.com/oss/python/langgraph/choosing-apis",
+          "https://docs.langchain.com/oss/python/langgraph/functional-api",
+          "https://docs.langchain.com/oss/python/langgraph/graph-api"
+        ]
+      }
+    },
+    "topRelevance": 1
+  },
+  {
+    "question": {
+      "id": "langgraph-10",
+      "technology": "langgraph",
+      "question": "How do I retry a node that fails or set a timeout on it?",
+      "expectedUrls": [
+        "https://docs.langchain.com/oss/python/langgraph/fault-tolerance"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/fault-tolerance",
+          "https://docs.langchain.com/oss/python/langgraph/fault-tolerance",
+          "https://docs.langchain.com/oss/python/langgraph/fault-tolerance",
+          "https://docs.langchain.com/oss/python/langgraph/thinking-in-langgraph",
+          "https://docs.langchain.com/oss/python/langgraph/fault-tolerance"
+        ]
+      },
+      "keyword": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/fault-tolerance",
+          "https://docs.langchain.com/oss/python/langgraph/fault-tolerance",
+          "https://docs.langchain.com/oss/python/langgraph/fault-tolerance",
+          "https://docs.langchain.com/oss/python/langgraph/fault-tolerance",
+          "https://docs.langchain.com/oss/python/langgraph/fault-tolerance"
+        ]
+      },
+      "hybrid": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/fault-tolerance",
+          "https://docs.langchain.com/oss/python/langgraph/fault-tolerance",
+          "https://docs.langchain.com/oss/python/langgraph/fault-tolerance",
+          "https://docs.langchain.com/oss/python/langgraph/fault-tolerance",
+          "https://docs.langchain.com/oss/python/langgraph/fault-tolerance"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/fault-tolerance",
+          "https://docs.langchain.com/oss/python/langgraph/thinking-in-langgraph",
+          "https://docs.langchain.com/oss/python/langgraph/fault-tolerance",
+          "https://docs.langchain.com/oss/python/langgraph/fault-tolerance",
+          "https://docs.langchain.com/oss/python/langgraph/fault-tolerance"
+        ]
+      }
+    },
+    "topRelevance": 1
+  },
+  {
+    "question": {
+      "id": "langgraph-11",
+      "technology": "langgraph",
+      "question": "How can I replay a past run or fork from an earlier checkpoint?",
+      "expectedUrls": [
+        "https://docs.langchain.com/oss/python/langgraph/use-time-travel"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/use-time-travel",
+          "https://docs.langchain.com/oss/python/langgraph/use-time-travel",
+          "https://docs.langchain.com/oss/python/langgraph/use-time-travel",
+          "https://docs.langchain.com/oss/python/langgraph/functional-api",
+          "https://docs.langchain.com/oss/python/langgraph/functional-api"
+        ]
+      },
+      "keyword": {
+        "rank": 3,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/checkpointers",
+          "https://docs.langchain.com/oss/python/langgraph/checkpointers",
+          "https://docs.langchain.com/oss/python/langgraph/use-time-travel",
+          "https://docs.langchain.com/oss/python/langgraph/checkpointers",
+          "https://docs.langchain.com/oss/python/langgraph/checkpointers"
+        ]
+      },
+      "hybrid": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/use-time-travel",
+          "https://docs.langchain.com/oss/python/langgraph/use-time-travel",
+          "https://docs.langchain.com/oss/python/langgraph/checkpointers",
+          "https://docs.langchain.com/oss/python/langgraph/checkpointers",
+          "https://docs.langchain.com/oss/python/langgraph/use-time-travel"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/use-time-travel",
+          "https://docs.langchain.com/oss/python/langgraph/use-time-travel",
+          "https://docs.langchain.com/oss/python/langgraph/checkpointers",
+          "https://docs.langchain.com/oss/python/langgraph/use-time-travel",
+          "https://docs.langchain.com/oss/python/langgraph/checkpointers"
+        ]
+      }
+    },
+    "topRelevance": 1
+  },
+  {
+    "question": {
+      "id": "langgraph-12",
+      "technology": "langgraph",
+      "question": "How do I use a graph as a node inside another graph?",
+      "expectedUrls": [
+        "https://docs.langchain.com/oss/python/langgraph/use-subgraphs"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 2,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/use-subgraphs",
+          "https://docs.langchain.com/oss/python/langgraph/use-subgraphs",
+          "https://docs.langchain.com/oss/python/langgraph/use-subgraphs",
+          "https://docs.langchain.com/oss/python/langgraph/graph-api"
+        ]
+      },
+      "keyword": {
+        "rank": 6,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/interrupts",
+          "https://docs.langchain.com/oss/python/langgraph/frontend/graph-execution",
+          "https://docs.langchain.com/oss/python/langgraph/graph-api"
+        ]
+      },
+      "hybrid": {
+        "rank": 3,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/frontend/graph-execution",
+          "https://docs.langchain.com/oss/python/langgraph/use-subgraphs",
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/graph-api"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/use-subgraphs",
+          "https://docs.langchain.com/oss/python/langgraph/use-subgraphs",
+          "https://docs.langchain.com/oss/python/langgraph/use-subgraphs",
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/frontend/graph-execution"
+        ]
+      }
+    },
+    "topRelevance": 1
+  },
+  {
+    "question": {
+      "id": "langgraph-13",
+      "technology": "langgraph",
+      "question": "How do I give an agent long-term memory that is shared across threads?",
+      "expectedUrls": [
+        "https://docs.langchain.com/oss/python/langgraph/stores"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 2,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/persistence",
+          "https://docs.langchain.com/oss/python/langgraph/stores",
+          "https://docs.langchain.com/oss/python/langgraph/checkpointers",
+          "https://docs.langchain.com/oss/python/langgraph/use-functional-api",
+          "https://docs.langchain.com/oss/python/langgraph/stores"
+        ]
+      },
+      "keyword": {
+        "rank": 2,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/persistence",
+          "https://docs.langchain.com/oss/python/langgraph/stores",
+          "https://docs.langchain.com/oss/python/langgraph/overview",
+          "https://docs.langchain.com/oss/python/langgraph/stores",
+          "https://docs.langchain.com/oss/python/langgraph/ui"
+        ]
+      },
+      "hybrid": {
+        "rank": 2,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/persistence",
+          "https://docs.langchain.com/oss/python/langgraph/stores",
+          "https://docs.langchain.com/oss/python/langgraph/stores",
+          "https://docs.langchain.com/oss/python/langgraph/use-subgraphs",
+          "https://docs.langchain.com/oss/python/langgraph/checkpointers"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/stores",
+          "https://docs.langchain.com/oss/python/langgraph/persistence",
+          "https://docs.langchain.com/oss/python/langgraph/persistence",
+          "https://docs.langchain.com/oss/python/langgraph/stores",
+          "https://docs.langchain.com/oss/python/langgraph/stores"
+        ]
+      }
+    },
+    "topRelevance": 1
+  },
+  {
+    "question": {
+      "id": "langgraph-14",
+      "technology": "langgraph",
+      "question": "How do I build an agent that grades retrieved documents and rewrites the question?",
+      "expectedUrls": [
+        "https://docs.langchain.com/oss/python/langgraph/agentic-rag"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/agentic-rag",
+          "https://docs.langchain.com/oss/python/langgraph/agentic-rag",
+          "https://docs.langchain.com/oss/python/langgraph/agentic-rag",
+          "https://docs.langchain.com/oss/python/langgraph/agentic-rag",
+          "https://docs.langchain.com/oss/python/langgraph/agentic-rag"
+        ]
+      },
+      "keyword": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/agentic-rag",
+          "https://docs.langchain.com/oss/python/langgraph/agentic-rag",
+          "https://docs.langchain.com/oss/python/langgraph/agentic-rag",
+          "https://docs.langchain.com/oss/python/langgraph/agentic-rag",
+          "https://docs.langchain.com/oss/python/langgraph/agentic-rag"
+        ]
+      },
+      "hybrid": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/agentic-rag",
+          "https://docs.langchain.com/oss/python/langgraph/agentic-rag",
+          "https://docs.langchain.com/oss/python/langgraph/agentic-rag",
+          "https://docs.langchain.com/oss/python/langgraph/agentic-rag",
+          "https://docs.langchain.com/oss/python/langgraph/agentic-rag"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/agentic-rag",
+          "https://docs.langchain.com/oss/python/langgraph/agentic-rag",
+          "https://docs.langchain.com/oss/python/langgraph/agentic-rag",
+          "https://docs.langchain.com/oss/python/langgraph/agentic-rag",
+          "https://docs.langchain.com/oss/python/langgraph/agentic-rag"
+        ]
+      }
+    },
+    "topRelevance": 1
+  },
+  {
+    "question": {
+      "id": "langgraph-15",
+      "technology": "langgraph",
+      "question": "What does the langgraph dev command do?",
+      "expectedUrls": [
+        "https://docs.langchain.com/oss/python/langgraph/local-server"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/local-server",
+          "https://docs.langchain.com/oss/python/langgraph/overview",
+          "https://docs.langchain.com/oss/python/langgraph/install",
+          "https://docs.langchain.com/oss/python/langgraph/overview",
+          "https://docs.langchain.com/oss/python/langgraph/local-server"
+        ]
+      },
+      "keyword": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/local-server",
+          "https://docs.langchain.com/oss/python/langgraph/local-server",
+          "https://docs.langchain.com/oss/python/langgraph/graph-api",
+          "https://docs.langchain.com/oss/python/langgraph/thinking-in-langgraph",
+          "https://docs.langchain.com/oss/python/langgraph/overview"
+        ]
+      },
+      "hybrid": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/local-server",
+          "https://docs.langchain.com/oss/python/langgraph/overview",
+          "https://docs.langchain.com/oss/python/langgraph/local-server",
+          "https://docs.langchain.com/oss/python/langgraph/overview",
+          "https://docs.langchain.com/oss/python/langgraph/overview"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/local-server",
+          "https://docs.langchain.com/oss/python/langgraph/overview",
+          "https://docs.langchain.com/oss/python/langgraph/local-server",
+          "https://docs.langchain.com/oss/python/langgraph/overview",
+          "https://docs.langchain.com/oss/python/langgraph/overview"
+        ]
+      }
+    },
+    "topRelevance": 1
+  },
+  {
+    "question": {
+      "id": "langgraph-16",
+      "technology": "langgraph",
+      "question": "How do I fan out work to several workers with the Send API?",
+      "expectedUrls": [
+        "https://docs.langchain.com/oss/python/langgraph/workflows-agents"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/workflows-agents",
+          "https://docs.langchain.com/oss/python/langgraph/use-functional-api",
+          "https://docs.langchain.com/oss/python/langgraph/use-functional-api",
+          "https://docs.langchain.com/oss/python/langgraph/workflows-agents",
+          "https://docs.langchain.com/oss/python/langgraph/choosing-apis"
+        ]
+      },
+      "keyword": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/workflows-agents",
+          "https://docs.langchain.com/oss/python/langgraph/functional-api",
+          "https://docs.langchain.com/oss/python/langgraph/choosing-apis",
+          "https://docs.langchain.com/oss/python/langgraph/workflows-agents",
+          "https://docs.langchain.com/oss/python/langgraph/choosing-apis"
+        ]
+      },
+      "hybrid": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/workflows-agents",
+          "https://docs.langchain.com/oss/python/langgraph/workflows-agents",
+          "https://docs.langchain.com/oss/python/langgraph/functional-api",
+          "https://docs.langchain.com/oss/python/langgraph/choosing-apis",
+          "https://docs.langchain.com/oss/python/langgraph/choosing-apis"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 1,
+        "top5": [
+          "https://docs.langchain.com/oss/python/langgraph/workflows-agents",
+          "https://docs.langchain.com/oss/python/langgraph/workflows-agents",
+          "https://docs.langchain.com/oss/python/langgraph/functional-api",
+          "https://docs.langchain.com/oss/python/langgraph/choosing-apis",
+          "https://docs.langchain.com/oss/python/langgraph/choosing-apis"
+        ]
+      }
+    },
+    "topRelevance": 1
+  },
+  {
+    "question": {
+      "id": "supabase-01",
+      "technology": "supabase",
+      "question": "How do I run Supabase locally with the CLI?",
+      "expectedUrls": [
+        "https://supabase.com/docs/guides/local-development.md"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://supabase.com/docs/guides/local-development.md",
+          "https://supabase.com/docs/guides/local-development.md",
+          "https://supabase.com/docs/guides/self-hosting.md",
+          "https://supabase.com/docs/guides/getting-started.md",
+          "https://supabase.com/docs/guides/deployment.md"
+        ]
+      },
+      "keyword": {
+        "rank": 1,
+        "top5": [
+          "https://supabase.com/docs/guides/local-development.md",
+          "https://supabase.com/docs/guides/local-development.md",
+          "https://supabase.com/docs/guides/self-hosting.md",
+          "https://supabase.com/docs/guides/deployment.md",
+          "https://supabase.com/docs/guides/functions.md"
+        ]
+      },
+      "hybrid": {
+        "rank": 1,
+        "top5": [
+          "https://supabase.com/docs/guides/local-development.md",
+          "https://supabase.com/docs/guides/local-development.md",
+          "https://supabase.com/docs/guides/self-hosting.md",
+          "https://supabase.com/docs/guides/deployment.md",
+          "https://supabase.com/docs/guides/resources.md"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 1,
+        "top5": [
+          "https://supabase.com/docs/guides/local-development.md",
+          "https://supabase.com/docs/guides/local-development.md",
+          "https://supabase.com/docs/guides/self-hosting.md",
+          "https://supabase.com/docs/guides/deployment.md",
+          "https://supabase.com/docs/guides/getting-started.md"
+        ]
+      }
+    },
+    "topRelevance": 1
+  },
+  {
+    "question": {
+      "id": "supabase-02",
+      "technology": "supabase",
+      "question": "How can I run Supabase on my own server?",
+      "expectedUrls": [
+        "https://supabase.com/docs/guides/self-hosting.md"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://supabase.com/docs/guides/self-hosting.md",
+          "https://supabase.com/docs/guides/local-development.md",
+          "https://supabase.com/docs/guides/local-development.md",
+          "https://supabase.com/docs/guides/platform.md",
+          "https://supabase.com/docs/guides/self-hosting.md"
+        ]
+      },
+      "keyword": {
+        "rank": 3,
+        "top5": [
+          "https://supabase.com/docs/guides/local-development.md",
+          "https://supabase.com/docs/guides/getting-started.md",
+          "https://supabase.com/docs/guides/self-hosting.md",
+          "https://supabase.com/docs/guides/resources.md",
+          "https://supabase.com/docs/guides/security.md"
+        ]
+      },
+      "hybrid": {
+        "rank": 2,
+        "top5": [
+          "https://supabase.com/docs/guides/local-development.md",
+          "https://supabase.com/docs/guides/self-hosting.md",
+          "https://supabase.com/docs/guides/local-development.md",
+          "https://supabase.com/docs/guides/security.md",
+          "https://supabase.com/docs/guides/resources.md"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 1,
+        "top5": [
+          "https://supabase.com/docs/guides/self-hosting.md",
+          "https://supabase.com/docs/guides/local-development.md",
+          "https://supabase.com/docs/guides/local-development.md",
+          "https://supabase.com/docs/guides/security.md",
+          "https://supabase.com/docs/guides/resources.md"
+        ]
+      }
+    },
+    "topRelevance": 1
+  },
+  {
+    "question": {
+      "id": "supabase-03",
+      "technology": "supabase",
+      "question": "How do I schedule a recurring job inside Postgres?",
+      "expectedUrls": [
+        "https://supabase.com/docs/guides/cron.md"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://supabase.com/docs/guides/cron.md",
+          "https://supabase.com/docs/guides/queues.md",
+          "https://supabase.com/docs/guides/database/overview.md",
+          "https://supabase.com/docs/guides/observability.md",
+          "https://supabase.com/docs/guides/resources.md"
+        ]
+      },
+      "keyword": {
+        "rank": 1,
+        "top5": [
+          "https://supabase.com/docs/guides/cron.md",
+          "https://supabase.com/docs/guides/getting-started.md",
+          "https://supabase.com/docs/guides/resources.md",
+          "https://supabase.com/docs/guides/database/overview.md",
+          "https://supabase.com/docs/guides/api.md"
+        ]
+      },
+      "hybrid": {
+        "rank": 1,
+        "top5": [
+          "https://supabase.com/docs/guides/cron.md",
+          "https://supabase.com/docs/guides/database/overview.md",
+          "https://supabase.com/docs/guides/queues.md",
+          "https://supabase.com/docs/guides/resources.md",
+          "https://supabase.com/docs/guides/api.md"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 1,
+        "top5": [
+          "https://supabase.com/docs/guides/cron.md",
+          "https://supabase.com/docs/guides/database/overview.md",
+          "https://supabase.com/docs/guides/queues.md",
+          "https://supabase.com/docs/guides/resources.md",
+          "https://supabase.com/docs/guides/api.md"
+        ]
+      }
+    },
+    "topRelevance": 1
+  },
+  {
+    "question": {
+      "id": "supabase-04",
+      "technology": "supabase",
+      "question": "How do I run server-side TypeScript functions at the edge?",
+      "expectedUrls": [
+        "https://supabase.com/docs/guides/functions.md"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://supabase.com/docs/guides/functions.md",
+          "https://supabase.com/docs/guides/functions.md",
+          "https://supabase.com/docs/guides/functions.md",
+          "https://supabase.com/docs/guides/getting-started.md",
+          "https://supabase.com/docs/guides/local-development.md"
+        ]
+      },
+      "keyword": {
+        "rank": 1,
+        "top5": [
+          "https://supabase.com/docs/guides/functions.md",
+          "https://supabase.com/docs/guides/functions.md",
+          "https://supabase.com/docs/guides/functions.md",
+          "https://supabase.com/docs/guides/cron.md",
+          "https://supabase.com/docs/guides/ai-tools.md"
+        ]
+      },
+      "hybrid": {
+        "rank": 1,
+        "top5": [
+          "https://supabase.com/docs/guides/functions.md",
+          "https://supabase.com/docs/guides/functions.md",
+          "https://supabase.com/docs/guides/functions.md",
+          "https://supabase.com/docs/guides/getting-started.md",
+          "https://supabase.com/docs/guides/ai-tools.md"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 1,
+        "top5": [
+          "https://supabase.com/docs/guides/functions.md",
+          "https://supabase.com/docs/guides/functions.md",
+          "https://supabase.com/docs/guides/functions.md",
+          "https://supabase.com/docs/guides/getting-started.md",
+          "https://supabase.com/docs/guides/ai-tools.md"
+        ]
+      }
+    },
+    "topRelevance": 1
+  },
+  {
+    "question": {
+      "id": "supabase-05",
+      "technology": "supabase",
+      "question": "How does Supabase handle message queues with guaranteed delivery?",
+      "expectedUrls": [
+        "https://supabase.com/docs/guides/queues.md"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://supabase.com/docs/guides/queues.md",
+          "https://supabase.com/docs/guides/realtime.md",
+          "https://supabase.com/docs/guides/platform.md",
+          "https://supabase.com/docs/guides/security.md",
+          "https://supabase.com/docs/guides/storage.md"
+        ]
+      },
+      "keyword": {
+        "rank": 1,
+        "top5": [
+          "https://supabase.com/docs/guides/queues.md",
+          "https://supabase.com/docs/guides/local-development.md",
+          "https://supabase.com/docs/guides/getting-started.md",
+          "https://supabase.com/docs/guides/security.md",
+          "https://supabase.com/docs/guides/getting-started.md"
+        ]
+      },
+      "hybrid": {
+        "rank": 1,
+        "top5": [
+          "https://supabase.com/docs/guides/queues.md",
+          "https://supabase.com/docs/guides/security.md",
+          "https://supabase.com/docs/guides/realtime.md",
+          "https://supabase.com/docs/guides/deployment.md",
+          "https://supabase.com/docs/guides/auth.md"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 1,
+        "top5": [
+          "https://supabase.com/docs/guides/queues.md",
+          "https://supabase.com/docs/guides/security.md",
+          "https://supabase.com/docs/guides/realtime.md",
+          "https://supabase.com/docs/guides/deployment.md",
+          "https://supabase.com/docs/guides/auth.md"
+        ]
+      }
+    },
+    "topRelevance": 1
+  },
+  {
+    "question": {
+      "id": "supabase-06",
+      "technology": "supabase",
+      "question": "Can I query my database with GraphQL?",
+      "expectedUrls": [
+        "https://supabase.com/docs/guides/graphql.md"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://supabase.com/docs/guides/graphql.md",
+          "https://supabase.com/docs/guides/graphql.md",
+          "https://supabase.com/docs/guides/graphql.md",
+          "https://supabase.com/docs/guides/graphql.md",
+          "https://supabase.com/docs/guides/database/overview.md"
+        ]
+      },
+      "keyword": {
+        "rank": 2,
+        "top5": [
+          "https://supabase.com/docs/guides/database/overview.md",
+          "https://supabase.com/docs/guides/graphql.md",
+          "https://supabase.com/docs/guides/graphql.md",
+          "https://supabase.com/docs/guides/getting-started.md",
+          "https://supabase.com/docs/guides/graphql.md"
+        ]
+      },
+      "hybrid": {
+        "rank": 1,
+        "top5": [
+          "https://supabase.com/docs/guides/graphql.md",
+          "https://supabase.com/docs/guides/graphql.md",
+          "https://supabase.com/docs/guides/database/overview.md",
+          "https://supabase.com/docs/guides/graphql.md",
+          "https://supabase.com/docs/guides/graphql.md"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 1,
+        "top5": [
+          "https://supabase.com/docs/guides/graphql.md",
+          "https://supabase.com/docs/guides/graphql.md",
+          "https://supabase.com/docs/guides/graphql.md",
+          "https://supabase.com/docs/guides/database/overview.md",
+          "https://supabase.com/docs/guides/graphql.md"
+        ]
+      }
+    },
+    "topRelevance": 1
+  },
+  {
+    "question": {
+      "id": "supabase-07",
+      "technology": "supabase",
+      "question": "How do I connect my AI coding agent to Supabase over MCP?",
+      "expectedUrls": [
+        "https://supabase.com/docs/guides/ai-tools.md"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://supabase.com/docs/guides/ai-tools.md",
+          "https://supabase.com/docs/guides/ai-tools.md",
+          "https://supabase.com/docs/guides/getting-started.md",
+          "https://supabase.com/docs/guides/ai.md",
+          "https://supabase.com/docs/guides/deployment.md"
+        ]
+      },
+      "keyword": {
+        "rank": 1,
+        "top5": [
+          "https://supabase.com/docs/guides/ai-tools.md",
+          "https://supabase.com/docs/guides/ai-tools.md",
+          "https://supabase.com/docs/guides/local-development.md",
+          "https://supabase.com/docs/guides/getting-started.md",
+          "https://supabase.com/docs/guides/getting-started.md"
+        ]
+      },
+      "hybrid": {
+        "rank": 1,
+        "top5": [
+          "https://supabase.com/docs/guides/ai-tools.md",
+          "https://supabase.com/docs/guides/ai-tools.md",
+          "https://supabase.com/docs/guides/ai.md",
+          "https://supabase.com/docs/guides/local-development.md",
+          "https://supabase.com/docs/guides/graphql.md"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 1,
+        "top5": [
+          "https://supabase.com/docs/guides/ai-tools.md",
+          "https://supabase.com/docs/guides/ai-tools.md",
+          "https://supabase.com/docs/guides/ai.md",
+          "https://supabase.com/docs/guides/local-development.md",
+          "https://supabase.com/docs/guides/graphql.md"
+        ]
+      }
+    },
+    "topRelevance": 0.9
+  },
+  {
+    "question": {
+      "id": "supabase-08",
+      "technology": "supabase",
+      "question": "How do I store embeddings and do vector search in Postgres?",
+      "expectedUrls": [
+        "https://supabase.com/docs/guides/ai.md"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://supabase.com/docs/guides/ai.md",
+          "https://supabase.com/docs/guides/ai.md",
+          "https://supabase.com/docs/guides/storage.md",
+          "https://supabase.com/docs/guides/database/overview.md",
+          "https://supabase.com/docs/guides/getting-started.md"
+        ]
+      },
+      "keyword": {
+        "rank": 1,
+        "top5": [
+          "https://supabase.com/docs/guides/ai.md",
+          "https://supabase.com/docs/guides/getting-started.md",
+          "https://supabase.com/docs/guides/storage.md",
+          "https://supabase.com/docs/guides/resources.md",
+          "https://supabase.com/docs/guides/ai.md"
+        ]
+      },
+      "hybrid": {
+        "rank": 1,
+        "top5": [
+          "https://supabase.com/docs/guides/ai.md",
+          "https://supabase.com/docs/guides/storage.md",
+          "https://supabase.com/docs/guides/ai.md",
+          "https://supabase.com/docs/guides/resources.md",
+          "https://supabase.com/docs/guides/database/overview.md"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 1,
+        "top5": [
+          "https://supabase.com/docs/guides/ai.md",
+          "https://supabase.com/docs/guides/storage.md",
+          "https://supabase.com/docs/guides/ai.md",
+          "https://supabase.com/docs/guides/resources.md",
+          "https://supabase.com/docs/guides/database/overview.md"
+        ]
+      }
+    },
+    "topRelevance": 0.9
+  },
+  {
+    "question": {
+      "id": "supabase-09",
+      "technology": "supabase",
+      "question": "How am I charged for authentication?",
+      "expectedUrls": [
+        "https://supabase.com/docs/guides/auth.md"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://supabase.com/docs/guides/auth.md",
+          "https://supabase.com/docs/guides/auth.md",
+          "https://supabase.com/docs/guides/auth.md",
+          "https://supabase.com/docs/guides/getting-started.md",
+          "https://supabase.com/docs/guides/security.md"
+        ]
+      },
+      "keyword": {
+        "rank": 2,
+        "top5": [
+          "https://supabase.com/docs/guides/graphql.md",
+          "https://supabase.com/docs/guides/auth.md",
+          "https://supabase.com/docs/guides/auth.md",
+          "https://supabase.com/docs/guides/security.md",
+          "https://supabase.com/docs/guides/graphql.md"
+        ]
+      },
+      "hybrid": {
+        "rank": 1,
+        "top5": [
+          "https://supabase.com/docs/guides/auth.md",
+          "https://supabase.com/docs/guides/auth.md",
+          "https://supabase.com/docs/guides/security.md",
+          "https://supabase.com/docs/guides/functions.md",
+          "https://supabase.com/docs/guides/graphql.md"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 1,
+        "top5": [
+          "https://supabase.com/docs/guides/auth.md",
+          "https://supabase.com/docs/guides/auth.md",
+          "https://supabase.com/docs/guides/security.md",
+          "https://supabase.com/docs/guides/functions.md",
+          "https://supabase.com/docs/guides/graphql.md"
+        ]
+      }
+    },
+    "topRelevance": 1
+  },
+  {
+    "question": {
+      "id": "supabase-10",
+      "technology": "supabase",
+      "question": "Can I use my own CI/CD pipeline to deploy changes?",
+      "expectedUrls": [
+        "https://supabase.com/docs/guides/deployment.md"
+      ]
+    },
+    "methods": {
+      "vector": {
+        "rank": 1,
+        "top5": [
+          "https://supabase.com/docs/guides/deployment.md",
+          "https://supabase.com/docs/guides/deployment.md",
+          "https://supabase.com/docs/guides/self-hosting.md",
+          "https://supabase.com/docs/guides/local-development.md",
+          "https://supabase.com/docs/guides/ai-tools.md"
+        ]
+      },
+      "keyword": {
+        "rank": 1,
+        "top5": [
+          "https://supabase.com/docs/guides/deployment.md",
+          "https://supabase.com/docs/guides/deployment.md",
+          "https://supabase.com/docs/guides/database/overview.md",
+          "https://supabase.com/docs/guides/auth.md",
+          "https://supabase.com/docs/guides/ai.md"
+        ]
+      },
+      "hybrid": {
+        "rank": 1,
+        "top5": [
+          "https://supabase.com/docs/guides/deployment.md",
+          "https://supabase.com/docs/guides/deployment.md",
+          "https://supabase.com/docs/guides/local-development.md",
+          "https://supabase.com/docs/guides/self-hosting.md",
+          "https://supabase.com/docs/guides/ai-tools.md"
+        ]
+      },
+      "hybrid+rerank": {
+        "rank": 1,
+        "top5": [
+          "https://supabase.com/docs/guides/deployment.md",
+          "https://supabase.com/docs/guides/deployment.md",
+          "https://supabase.com/docs/guides/local-development.md",
+          "https://supabase.com/docs/guides/self-hosting.md",
+          "https://supabase.com/docs/guides/ai-tools.md"
+        ]
+      }
+    },
+    "topRelevance": 1
+  }
+]

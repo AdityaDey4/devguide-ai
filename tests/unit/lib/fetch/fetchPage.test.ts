@@ -1,6 +1,11 @@
 import dns from "node:dns";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { createFetchPage, FetchError } from "@/lib/fetch/fetchPage";
+import {
+  fetchPage as fetch,
+  FetchError,
+  type FetchDeps,
+  type FetchPageOptions,
+} from "@/lib/fetch/fetchPage";
 import { assertSafeUrl, SsrfBlockedError } from "@/lib/fetch/ssrfGuard";
 import { startServer } from "../../../helpers/localServer";
 
@@ -54,7 +59,7 @@ beforeAll(async () => {
 
 afterAll(() => server.close());
 
-const fetchPage = createFetchPage({
+const deps: FetchDeps = {
   assertSafeUrl: async (raw) => {
     const url = new URL(raw);
     if (url.hostname === "127.0.0.1" && url.port === String(server.port)) {
@@ -64,7 +69,10 @@ const fetchPage = createFetchPage({
   },
   // The real connect-time check would refuse 127.0.0.1, so use Node's normal lookup here.
   lookup: dns.lookup as never,
-});
+};
+
+const fetchPage = (url: string, options?: FetchPageOptions) =>
+  fetch(url, options, deps);
 
 const noRetry = { retries: 0 };
 

@@ -1,5 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
-import { createIngest, technologyFor, type PageOutcome } from "@/lib/ingest";
+import {
+  ingestSite as ingest,
+  technologyFor,
+  type IngestOptions,
+  type PageOutcome,
+} from "@/lib/ingest";
 import type { IngestDeps } from "@/lib/ingest/types";
 import type { StoreInput } from "@/lib/rag/store";
 import type { ServiceClient } from "@/lib/supabase/service";
@@ -43,7 +48,13 @@ function setup(files: Record<string, Reply>, urls: string[]) {
       };
     }),
   };
-  return { ingestSite: createIngest(deps), deps, site, stored };
+  return {
+    ingestSite: (url: string, options?: IngestOptions) =>
+      ingest(url, options, deps),
+    deps,
+    site,
+    stored,
+  };
 }
 
 describe("ingestSite", () => {

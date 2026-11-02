@@ -1,5 +1,8 @@
 import { assertSafeUrl, safeLookup } from "../ssrfGuard";
-import { createFetchPage } from "./createFetchPage";
+import { DEFAULTS } from "./config";
+import { fetchOnce } from "./fetchOnce";
+import { retryDelay, shouldRetry, sleep } from "./retry";
+import type { FetchDeps, FetchedPage, FetchPageOptions } from "./types";
 
 // Fetches one page safely (SRS SEC-5, section 5 error handling):
 //   10 s timeout per attempt, 5 MB cap (after decompression), max 3 redirects,
@@ -13,15 +16,28 @@ import { createFetchPage } from "./createFetchPage";
 //   4. status check    404, 503, ... become a FetchError
 //   5. content type    only text-like pages are accepted
 //   6. readBody        decompress and enforce the size cap
-// createFetchPage.ts adds the retry around all of that.
+// The function below adds one retry around all of that; retry.ts holds the rules.
 
-export { createFetchPage } from "./createFetchPage";
 export { FetchError } from "./errors";
 export type { FetchErrorKind } from "./errors";
 export type { FetchDeps, FetchedPage, FetchPageOptions } from "./types";
 
-/**
- * The guarded fetcher. Always checks every hop and every connection against the SSRF guard.
- * (`createFetchPage(deps)` exists only so tests can use a local server; never use it in the app.)
- */
-export const fetchPage = createFetchPage({ assertSafeUrl, lookup: safeLookup });
+/** The guard used in the app. Tests pass their own as the third argument of fetchPage. */
+const realDeps: FetchDeps = { assertSafeUrl, lookup: safeLookup };
+
+export async function fetchPage(
+  url: string,
+  overrides: FetchPageOptions = {},
+  deps: FetchDeps = realDeps,
+): Promise<FetchedPage> {
+  const options = { ...DEFAULTS, ...overrides };
+
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await fetchOnce(url, options, deps);
+    } catch (error) {
+      if (!shouldRetry(error, attempt, options)) throw error;
+      await sleep(retryDelay(error, attempt), options.signal);
+    }
+  }
+}

@@ -104,7 +104,7 @@ devguide-ai/
 │  ├─ fetch/
 │  │  ├─ ssrfGuard/   index.ts · assertSafeUrl.ts safeLookup.ts blockedAddresses.ts
 │  │  │               blockedHostnames.ts errors.ts
-│  │  ├─ fetchPage/   index.ts · fetchOnce.ts createFetchPage.ts openRequest.ts readBody.ts
+│  │  ├─ fetchPage/   index.ts · fetchOnce.ts retry.ts openRequest.ts readBody.ts
 │  │  │               redirects.ts contentType.ts errors.ts config.ts types.ts
 │  │  ├─ clean/       index.ts (the recipe: the 5 steps in order) · removeJunk.ts pickContent.ts
 │  │  │               codeBlocks.ts markdown.ts normalizeMarkdown.ts plainText.ts title.ts
@@ -135,6 +135,7 @@ Notes:
 - In the repository, `app/`, `lib/` and `components/` live inside `src/` (the `@/` import alias points there).
 - `lib/supabase/database.types.ts` is generated from the database. After a migration, regenerate it with `npm run db:types` (public schema only). Never edit it; friendly names such as `ChunkRow` live in `models.ts`.
 - Tests: `npm test` runs the unit tests (Vitest, offline, also run by CI). `npm run test:integration` needs the local Supabase running and is not part of CI. A test file mirrors the module it covers.
+- Testability convention: a function that needs outside things (database, network, OpenAI) takes them as a last parameter that defaults to the real ones, e.g. `fetchPage(url, options, deps = realDeps)`. App code calls `fetchPage(url)`; tests pass fakes. No function returns another function.
 - Convention for `lib/`: one file, one job. A multi-step module is a folder whose `index.ts` only calls its steps in order, one line per step (see everything under `fetch/`). A file that grows past about 150 lines is split.
 
 ---

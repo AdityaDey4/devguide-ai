@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { createEmbedder, EmbeddingError } from "@/lib/rag/embedder";
+import { embedTexts, EmbeddingError } from "@/lib/rag/embedder";
 import { makeBatches } from "@/lib/rag/embedder/batches";
 import { buildRequestBody } from "@/lib/rag/embedder/client";
 import { readSettings } from "@/lib/rag/embedder/config";
-import type { EmbeddingSettings } from "@/lib/rag/embedder/types";
+import type { EmbedDeps, EmbeddingSettings } from "@/lib/rag/embedder/types";
 import { sleep } from "../../../helpers/localServer";
 
 const settings: EmbeddingSettings = {
@@ -41,10 +41,14 @@ function fakeApi() {
   };
 }
 
+/** embedTexts with fake settings and a fake API. */
+const embedWith = (deps: EmbedDeps) => (texts: string[]) =>
+  embedTexts(texts, {}, deps);
+
 describe("embedTexts", () => {
   it("returns nothing, and calls nothing, for an empty list", async () => {
     const api = fakeApi();
-    const embed = createEmbedder({
+    const embed = embedWith({
       settings: () => settings,
       requestBatch: api.requestBatch,
     });
@@ -54,7 +58,7 @@ describe("embedTexts", () => {
 
   it("sends 250 texts as batches of 100, 100 and 50, and keeps every vector at its text's position", async () => {
     const api = fakeApi();
-    const embed = createEmbedder({
+    const embed = embedWith({
       settings: () => settings,
       requestBatch: api.requestBatch,
     });
@@ -69,7 +73,7 @@ describe("embedTexts", () => {
   });
 
   it("fails when the model returns vectors of the wrong length", async () => {
-    const embed = createEmbedder({
+    const embed = embedWith({
       settings: () => settings,
       requestBatch: async (_s, batch) => ({
         vectors: batch.map(() => [1, 2, 3]),
@@ -83,7 +87,7 @@ describe("embedTexts", () => {
   });
 
   it("fails when the number of vectors does not match the number of texts", async () => {
-    const embed = createEmbedder({
+    const embed = embedWith({
       settings: () => settings,
       requestBatch: async () => ({ vectors: [vector(1)], tokens: 1 }),
     });
@@ -92,7 +96,7 @@ describe("embedTexts", () => {
 
   it("refuses an empty text before anything is sent", async () => {
     const api = fakeApi();
-    const embed = createEmbedder({
+    const embed = embedWith({
       settings: () => settings,
       requestBatch: api.requestBatch,
     });

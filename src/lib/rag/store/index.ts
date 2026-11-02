@@ -26,63 +26,70 @@ export type {
 // Run it again with the same page: { inserted: 0, skipped: 15, tokens: 0 } and no embedding cost.
 // Read this file first: it is the whole recipe. Server only: it uses the service-role key.
 
-export function createStore(deps: StoreDeps) {
-  return async function storeChunks(input: StoreInput): Promise<StoreResult> {
-    const { technologyId, source, chunks } = input;
-    const db = deps.db();
-    const fetchedAt = deps.now();
+const realDeps: StoreDeps = {
+  db: createServiceClient,
+  embed: (texts) => embedTexts(texts),
+  now: () => new Date(),
+};
 
-    // 1. Fingerprint every chunk. The same text twice on one page counts once.
-    const unique = uniqueByHash(chunks);
+export async function storeChunks(
+  input: StoreInput,
+  deps: StoreDeps = realDeps,
+): Promise<StoreResult> {
+  const { technologyId, source, chunks } = input;
+  const db = deps.db();
+  const fetchedAt = deps.now();
 
-    // 2. Which of them are already stored for this technology?
-    const existing = await findExistingHashes(
-      db,
-      technologyId,
-      unique.map((chunk) => chunk.hash),
-    );
-    const fresh = unique.filter((chunk) => !existing.has(chunk.hash));
+  // 1. Fingerprint every chunk. The same text twice on one page counts once.
+  const unique = uniqueByHash(chunks);
 
-    // 3. Embed ONLY the new ones. This is where skipping saves money.
-    const embedded =
-      fresh.length > 0
-        ? await deps.embed(fresh.map((chunk) => chunk.content))
-        : { embeddings: [], tokens: 0 };
+  // 2. Which of them are already stored for this technology?
+  const existing = await findExistingHashes(
+    db,
+    technologyId,
+    unique.map((chunk) => chunk.hash),
+  );
+  const fresh = unique.filter((chunk) => !existing.has(chunk.hash));
 
-    // 4. Record the page (after embedding, so a failed embedding leaves nothing behind).
-    const sourceId = await upsertSource(db, {
-      technologyId,
-      url: source.url,
-      title: source.title,
-      type: source.type,
-      contentHash:
-        source.contentHash ??
-        contentHash(chunks.map((chunk) => chunk.content).join("\n\n")),
-      fetchedAt,
-    });
+  // 3. Embed ONLY the new ones. This is where skipping saves money.
+  const embedded =
+    fresh.length > 0
+      ? await deps.embed(fresh.map((chunk) => chunk.content))
+      : { embeddings: [], tokens: 0 };
 
-    // 5. Save the new chunks, with their vectors and expiry.
-    const rows: TablesInsert<"chunks">[] = fresh.map((chunk, i) => ({
-      technology_id: technologyId,
-      source_id: sourceId,
-      source_type: source.type,
-      content: chunk.content,
-      heading_path: chunk.headingPath,
-      tech_version: input.techVersion ?? null,
-      content_hash: chunk.hash,
-      embedding: JSON.stringify(embedded.embeddings[i]), // pgvector reads "[0.1,0.2,...]"
-      fetched_at: fetchedAt.toISOString(),
-      expires_at: expiresAt(source.type, fetchedAt),
-    }));
-    const inserted = await insertChunks(db, rows);
+  // 4. Record the page (after embedding, so a failed embedding leaves nothing behind).
+  const sourceId = await upsertSource(db, {
+    technologyId,
+    url: source.url,
+    title: source.title,
+    type: source.type,
+    contentHash:
+      source.contentHash ??
+      contentHash(chunks.map((chunk) => chunk.content).join("\n\n")),
+    fetchedAt,
+  });
 
-    return {
-      sourceId,
-      total: chunks.length,
-      inserted,
-      skipped: chunks.length - inserted,
-      tokens: embedded.tokens,
-    };
+  // 5. Save the new chunks, with their vectors and expiry.
+  const rows: TablesInsert<"chunks">[] = fresh.map((chunk, i) => ({
+    technology_id: technologyId,
+    source_id: sourceId,
+    source_type: source.type,
+    content: chunk.content,
+    heading_path: chunk.headingPath,
+    tech_version: input.techVersion ?? null,
+    content_hash: chunk.hash,
+    embedding: JSON.stringify(embedded.embeddings[i]), // pgvector reads "[0.1,0.2,...]"
+    fetched_at: fetchedAt.toISOString(),
+    expires_at: expiresAt(source.type, fetchedAt),
+  }));
+  const inserted = await insertChunks(db, rows);
+
+  return {
+    sourceId,
+    total: chunks.length,
+    inserted,
+    skipped: chunks.length - inserted,
+    tokens: embedded.tokens,
   };
 }
 
@@ -94,10 +101,3 @@ function uniqueByHash(chunks: Chunk[]): (Chunk & { hash: string })[] {
   }
   return Array.from(byHash.values());
 }
-
-/** The real store: real database (service role) and real OpenAI embeddings. */
-export const storeChunks = createStore({
-  db: createServiceClient,
-  embed: (texts) => embedTexts(texts),
-  now: () => new Date(),
-});

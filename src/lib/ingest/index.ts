@@ -24,65 +24,72 @@ export { technologyFor } from "./technology";
 // Run it again: { inserted: 0, skipped: 142, tokens: 0 } (nothing new, nothing to pay for).
 // Read this file first: it is the whole belt. Server only (database key, OpenAI key).
 
-export function createIngest(deps: IngestDeps) {
-  return async function ingestSite(
-    docsUrl: string,
-    options: IngestOptions = {},
-  ): Promise<IngestResult> {
-    const maxPages = options.maxPages ?? DEFAULT_MAX_PAGES;
+const realDeps: IngestDeps = {
+  db: createServiceClient,
+  upsertTechnology,
+  discoverDocs,
+  fetchPage,
+  storeChunks,
+};
 
-    // 1. Who is this about? (only a name and a short id, nothing is written yet)
-    const { name, slug } = technologyFor(docsUrl, options);
+export async function ingestSite(
+  docsUrl: string,
+  options: IngestOptions = {},
+  deps: IngestDeps = realDeps,
+): Promise<IngestResult> {
+  const maxPages = options.maxPages ?? DEFAULT_MAX_PAGES;
 
-    // 2. Which pages does the site have? (llms.txt, then sitemap, then a crawl)
-    const discovery = await deps.discoverDocs(docsUrl, {
-      signal: options.signal,
-    });
-    const pages = discovery.pages.slice(0, maxPages);
-    const summary = {
-      source: discovery.source,
-      found: discovery.pages.length,
-      cutByMaxPages: discovery.pages.length > pages.length,
-      attempts: discovery.attempts,
-    };
-    // Nothing found: leave the database untouched (no empty technology left behind).
-    if (pages.length === 0) {
-      return {
-        technology: { id: null, name, slug },
-        discovery: summary,
-        outcomes: [],
-        totals: sum([]),
-      };
-    }
+  // 1. Who is this about? (only a name and a short id, nothing is written yet)
+  const { name, slug } = technologyFor(docsUrl, options);
 
-    // 3. Make sure the technology exists in the database.
-    const id = await deps.upsertTechnology(deps.db(), {
-      name,
-      slug,
-      docsUrl,
-      officialUrl: new URL(docsUrl).origin,
-    });
-
-    // 4. Read the pages, a few at a time. Each one: fetch, clean, chunk, store.
-    const limit = createLimiter(PAGE_CONCURRENCY);
-    let done = 0;
-    const outcomes: PageOutcome[] = await Promise.all(
-      pages.map((page) =>
-        limit(async () => {
-          const outcome = await ingestPage(page, id, deps, options.signal);
-          options.onPage?.(outcome, { done: ++done, total: pages.length });
-          return outcome;
-        }),
-      ),
-    );
-
-    // 5. Add it all up.
+  // 2. Which pages does the site have? (llms.txt, then sitemap, then a crawl)
+  const discovery = await deps.discoverDocs(docsUrl, {
+    signal: options.signal,
+  });
+  const pages = discovery.pages.slice(0, maxPages);
+  const summary = {
+    source: discovery.source,
+    found: discovery.pages.length,
+    cutByMaxPages: discovery.pages.length > pages.length,
+    attempts: discovery.attempts,
+  };
+  // Nothing found: leave the database untouched (no empty technology left behind).
+  if (pages.length === 0) {
     return {
-      technology: { id, name, slug },
+      technology: { id: null, name, slug },
       discovery: summary,
-      outcomes,
-      totals: sum(outcomes),
+      outcomes: [],
+      totals: sum([]),
     };
+  }
+
+  // 3. Make sure the technology exists in the database.
+  const id = await deps.upsertTechnology(deps.db(), {
+    name,
+    slug,
+    docsUrl,
+    officialUrl: new URL(docsUrl).origin,
+  });
+
+  // 4. Read the pages, a few at a time. Each one: fetch, clean, chunk, store.
+  const limit = createLimiter(PAGE_CONCURRENCY);
+  let done = 0;
+  const outcomes: PageOutcome[] = await Promise.all(
+    pages.map((page) =>
+      limit(async () => {
+        const outcome = await ingestPage(page, id, deps, options.signal);
+        options.onPage?.(outcome, { done: ++done, total: pages.length });
+        return outcome;
+      }),
+    ),
+  );
+
+  // 5. Add it all up.
+  return {
+    technology: { id, name, slug },
+    discovery: summary,
+    outcomes,
+    totals: sum(outcomes),
   };
 }
 
@@ -103,12 +110,3 @@ function sum(outcomes: PageOutcome[]): IngestResult["totals"] {
     tokens: total("tokens"),
   };
 }
-
-/** The real belt: real fetching, real database, real OpenAI embeddings. */
-export const ingestSite = createIngest({
-  db: createServiceClient,
-  upsertTechnology,
-  discoverDocs,
-  fetchPage,
-  storeChunks,
-});

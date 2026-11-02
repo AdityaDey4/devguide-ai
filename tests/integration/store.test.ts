@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import type { Chunk } from "@/lib/rag/chunker";
-import { createStore, upsertTechnology } from "@/lib/rag/store";
+import type { StoreInput } from "@/lib/rag/store";
+import { storeChunks as store, upsertTechnology } from "@/lib/rag/store";
 import { createServiceClient } from "@/lib/supabase/service";
 
 // Runs against the real local database (npx supabase start). The embedder is a fake that
@@ -15,11 +16,12 @@ const embed = vi.fn(async (texts: string[]) => ({
   embeddings: texts.map(() => Array.from({ length: 1536 }, () => 0.01)),
   tokens: texts.length * 7,
 }));
-const storeChunks = createStore({
+const deps = {
   db: () => db,
   embed,
   now: () => new Date("2026-01-01T00:00:00Z"),
-});
+};
+const storeChunks = (input: StoreInput) => store(input, deps);
 
 const chunk = (content: string): Chunk => ({
   content,

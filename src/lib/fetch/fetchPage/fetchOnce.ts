@@ -7,7 +7,7 @@ import { redirectTarget } from "./redirects";
 import type { FetchDeps, FetchedPage, ResolvedOptions } from "./types";
 
 // ONE attempt at fetching a page, following redirects. This is the main flow.
-// The retry around it lives in createFetchPage.ts.
+// The retry around it lives in index.ts (rules in retry.ts).
 
 export async function fetchOnce(
   requestedUrl: string,

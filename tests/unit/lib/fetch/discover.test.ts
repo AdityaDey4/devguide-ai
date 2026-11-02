@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { createDiscoverDocs } from "@/lib/fetch/discover";
+import { discoverDocs as discover } from "@/lib/fetch/discover";
+import type { DiscoverOptions } from "@/lib/fetch/discover";
 import { fakeSite, htmlPage } from "../../../helpers/fakeSite";
 
 const ROOT = "https://docs.example.com";
@@ -8,7 +9,8 @@ function discoverWith(files: Parameters<typeof fakeSite>[0]) {
   const site = fakeSite(files);
   return {
     site,
-    discoverDocs: createDiscoverDocs({ fetchPage: site.fetchPage }),
+    discoverDocs: (url: string, options?: DiscoverOptions) =>
+      discover(url, options, { fetchPage: site.fetchPage }),
   };
 }
 

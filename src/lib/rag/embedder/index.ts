@@ -16,42 +16,46 @@ export type { EmbedOptions, EmbedResult } from "./types";
 //
 // Read this file first: it is the whole recipe. Node only: do not import it from client code.
 
-export function createEmbedder(deps: EmbedDeps) {
-  return async function embedTexts(
-    texts: string[],
-    options: EmbedOptions = {},
-  ): Promise<EmbedResult> {
-    if (texts.length === 0) return { embeddings: [], tokens: 0 };
+const realDeps: EmbedDeps = {
+  settings: readSettings,
+  requestBatch,
+};
 
-    const settings = deps.settings(); //          1. which model, which key (fails early if missing)
-    const batches = makeBatches(texts); //        2. groups of up to 100 texts (refuses bad texts)
+export async function embedTexts(
+  texts: string[],
+  options: EmbedOptions = {},
+  deps: EmbedDeps = realDeps,
+): Promise<EmbedResult> {
+  if (texts.length === 0) return { embeddings: [], tokens: 0 };
 
-    const limit = createLimiter(CONCURRENCY);
-    const embeddings: number[][] = new Array(texts.length);
-    let tokens = 0;
+  const settings = deps.settings(); //          1. which model, which key (fails early if missing)
+  const batches = makeBatches(texts); //        2. groups of up to 100 texts (refuses bad texts)
 
-    await Promise.all(
-      batches.map((batch) =>
-        limit(async () => {
-          // 3. send the batch (3 requests at a time)
-          const result = await deps.requestBatch(
-            settings,
-            batch.texts,
-            options.signal,
-          );
-          // 4. make sure the vectors are what the database expects
-          checkVectors(result.vectors, batch.texts.length, settings.dimensions);
-          // 5. put each vector back at the position of its text
-          result.vectors.forEach(
-            (vector, i) => (embeddings[batch.start + i] = vector),
-          );
-          tokens += result.tokens;
-        }),
-      ),
-    );
+  const limit = createLimiter(CONCURRENCY);
+  const embeddings: number[][] = new Array(texts.length);
+  let tokens = 0;
 
-    return { embeddings, tokens };
-  };
+  await Promise.all(
+    batches.map((batch) =>
+      limit(async () => {
+        // 3. send the batch (3 requests at a time)
+        const result = await deps.requestBatch(
+          settings,
+          batch.texts,
+          options.signal,
+        );
+        // 4. make sure the vectors are what the database expects
+        checkVectors(result.vectors, batch.texts.length, settings.dimensions);
+        // 5. put each vector back at the position of its text
+        result.vectors.forEach(
+          (vector, i) => (embeddings[batch.start + i] = vector),
+        );
+        tokens += result.tokens;
+      }),
+    ),
+  );
+
+  return { embeddings, tokens };
 }
 
 function checkVectors(
@@ -73,9 +77,3 @@ function checkVectors(
     );
   }
 }
-
-/** The real embedder: calls OpenAI with the key and model from the environment. */
-export const embedTexts = createEmbedder({
-  settings: readSettings,
-  requestBatch,
-});

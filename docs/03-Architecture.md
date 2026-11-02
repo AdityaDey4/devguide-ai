@@ -93,17 +93,50 @@ devguide-ai/
 │  │  ├─ chat/      graph.ts state.ts nodes/*.ts prompts.ts
 │  │  ├─ edit/      graph.ts ...
 │  │  └─ shared/    llm.ts budget.ts events.ts
-│  ├─ rag/  chunker.ts embedder.ts retriever.ts reranker.ts store.ts
-│  ├─ fetch/  discover.ts fetchPage.ts clean.ts ssrfGuard.ts
+│  ├─ rag/
+│  │  ├─ chunker/     index.ts (the recipe: the 4 steps) · parseBlocks.ts buildUnits.ts splitLarge.ts
+│  │  │               pack.ts text.ts headingPath.ts tokens.ts config.ts types.ts
+│  │  ├─ embedder/    index.ts (the recipe: the 5 steps) · batches.ts client.ts config.ts
+│  │  │               errors.ts types.ts
+│  │  ├─ store/       index.ts (the recipe: the 5 steps) · chunks.ts sources.ts technologies.ts
+│  │  │               hash.ts expiry.ts config.ts errors.ts types.ts
+│  │  └─ retriever.ts  reranker.ts
+│  ├─ fetch/
+│  │  ├─ ssrfGuard/   index.ts · assertSafeUrl.ts safeLookup.ts blockedAddresses.ts
+│  │  │               blockedHostnames.ts errors.ts
+│  │  ├─ fetchPage/   index.ts · fetchOnce.ts retry.ts openRequest.ts readBody.ts
+│  │  │               redirects.ts contentType.ts errors.ts config.ts types.ts
+│  │  ├─ clean/       index.ts (the recipe: the 5 steps in order) · removeJunk.ts pickContent.ts
+│  │  │               codeBlocks.ts markdown.ts normalizeMarkdown.ts plainText.ts title.ts
+│  │  │               shared.ts types.ts
+│  │  └─ discover/    index.ts (llms.txt, then sitemap, then crawl) · fromLlmsTxt.ts
+│  │                  fromSitemap.ts fromCrawl.ts readLinks.ts scope.ts config.ts shared.ts types.ts
+│  ├─ ingest/     index.ts (the belt: discover, then fetch, clean, chunk, store for each page)
+│  │              ingestPage.ts technology.ts config.ts types.ts
+│  ├─ limiter.ts      (runs at most N async jobs at the same time; used by the crawl, the embedder and ingest)
 │  ├─ mcp/  client.ts (Context7)  server.ts (v1.1)
-│  ├─ db/   supabase.ts queries/*.ts types.ts
+│  ├─ supabase/   client.ts server.ts proxy.ts (sign-in clients) · service.ts (service-role client,
+│  │              server only) · database.types.ts (generated) · models.ts (short row names)
 │  ├─ pdf/  render.ts
 │  └─ limits/ ratelimit.ts
 ├─ components/  guide/ chat/ progress/ editor/ ui/
 ├─ supabase/migrations/*.sql
+├─ scripts/  ingest.ts  (npm run ingest -- <docsUrl>)
+├─ tests/
+│  ├─ unit/lib/  one *.test.ts per module, mirroring src/lib (offline: fake site, local server, mocked DNS)
+│  ├─ integration/  store.test.ts (real local database; npm run test:integration)
+│  └─ helpers/  localServer.ts fakeSite.ts markdown.ts
 ├─ evals/  retrieval.jsonl  run-evals.ts
 └─ .env.example
 ```
+
+Notes:
+
+- In the repository, `app/`, `lib/` and `components/` live inside `src/` (the `@/` import alias points there).
+- `lib/supabase/database.types.ts` is generated from the database. After a migration, regenerate it with `npm run db:types` (public schema only). Never edit it; friendly names such as `ChunkRow` live in `models.ts`.
+- Tests: `npm test` runs the unit tests (Vitest, offline, also run by CI). `npm run test:integration` needs the local Supabase running and is not part of CI. A test file mirrors the module it covers.
+- Testability convention: a function that needs outside things (database, network, OpenAI) takes them as a last parameter that defaults to the real ones, e.g. `fetchPage(url, options, deps = realDeps)`. App code calls `fetchPage(url)`; tests pass fakes. No function returns another function.
+- Convention for `lib/`: one file, one job. A multi-step module is a folder whose `index.ts` only calls its steps in order, one line per step (see everything under `fetch/`). A file that grows past about 150 lines is split.
 
 ---
 
@@ -379,7 +412,7 @@ const GradeSchema = z.object({
 ## 6. RAG pipeline details
 
 **Ingestion (used by generation, chat background storage, refresh)**
-1. Fetch (SSRF guard, 10 s timeout, 2 MB cap, 1 retry).
+1. Fetch (SSRF guard, 10 s timeout, 5 MB cap, 1 retry).
 2. Clean: Readability → Turndown to Markdown; strip nav/footers.
 3. Chunk: split by headings; 500–800 tokens; ~15% overlap; code blocks kept whole; store `heading_path`.
 4. Hash each chunk (SHA-256 of normalised text); skip if hash exists for the technology.
@@ -489,7 +522,7 @@ SENTRY_DSN=
 
 - Server-only secrets; service-role key never imported in client components.
 - RLS on user tables; shared tables written only by server code.
-- SSRF guard in fetcher: block private, loopback, link-local and metadata IPs (resolve DNS first), https/http only, max 3 redirects, 2 MB, 10 s.
+- SSRF guard in fetcher: block private, loopback, link-local and metadata IPs (resolve DNS first), https/http only, max 3 redirects, 5 MB, 10 s.
 - Prompt-injection posture: reference material delimited and labelled as data; agents only have read/fetch/store tools; output is Markdown text.
 - Markdown sanitised on render (`rehype-sanitize`).
 - Rate limits (Upstash) on every API route; per-run budgets in graphs.

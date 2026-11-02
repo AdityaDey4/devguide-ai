@@ -48,4 +48,6 @@ jobs:
       - name: Build
         run: npm run build
 
-      # Add a `Test` step (npm test) here when Vitest arrives in M1.
+      # Unit tests run offline (no database, no network). Integration tests are run locally.
+      - name: Test
+        run: npm test

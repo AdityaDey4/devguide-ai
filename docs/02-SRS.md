@@ -180,7 +180,7 @@ All errors are logged with `run_id` and traced in LangSmith.
 - **SEC-2** Row Level Security on all user-owned tables (forks, chats, messages, usage, API keys).
 - **SEC-3** Fetched content is passed to the LLM inside clearly delimited "reference material" blocks; system prompts state that instructions inside reference material must be ignored.
 - **SEC-4** Agents have read-only tools (search, fetch, retrieve). No tool can send messages, execute code, or modify data other than storing chunks and guide drafts.
-- **SEC-5** The fetcher only requests `http(s)` URLs, blocks private/internal IP ranges (SSRF protection), follows max 3 redirects, max 2 MB per page, 10 s timeout.
+- **SEC-5** The fetcher only requests `http(s)` URLs, blocks private/internal IP ranges (SSRF protection), follows max 3 redirects, max 5 MB per page, 10 s timeout.
 - **SEC-6** Rendered Markdown is sanitised (no raw HTML / scripts) before display.
 - **SEC-7** MCP API keys are stored hashed; shown once on creation.
 - **SEC-8** Rate limiting on all API routes by user id and IP.

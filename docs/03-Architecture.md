@@ -111,7 +111,9 @@ devguide-ai/
 │  │  │               shared.ts types.ts
 │  │  └─ discover/    index.ts (llms.txt, then sitemap, then crawl) · fromLlmsTxt.ts
 │  │                  fromSitemap.ts fromCrawl.ts readLinks.ts scope.ts config.ts shared.ts types.ts
-│  ├─ limiter.ts      (runs at most N async jobs at the same time; used by the crawl and the embedder)
+│  ├─ ingest/     index.ts (the belt: discover, then fetch, clean, chunk, store for each page)
+│  │              ingestPage.ts technology.ts config.ts types.ts
+│  ├─ limiter.ts      (runs at most N async jobs at the same time; used by the crawl, the embedder and ingest)
 │  ├─ mcp/  client.ts (Context7)  server.ts (v1.1)
 │  ├─ supabase/   client.ts server.ts proxy.ts (sign-in clients) · service.ts (service-role client,
 │  │              server only) · database.types.ts (generated)
@@ -119,6 +121,11 @@ devguide-ai/
 │  └─ limits/ ratelimit.ts
 ├─ components/  guide/ chat/ progress/ editor/ ui/
 ├─ supabase/migrations/*.sql
+├─ scripts/  ingest.ts  (npm run ingest -- <docsUrl>)
+├─ tests/
+│  ├─ unit/lib/  one *.test.ts per module, mirroring src/lib (offline: fake site, local server, mocked DNS)
+│  ├─ integration/  store.test.ts (real local database; npm run test:integration)
+│  └─ helpers/  localServer.ts fakeSite.ts markdown.ts
 ├─ evals/  retrieval.jsonl  run-evals.ts
 └─ .env.example
 ```
@@ -127,6 +134,7 @@ Notes:
 
 - In the repository, `app/`, `lib/` and `components/` live inside `src/` (the `@/` import alias points there).
 - `lib/supabase/database.types.ts` is generated from the database. After a migration, regenerate it with `npx supabase gen types typescript --local > src/lib/supabase/database.types.ts`.
+- Tests: `npm test` runs the unit tests (Vitest, offline, also run by CI). `npm run test:integration` needs the local Supabase running and is not part of CI. A test file mirrors the module it covers.
 - Convention for `lib/`: one file, one job. A multi-step module is a folder whose `index.ts` only calls its steps in order, one line per step (see everything under `fetch/`). A file that grows past about 150 lines is split.
 
 ---

@@ -3,7 +3,7 @@
 /** Used when the caller does not pass an option. */
 export const DEFAULTS = {
   timeoutMs: 10_000,
-  maxBytes: 2 * 1024 * 1024, // 2 MB, counted after decompression
+  maxBytes: 5 * 1024 * 1024, // 5 MB, counted after decompression
   maxRedirects: 3,
   retries: 1,
 } as const;

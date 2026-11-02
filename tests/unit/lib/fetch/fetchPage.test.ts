@@ -31,7 +31,7 @@ beforeAll(async () => {
       case "/image":
         return reply(200, "image/png", "not really a picture");
       case "/big":
-        return reply(200, "text/plain", "x".repeat(3_000_000));
+        return reply(200, "text/plain", "x".repeat(6_000_000));
       case "/missing":
         return reply(404, "text/plain", "nope");
       case "/slow":

@@ -3,7 +3,7 @@ import type { safeLookup } from "../ssrfGuard";
 export type FetchPageOptions = {
   /** Per attempt, covering all redirect hops. Default 10 s. */
   timeoutMs?: number;
-  /** Decompressed body limit. Default 2 MB. */
+  /** Decompressed body limit. Default 5 MB. */
   maxBytes?: number;
   /** Default 3. */
   maxRedirects?: number;

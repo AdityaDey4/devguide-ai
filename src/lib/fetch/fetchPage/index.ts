@@ -2,7 +2,7 @@ import { assertSafeUrl, safeLookup } from "../ssrfGuard";
 import { createFetchPage } from "./createFetchPage";
 
 // Fetches one page safely (SRS SEC-5, section 5 error handling):
-//   10 s timeout per attempt, 2 MB cap (after decompression), max 3 redirects,
+//   10 s timeout per attempt, 5 MB cap (after decompression), max 3 redirects,
 //   1 retry with backoff for transient failures. Numbers live in config.ts.
 // Node only: do not import this from client code.
 //

@@ -14,7 +14,7 @@
     "test:watch": "vitest",
     "test:integration": "vitest run --config vitest.integration.config.ts",
     "ingest": "tsx --env-file=.env.local scripts/ingest.ts",
-    "db:types": "supabase gen types typescript --local > src/lib/supabase/database.types.ts"
+    "db:types": "npx supabase gen types typescript --local --schema public > src/lib/supabase/database.types.ts.tmp && node -e \"require('fs').renameSync('src/lib/supabase/database.types.ts.tmp','src/lib/supabase/database.types.ts')\" && prettier --write src/lib/supabase/database.types.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",

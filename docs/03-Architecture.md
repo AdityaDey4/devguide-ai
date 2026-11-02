@@ -100,7 +100,10 @@ devguide-ai/
 │  │  │               errors.ts types.ts
 │  │  ├─ store/       index.ts (the recipe: the 5 steps) · chunks.ts sources.ts technologies.ts
 │  │  │               hash.ts expiry.ts config.ts errors.ts types.ts
-│  │  └─ retriever.ts  reranker.ts
+│  │  ├─ retriever/   index.ts (the recipe: the 4 steps) · variants.ts search.ts merge.ts
+│  │  │               config.ts errors.ts types.ts
+│  │  └─ reranker/    index.ts (the recipe: the 5 steps) · prompt.ts client.ts parse.ts
+│  │                  config.ts errors.ts types.ts
 │  ├─ fetch/
 │  │  ├─ ssrfGuard/   index.ts · assertSafeUrl.ts safeLookup.ts blockedAddresses.ts
 │  │  │               blockedHostnames.ts errors.ts
@@ -252,46 +255,19 @@ Row Level Security: enabled on `guides` (forks), `guide_versions`, `chats`, `mes
 
 ### Hybrid search function (vector + keyword, merged with RRF)
 
-```sql
-create or replace function hybrid_search(
-  query_text text,
-  query_embedding vector(1536),
-  tech_id uuid,
-  p_guide_id uuid default null,
-  match_count int default 20,
-  rrf_k int default 60
-) returns table (id uuid, content text, heading_path text, source_type text, source_id uuid, score float)
-language sql stable as $$
-  with eligible as (
-    select * from chunks
-    where technology_id = tech_id
-      and (expires_at is null or expires_at > now())
-      and (source_type <> 'guide' or guide_id = p_guide_id)
-  ),
-  semantic as (
-    select id, row_number() over (order by embedding <=> query_embedding) as rank
-    from eligible
-    order by embedding <=> query_embedding
-    limit match_count
-  ),
-  keyword as (
-    select id, row_number() over (order by ts_rank_cd(fts, websearch_to_tsquery('english', query_text)) desc) as rank
-    from eligible
-    where fts @@ websearch_to_tsquery('english', query_text)
-    order by ts_rank_cd(fts, websearch_to_tsquery('english', query_text)) desc
-    limit match_count
-  )
-  select c.id, c.content, c.heading_path, c.source_type, c.source_id,
-         coalesce(1.0 / (rrf_k + s.rank), 0) + coalesce(1.0 / (rrf_k + k.rank), 0) as score
-  from semantic s
-  full outer join keyword k on s.id = k.id
-  join chunks c on c.id = coalesce(s.id, k.id)
-  order by score desc
-  limit match_count;
-$$;
+The function lives in `supabase/migrations/*_hybrid_search.sql` (read it there; it is the source of truth). In short:
+
+```
+hybrid_search(query_text, query_embedding, tech_id, p_guide_id = null, match_count = 20, rrf_k = 60)
+  semantic list : the 20 closest chunks by meaning (HNSW index)
+  keyword list  : the 20 best chunks by words (GIN index), words joined with OR
+  score         : 1/(60 + rank in semantic) + 1/(60 + rank in keyword), best 20 returned
+  returns       : id, content, heading_path, source_type, source_id, source_url, source_title, score
 ```
 
-Note: filtering by `technology_id` with an HNSW index can reduce recall when one technology is a small share of all chunks. Enable pgvector iterative index scans (`set hnsw.iterative_scan = relaxed_order`, pgvector ≥ 0.8) or partition by technology if this becomes an issue.
+- Only chunks of `tech_id` that have not expired are searched; `guide` chunks only when they belong to `p_guide_id`.
+- Words are turned into an OR query (`validat | email | address`), so a long natural-language question still matches. Stop-word-only questions fall back to meaning alone.
+- The technology filter is written directly on `chunks` (not in a shared CTE) so Postgres can use the HNSW index, and `hnsw.iterative_scan = relaxed_order` is set inside the function so a small technology still gets a full 20 results (pgvector 0.8).
 
 ---
 

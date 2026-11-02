@@ -151,6 +151,26 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      hybrid_search: {
+        Args: {
+          match_count?: number;
+          p_guide_id?: string;
+          query_embedding: string;
+          query_text: string;
+          rrf_k?: number;
+          tech_id: string;
+        };
+        Returns: {
+          content: string;
+          heading_path: string;
+          id: string;
+          score: number;
+          source_id: string;
+          source_title: string;
+          source_type: string;
+          source_url: string;
+        }[];
+      };
       show_limit: { Args: Record<PropertyKey, never>; Returns: number };
       show_trgm: { Args: { "": string }; Returns: string[] };
     };

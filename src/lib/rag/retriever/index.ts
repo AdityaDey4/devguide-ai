@@ -7,7 +7,7 @@ import type { Candidate, RetrieveDeps, RetrieveInput } from "./types";
 import { cleanVariants } from "./variants";
 
 export { RetrieveError } from "./errors";
-export type { Candidate, RetrieveInput } from "./types";
+export type { Candidate, RetrieveInput, SearchMode } from "./types";
 
 // Finds the chunks that may answer a question (SRS FR-CHAT-3).
 //
@@ -42,6 +42,7 @@ export async function retrieve(
       vector: embeddings[i],
       technologyId: input.technologyId,
       guideId: input.guideId,
+      mode: input.mode,
     }),
   );
   const lists = await Promise.all(searches);

@@ -106,4 +106,50 @@ describe("hybrid_search (real database)", () => {
     });
     expect(data).toHaveLength(2);
   });
+
+  describe("search_mode (used by the evals)", () => {
+    const searchIn = async (mode: string, count = 20) => {
+      const { data, error } = await db.rpc("hybrid_search", {
+        query_text: "validate email",
+        query_embedding: axis(0),
+        tech_id: ids[slugs[0]],
+        search_mode: mode,
+        match_count: count,
+      });
+      if (error) throw error;
+      return data.map((r) => r.content);
+    };
+
+    it("'vector' returns only chunks found by meaning", async () => {
+      const contents = await searchIn("vector", 2); // the 2 closest in meaning
+      expect(contents).toContain(
+        "something unrelated about addresses of memory",
+      );
+      expect(contents).not.toContain("email checking helper");
+    });
+
+    it("'keyword' returns only chunks found by words", async () => {
+      const contents = await searchIn("keyword");
+      expect(contents).toContain("email checking helper");
+      expect(contents).not.toContain(
+        "something unrelated about addresses of memory",
+      );
+    });
+
+    it("'hybrid' is the same as leaving it out", async () => {
+      expect(await searchIn("hybrid")).toEqual(
+        (await search("validate email", 0)).map((r) => r.content),
+      );
+    });
+
+    it("rejects an unknown mode", async () => {
+      const { error } = await db.rpc("hybrid_search", {
+        query_text: "x",
+        query_embedding: axis(0),
+        tech_id: ids[slugs[0]],
+        search_mode: "fuzzy",
+      });
+      expect(error?.message).toMatch(/search_mode must be/);
+    });
+  });
 });

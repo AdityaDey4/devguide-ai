@@ -1,0 +1,42 @@
+{"id":"zod-01","technology":"zod","question":"How do I get the TypeScript type from a Zod schema?","expectedUrls":["https://zod.dev/basics"]}
+{"id":"zod-02","technology":"zod","question":"What is the difference between parse and safeParse?","expectedUrls":["https://zod.dev/basics"]}
+{"id":"zod-03","technology":"zod","question":"How do I validate a discriminated union?","expectedUrls":["https://zod.dev/api"]}
+{"id":"zod-04","technology":"zod","question":"How do I make a field optional or give it a default value?","expectedUrls":["https://zod.dev/api"]}
+{"id":"zod-05","technology":"zod","question":"Is z.nativeEnum still supported?","expectedUrls":["https://zod.dev/api","https://zod.dev/v4/changelog"]}
+{"id":"zod-06","technology":"zod","question":"How can I convert a Zod schema to JSON Schema?","expectedUrls":["https://zod.dev/json-schema"]}
+{"id":"zod-07","technology":"zod","question":"How do I turn a schema into something an OpenAPI or LLM tool can read, and keep descriptions on it?","expectedUrls":["https://zod.dev/json-schema","https://zod.dev/metadata"]}
+{"id":"zod-08","technology":"zod","question":"How do I attach custom metadata like a title or description to a schema?","expectedUrls":["https://zod.dev/metadata"]}
+{"id":"zod-09","technology":"zod","question":"How do I customize the error message for a failed validation?","expectedUrls":["https://zod.dev/error-customization"]}
+{"id":"zod-10","technology":"zod","question":"Which error message wins when I set one on the schema and another one globally?","expectedUrls":["https://zod.dev/error-customization"]}
+{"id":"zod-11","technology":"zod","question":"How do I print a Zod error in a human-readable way?","expectedUrls":["https://zod.dev/error-formatting"]}
+{"id":"zod-12","technology":"zod","question":"What are codecs and how do I encode a value back to its original form?","expectedUrls":["https://zod.dev/codecs"]}
+{"id":"zod-13","technology":"zod","question":"What changed in Zod 4 and what breaks when I upgrade from Zod 3?","expectedUrls":["https://zod.dev/v4/changelog","https://zod.dev/v4"]}
+{"id":"zod-14","technology":"zod","question":"When should I use Zod Mini instead of regular Zod?","expectedUrls":["https://zod.dev/packages/mini"]}
+{"id":"zod-15","technology":"zod","question":"How do I speed up validation by compiling a schema ahead of time?","expectedUrls":["https://zod.dev/compile"]}
+{"id":"zod-16","technology":"zod","question":"Which subpath should a library import from so it works with both Zod 3 and Zod 4?","expectedUrls":["https://zod.dev/library-authors","https://zod.dev/v4/versioning"]}
+{"id":"langgraph-01","technology":"langgraph","question":"What is a checkpointer and what does it save?","expectedUrls":["https://docs.langchain.com/oss/python/langgraph/checkpointers","https://docs.langchain.com/oss/python/langgraph/persistence"]}
+{"id":"langgraph-02","technology":"langgraph","question":"How do I pause a graph and wait for a human to approve something?","expectedUrls":["https://docs.langchain.com/oss/python/langgraph/interrupts"]}
+{"id":"langgraph-03","technology":"langgraph","question":"How do I resume a graph after an interrupt with Command(resume=...)?","expectedUrls":["https://docs.langchain.com/oss/python/langgraph/interrupts"]}
+{"id":"langgraph-04","technology":"langgraph","question":"What stream modes are available when streaming a graph?","expectedUrls":["https://docs.langchain.com/oss/python/langgraph/streaming"]}
+{"id":"langgraph-05","technology":"langgraph","question":"How do I stream LLM tokens as they are generated?","expectedUrls":["https://docs.langchain.com/oss/python/langgraph/streaming","https://docs.langchain.com/oss/python/langgraph/event-streaming"]}
+{"id":"langgraph-06","technology":"langgraph","question":"How do I define the state of a graph and combine updates with a reducer?","expectedUrls":["https://docs.langchain.com/oss/python/langgraph/graph-api"]}
+{"id":"langgraph-07","technology":"langgraph","question":"What is the recursion limit and how do I change it?","expectedUrls":["https://docs.langchain.com/oss/python/langgraph/graph-api"]}
+{"id":"langgraph-08","technology":"langgraph","question":"How do I use entrypoint and task from the functional API?","expectedUrls":["https://docs.langchain.com/oss/python/langgraph/functional-api","https://docs.langchain.com/oss/python/langgraph/use-functional-api"]}
+{"id":"langgraph-09","technology":"langgraph","question":"Should I pick the Graph API or the Functional API?","expectedUrls":["https://docs.langchain.com/oss/python/langgraph/choosing-apis"]}
+{"id":"langgraph-10","technology":"langgraph","question":"How do I retry a node that fails or set a timeout on it?","expectedUrls":["https://docs.langchain.com/oss/python/langgraph/fault-tolerance"]}
+{"id":"langgraph-11","technology":"langgraph","question":"How can I replay a past run or fork from an earlier checkpoint?","expectedUrls":["https://docs.langchain.com/oss/python/langgraph/use-time-travel"]}
+{"id":"langgraph-12","technology":"langgraph","question":"How do I use a graph as a node inside another graph?","expectedUrls":["https://docs.langchain.com/oss/python/langgraph/use-subgraphs"]}
+{"id":"langgraph-13","technology":"langgraph","question":"How do I give an agent long-term memory that is shared across threads?","expectedUrls":["https://docs.langchain.com/oss/python/langgraph/stores"]}
+{"id":"langgraph-14","technology":"langgraph","question":"How do I build an agent that grades retrieved documents and rewrites the question?","expectedUrls":["https://docs.langchain.com/oss/python/langgraph/agentic-rag"]}
+{"id":"langgraph-15","technology":"langgraph","question":"What does the langgraph dev command do?","expectedUrls":["https://docs.langchain.com/oss/python/langgraph/local-server"]}
+{"id":"langgraph-16","technology":"langgraph","question":"How do I fan out work to several workers with the Send API?","expectedUrls":["https://docs.langchain.com/oss/python/langgraph/workflows-agents"]}
+{"id":"supabase-01","technology":"supabase","question":"How do I run Supabase locally with the CLI?","expectedUrls":["https://supabase.com/docs/guides/local-development.md"]}
+{"id":"supabase-02","technology":"supabase","question":"How can I run Supabase on my own server?","expectedUrls":["https://supabase.com/docs/guides/self-hosting.md"]}
+{"id":"supabase-03","technology":"supabase","question":"How do I schedule a recurring job inside Postgres?","expectedUrls":["https://supabase.com/docs/guides/cron.md"]}
+{"id":"supabase-04","technology":"supabase","question":"How do I run server-side TypeScript functions at the edge?","expectedUrls":["https://supabase.com/docs/guides/functions.md"]}
+{"id":"supabase-05","technology":"supabase","question":"How does Supabase handle message queues with guaranteed delivery?","expectedUrls":["https://supabase.com/docs/guides/queues.md"]}
+{"id":"supabase-06","technology":"supabase","question":"Can I query my database with GraphQL?","expectedUrls":["https://supabase.com/docs/guides/graphql.md"]}
+{"id":"supabase-07","technology":"supabase","question":"How do I connect my AI coding agent to Supabase over MCP?","expectedUrls":["https://supabase.com/docs/guides/ai-tools.md"]}
+{"id":"supabase-08","technology":"supabase","question":"How do I store embeddings and do vector search in Postgres?","expectedUrls":["https://supabase.com/docs/guides/ai.md"]}
+{"id":"supabase-09","technology":"supabase","question":"How am I charged for authentication?","expectedUrls":["https://supabase.com/docs/guides/auth.md"]}
+{"id":"supabase-10","technology":"supabase","question":"Can I use my own CI/CD pipeline to deploy changes?","expectedUrls":["https://supabase.com/docs/guides/deployment.md"]}

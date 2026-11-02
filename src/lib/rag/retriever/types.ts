@@ -10,7 +10,12 @@ export type RetrieveInput = {
   queries: string[];
   /** Include this guide's own chunks too (other guides' chunks are never returned). */
   guideId?: string;
+  /** Only the evals set this, to measure each half of the search alone. Default: "hybrid". */
+  mode?: SearchMode;
 };
+
+/** Which half of the search to use: both merged, meaning only, or words only. */
+export type SearchMode = "hybrid" | "vector" | "keyword";
 
 /** One chunk that may help answer the question. */
 export type Candidate = {

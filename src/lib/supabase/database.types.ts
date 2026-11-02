@@ -158,6 +158,7 @@ export type Database = {
           query_embedding: string;
           query_text: string;
           rrf_k?: number;
+          search_mode?: string;
           tech_id: string;
         };
         Returns: {

@@ -58,6 +58,13 @@ export type Database = {
         };
         Relationships: [
           {
+            foreignKeyName: "chunks_guide_fk";
+            columns: ["guide_id"];
+            isOneToOne: false;
+            referencedRelation: "guides";
+            referencedColumns: ["id"];
+          },
+          {
             foreignKeyName: "chunks_source_id_fkey";
             columns: ["source_id"];
             isOneToOne: false;
@@ -66,6 +73,182 @@ export type Database = {
           },
           {
             foreignKeyName: "chunks_technology_id_fkey";
+            columns: ["technology_id"];
+            isOneToOne: false;
+            referencedRelation: "technologies";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      guide_versions: {
+        Row: {
+          author_id: string | null;
+          author_type: string;
+          change_note: string | null;
+          created_at: string;
+          guide_id: string;
+          id: string;
+          sections: NonNullable<Json>;
+          version_no: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          author_id?: string | null;
+          author_type: string;
+          change_note?: string | null;
+          created_at?: string;
+          guide_id: string;
+          id?: string;
+          sections: NonNullable<Json>;
+          version_no: number;
+        };
+        Update: {
+          author_id?: string | null;
+          author_type?: string;
+          change_note?: string | null;
+          created_at?: string;
+          guide_id?: string;
+          id?: string;
+          sections?: NonNullable<Json>;
+          version_no?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "guide_versions_guide_id_fkey";
+            columns: ["guide_id"];
+            isOneToOne: false;
+            referencedRelation: "guides";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      guides: {
+        Row: {
+          created_at: string;
+          current_version_id: string | null;
+          forked_from: string | null;
+          id: string;
+          last_refreshed_at: string | null;
+          owner_id: string | null;
+          status: string;
+          technology_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          current_version_id?: string | null;
+          forked_from?: string | null;
+          id?: string;
+          last_refreshed_at?: string | null;
+          owner_id?: string | null;
+          status?: string;
+          technology_id: string;
+        };
+        Update: {
+          created_at?: string;
+          current_version_id?: string | null;
+          forked_from?: string | null;
+          id?: string;
+          last_refreshed_at?: string | null;
+          owner_id?: string | null;
+          status?: string;
+          technology_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "guides_current_version_fk";
+            columns: ["current_version_id"];
+            isOneToOne: false;
+            referencedRelation: "guide_versions";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "guides_forked_from_fkey";
+            columns: ["forked_from"];
+            isOneToOne: false;
+            referencedRelation: "guides";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "guides_technology_id_fkey";
+            columns: ["technology_id"];
+            isOneToOne: false;
+            referencedRelation: "technologies";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      run_events: {
+        Row: {
+          created_at: string;
+          id: number;
+          payload: Json | null;
+          run_id: string;
+          type: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          id?: number;
+          payload?: Json | null;
+          run_id: string;
+          type: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: number;
+          payload?: Json | null;
+          run_id?: string;
+          type?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "run_events_run_id_fkey";
+            columns: ["run_id"];
+            isOneToOne: false;
+            referencedRelation: "runs";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      runs: {
+        Row: {
+          budget: NonNullable<Json>;
+          created_at: string;
+          error: string | null;
+          finished_at: string | null;
+          id: string;
+          status: string;
+          technology_id: string | null;
+          type: string;
+          user_id: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          budget?: NonNullable<Json>;
+          created_at?: string;
+          error?: string | null;
+          finished_at?: string | null;
+          id?: string;
+          status?: string;
+          technology_id?: string | null;
+          type: string;
+          user_id?: string | null;
+        };
+        Update: {
+          budget?: NonNullable<Json>;
+          created_at?: string;
+          error?: string | null;
+          finished_at?: string | null;
+          id?: string;
+          status?: string;
+          technology_id?: string | null;
+          type?: string;
+          user_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "runs_technology_id_fkey";
             columns: ["technology_id"];
             isOneToOne: false;
             referencedRelation: "technologies";

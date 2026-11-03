@@ -92,7 +92,10 @@ devguide-ai/
 │  │  ├─ generate/  graph.ts state.ts nodes/*.ts prompts.ts
 │  │  ├─ chat/      graph.ts state.ts nodes/*.ts prompts.ts
 │  │  ├─ edit/      graph.ts ...
-│  │  └─ shared/    llm.ts budget.ts events.ts
+│  │  └─ shared/    llm/ (index.ts: getModel / largeModel / smallModel · config.ts providers.ts
+│  │                 errors.ts types.ts) · budget/ (index.ts · check.ts update.ts
+│  │                 config.ts errors.ts types.ts) · events/ (index.ts: class RunEvents ·
+│  │                 row.ts database.ts config.ts types.ts)
 │  ├─ rag/
 │  │  ├─ chunker/     index.ts (the recipe: the 4 steps) · parseBlocks.ts buildUnits.ts splitLarge.ts
 │  │  │               pack.ts text.ts headingPath.ts tokens.ts config.ts types.ts
@@ -255,7 +258,9 @@ create table usage_counters (user_id uuid, day date, generations int default 0, 
 create table api_keys (id uuid primary key default gen_random_uuid(), user_id uuid references auth.users(id), key_hash text unique, name text, created_at timestamptz default now(), revoked_at timestamptz);  -- v1.1
 ```
 
-Row Level Security: enabled on `guides` (forks), `guide_versions`, `chats`, `messages`, `usage_counters`, `api_keys`. Canonical guides and shared chunks are readable by all signed-in users; writes to shared tables happen only on the server with the service key.
+The migrations in `supabase/migrations/` are the source of truth; the SQL above is the shape. M3 differences: one canonical guide per technology is enforced by a partial unique index, `runs` has `finished_at`, and `run_events` is published to Supabase Realtime.
+
+Row Level Security: enabled on `guides` (forks), `guide_versions`, `runs`, `run_events`, `chats`, `messages`, `usage_counters`, `api_keys`. Any signed-in user reads `generate` runs and their events (everyone waiting for a technology watches the same run); other runs only by their owner. Canonical guides and shared chunks are readable by all signed-in users; writes to shared tables happen only on the server with the service key.
 
 ### Hybrid search function (vector + keyword, merged with RRF)
 
@@ -312,7 +317,7 @@ const GenerateState = Annotation.Root({
     default: () => ({}),
   }),
   checkAttempts: Annotation<Record<string, number>>({ reducer: (a, b) => ({ ...a, ...b }), default: () => ({}) }),
-  budget: Annotation<{ steps: number; fetches: number; startedAt: number }>,
+  budget: Annotation<Budget>({ reducer: mergeBudget, default: newBudget }),   // see agents/shared/budget
 });
 
 type SectionDraft = {
@@ -483,6 +488,8 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 DATABASE_URL=                    # for LangGraph checkpointer
 LLM_PROVIDER=anthropic|openai
+LLM_MODEL_LARGE=                 # optional; default per provider (config.ts in agents/shared/llm)
+LLM_MODEL_SMALL=
 ANTHROPIC_API_KEY=
 OPENAI_API_KEY=
 EMBEDDING_MODEL=text-embedding-3-small

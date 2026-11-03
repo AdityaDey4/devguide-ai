@@ -8,3 +8,10 @@ export type TechnologyRow = Tables<"technologies">;
 export type SourceRow = Tables<"sources">;
 export type ChunkRow = Tables<"chunks">;
 export type ChunkInsert = TablesInsert<"chunks">;
+
+export type GuideRow = Tables<"guides">;
+export type GuideVersionRow = Tables<"guide_versions">;
+export type GuideVersionInsert = TablesInsert<"guide_versions">;
+export type RunRow = Tables<"runs">;
+export type RunInsert = TablesInsert<"runs">;
+export type RunEventRow = Tables<"run_events">;

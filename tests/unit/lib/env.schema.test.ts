@@ -16,6 +16,8 @@ describe("server environment", () => {
     expect(env.RERANK_FAST_PATH_THRESHOLD).toBe(0.85);
     expect(env.LANGSMITH_TRACING).toBe(false);
     expect(env.OPENAI_API_KEY).toBeUndefined();
+    expect(env.LLM_MODEL_LARGE).toBeUndefined(); // the per-provider default applies later
+    expect(env.LLM_MODEL_SMALL).toBeUndefined();
   });
 
   it("treats an empty value (FOO=) as not set", () => {

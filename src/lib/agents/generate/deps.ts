@@ -4,6 +4,7 @@ import type { DiscoveryResult } from "../../fetch/discover";
 import type { FetchedPage } from "../../fetch/fetchPage";
 import type { StoreInput, StoreResult, TechnologyInput } from "../../rag/store";
 import type { RunEvents } from "../shared/events";
+import type { Snippet } from "../../mcp/context7";
 import type { SavedGuide, SaveGuideInput } from "./guide/saveGuide";
 import type { ModelSize } from "../shared/llm";
 import type { SearchHit } from "../shared/tavily";
@@ -32,6 +33,8 @@ export type GenerateDeps = {
   searchWeb: (query: string) => Promise<SearchHit[]>;
   discoverDocs: (docsUrl: string) => Promise<DiscoveryResult>;
   fetchPage: (url: string) => Promise<FetchedPage>;
+  /** Code snippets for a topic from Context7. Never fails: no snippets is an empty list. */
+  codeSnippets: (technologyName: string, topic: string) => Promise<Snippet[]>;
   /** Makes sure the technology exists in the database and returns its id. */
   saveTechnology: (input: TechnologyInput) => Promise<string>;
   /** Saves the finished guide as a new version and returns the ids. */

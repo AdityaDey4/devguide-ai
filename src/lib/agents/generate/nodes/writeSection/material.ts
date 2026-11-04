@@ -1,5 +1,6 @@
 import { cleanToMarkdown } from "../../../../fetch/clean";
 import { MIN_PAGE_CHARS } from "../../../../ingest/config";
+import type { Snippet } from "../../../../mcp/context7";
 import type { GenerateDeps } from "../../deps";
 import { MAX_CHARS_PER_PAGE, MAX_CHARS_PER_SECTION } from "./config";
 import type { Material } from "./input";
@@ -53,4 +54,24 @@ async function load(
   } catch {
     return null;
   }
+}
+
+/**
+ * Code snippets from Context7 as extra numbered sources, continuing after the downloaded pages
+ * (pages are [1], [2]; snippets are [3], [4]...). The writer cites them like any other source,
+ * and the checker looks for code names in them too.
+ */
+export function withSnippets(
+  pages: Material[],
+  snippets: Snippet[],
+): Material[] {
+  return [
+    ...pages,
+    ...snippets.map((snippet, i) => ({
+      n: pages.length + i + 1,
+      url: snippet.url,
+      title: snippet.title,
+      markdown: snippet.markdown,
+    })),
+  ];
 }

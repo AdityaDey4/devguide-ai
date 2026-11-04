@@ -252,3 +252,106 @@ describe("writeSection", () => {
     );
   });
 });
+
+describe("writeSection with Context7 code snippets", () => {
+  const snippets = [
+    {
+      title: "Install Zod",
+      url: "https://github.com/colinhacks/zod/blob/main/install.mdx",
+      markdown:
+        "### Install Zod\n\nSource: https://github.com/colinhacks/zod/blob/main/install.mdx\n\nnpm install zod",
+    },
+    {
+      title: "Parse data",
+      url: "https://github.com/colinhacks/zod/blob/main/parse.mdx",
+      markdown:
+        "### Parse data\n\nSource: https://github.com/colinhacks/zod/blob/main/parse.mdx\n\nschema.parse(data)",
+    },
+  ];
+
+  it("asks for snippets on a code-heavy section, about that section's topic", async () => {
+    const { deps, snippetQueries } = fakeDeps({ snippets });
+    await writeSection(input(), deps);
+    expect(snippetQueries).toEqual([
+      { name: "Zod", topic: "Installation and setup: Show how to install it." },
+    ]);
+  });
+
+  it("does not ask for snippets on a section that is not code-heavy", async () => {
+    const { deps, snippetQueries } = fakeDeps({ snippets });
+    await writeSection(
+      input({ section: { ...section, key: "what-it-is", codeHeavy: false } }),
+      deps,
+    );
+    expect(snippetQueries).toEqual([]);
+  });
+
+  it("numbers the snippets after the pages, and the writer can cite them", async () => {
+    const { deps, written } = fakeDeps({
+      snippets,
+      text: () =>
+        "Install it with npm [1]. Then parse data with schema.parse [4].",
+    });
+    const draft = draftOf(await writeSection(input(), deps));
+
+    const prompt = String(
+      (written[0].messages[1] as { content: string }).content,
+    );
+    expect(prompt).toContain(
+      "=== SOURCE [3]: Install Zod (https://github.com/colinhacks/zod/blob/main/install.mdx) ===",
+    );
+    expect(prompt).toContain("=== SOURCE [4]: Parse data");
+    expect(draft.sources.map((s) => s.n)).toEqual([1, 2, 3, 4]);
+    expect(draft.citations.map((c) => [c.n, c.url])).toEqual([
+      [1, "https://zod.dev/basics"],
+      [4, "https://github.com/colinhacks/zod/blob/main/parse.mdx"],
+    ]);
+  });
+
+  it("keeps the snippets in the draft so the checker can look for code names in them", async () => {
+    const { deps } = fakeDeps({ snippets });
+    const draft = draftOf(await writeSection(input(), deps));
+    expect(
+      draft.sources.some((s) => s.markdown.includes("schema.parse(data)")),
+    ).toBe(true);
+  });
+
+  it("writes from the pages alone when Context7 has nothing or is unavailable", async () => {
+    const { deps } = fakeDeps({ snippets: [] });
+    const draft = draftOf(await writeSection(input(), deps));
+    expect(draft.status).toBe("draft");
+    expect(draft.sources.map((s) => s.n)).toEqual([1, 2]);
+  });
+
+  it("saves the snippets in the knowledge base as Context7 sources, apart from the pages", async () => {
+    const { deps, stored } = fakeDeps({ snippets });
+    await writeSection(input(), deps);
+    const byType = (type: string) =>
+      stored
+        .filter((s) => s.source.type === type)
+        .map((s) => s.source.url)
+        .sort();
+    expect(byType("official")).toEqual([
+      "https://zod.dev/api",
+      "https://zod.dev/basics",
+    ]);
+    expect(byType("context7")).toEqual(snippets.map((s) => s.url).sort());
+  });
+
+  it("does not count snippets as page fetches", async () => {
+    const { deps } = fakeDeps({ snippets });
+    const update = await writeSection(input(), deps);
+    expect(update.budget).toMatchObject({ steps: 1, fetches: 2 });
+  });
+
+  it("still writes the section from snippets when none of its pages can be read", async () => {
+    const { deps, written } = fakeDeps({
+      snippets,
+      brokenUrls: section.pageUrls,
+    });
+    const draft = draftOf(await writeSection(input(), deps));
+    expect(written).toHaveLength(1); // the model was asked
+    expect(draft.status).toBe("draft");
+    expect(draft.sources.map((s) => s.n)).toEqual([1, 2]); // the snippets, numbered from 1
+  });
+});

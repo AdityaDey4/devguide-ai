@@ -55,6 +55,8 @@ export function fakeDeps(
     /** What the writer produces. `rewrite` is true when it is asked to fix a draft. */
     text?: (sources: number, rewrite: boolean) => string;
     storeFails?: boolean;
+    /** What Context7 answers with (default: nothing). */
+    snippets?: { title: string; url: string; markdown: string }[];
   } = {},
 ) {
   const events: RunEvent[] = [];
@@ -64,6 +66,7 @@ export function fakeDeps(
   const fetched: string[] = [];
   const stored: StoreInput[] = [];
   const guides: SaveGuideInput[] = [];
+  const snippetQueries: { name: string; topic: string }[] = [];
   const written: { messages: unknown[] }[] = [];
 
   const deps: GenerateDeps = {
@@ -120,6 +123,10 @@ export function fakeDeps(
         fetchedAt: new Date(),
       };
     },
+    codeSnippets: async (name, topic) => {
+      snippetQueries.push({ name, topic });
+      return answers.snippets ?? [];
+    },
     saveTechnology: async (input) => {
       saved.push(input);
       return "tech-1";
@@ -144,6 +151,7 @@ export function fakeDeps(
     stored,
     written,
     guides,
+    snippetQueries,
   };
 }
 

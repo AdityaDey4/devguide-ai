@@ -1,5 +1,6 @@
 import { discoverDocs } from "../../fetch/discover";
 import { fetchPage } from "../../fetch/fetchPage";
+import { fetchSnippets } from "../../mcp/context7";
 import { storeChunks, upsertTechnology } from "../../rag/store";
 import { createServiceClient } from "../../supabase/service";
 import { RunEvents } from "../shared/events";
@@ -18,6 +19,8 @@ export const realDeps: GenerateDeps = {
   searchWeb: (query) => searchWeb(query),
   discoverDocs: (docsUrl) => discoverDocs(docsUrl),
   fetchPage: (url) => fetchPage(url),
+  codeSnippets: (technologyName, topic) =>
+    fetchSnippets({ library: technologyName, topic }),
   saveTechnology: (input) => upsertTechnology(createServiceClient(), input),
   saveGuide: (input) => saveGuide(createServiceClient(), input),
   storeChunks: (input) => storeChunks(input),

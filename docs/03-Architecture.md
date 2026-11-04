@@ -125,7 +125,7 @@ devguide-ai/
 │  ├─ ingest/     index.ts (the belt: discover, then fetch, clean, chunk, store for each page)
 │  │              ingestPage.ts technology.ts config.ts types.ts
 │  ├─ limiter.ts      (runs at most N async jobs at the same time; used by the crawl, the embedder and ingest)
-│  ├─ mcp/  client.ts (Context7)  server.ts (v1.1)
+│  ├─ mcp/  context7/ (index client parse config types)  server.ts (v1.1)
 │  ├─ supabase/   client.ts server.ts proxy.ts (sign-in clients) · service.ts (service-role client,
 │  │              server only) · database.types.ts (generated) · models.ts (short row names)
 │  ├─ pdf/  render.ts
@@ -424,24 +424,16 @@ const GradeSchema = z.object({
 
 ### 7.1 Consuming Context7 (MVP)
 
-```ts
-// lib/mcp/client.ts
-import { MultiServerMCPClient } from '@langchain/mcp-adapters';
+Built as `lib/mcp/context7/` on the official `@modelcontextprotocol/sdk` (Streamable HTTP), not on `@langchain/mcp-adapters`: only two tools are called and plain text is wanted back, so the adapter layer added nothing.
 
-export const mcp = new MultiServerMCPClient({
-  mcpServers: {
-    context7: {
-      transport: 'http',
-      url: 'https://mcp.context7.com/mcp',
-      headers: { CONTEXT7_API_KEY: process.env.CONTEXT7_API_KEY! },
-    },
-  },
-});
-export const getContext7Tools = () => mcp.getTools();
+```ts
+const snippets = await fetchSnippets({ library: "Zod", topic: "Installation: show how to install it" });
+// -> [{ title, url: "https://github.com/...", markdown }]   [] when Context7 is slow, limited or down
 ```
 
-- Use the library-resolve tool, then the docs tool with a `topic` built from the grader's `missing` field (check the current Context7 tool names and header format in their docs at build time).
-- Wrap calls with a 10 s timeout; on 429 or error, return an empty result and log (never fail the chat).
+- Endpoint `https://mcp.context7.com/mcp`, key in the `CONTEXT7_API_KEY` header (checked live; tools can also be listed without it). Tool names as of this build: `resolve-library-id` (`libraryName`, `query`) then `query-docs` (`libraryId`, `query`); the answers are plain text, parsed in `parse.ts`. Every snippet carries its own `Source:` address, so it can be cited like any page.
+- Each request times out after 10 s and the whole lookup after 20 s; any error, 429 or timeout returns an empty list and is logged. It never fails a run or a chat.
+- Used by `writeSection` for code-heavy sections: snippets become extra numbered sources after the downloaded pages, are kept in the draft so the checker can look for code names in them, and are stored as `context7` chunks (30 days). The chat's use of Context7 (the grader's `missing` field as the topic) comes with M5.
 
 ### 7.2 Exposing DevGuide as an MCP server (v1.1)
 

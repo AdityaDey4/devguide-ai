@@ -95,6 +95,7 @@ devguide-ai/
 │  │  │             writeSection/ (index input material prompt citations store config)
 │  │  │             checkSections/ (index check paragraphs codeNames) · rewriteSection/ (index input prompt)
 │  │  │             assembleGuide.ts · guide/saveGuide.ts (the database part of "assemble") · config.ts
+│  │  │             run/ (index: startGeneration / resumeGeneration · drive failure partial store types)
 │  │  ├─ chat/      graph.ts state.ts nodes/*.ts prompts.ts
 │  │  ├─ edit/      graph.ts ...
 │  │  └─ shared/    llm/ (index.ts: getModel / largeModel / smallModel · config.ts providers.ts
@@ -133,6 +134,7 @@ devguide-ai/
 ├─ components/  guide/ chat/ progress/ editor/ ui/
 ├─ supabase/migrations/*.sql
 ├─ scripts/  ingest.ts  (npm run ingest -- <docsUrl>)
+│            generate.ts  (npm run generate -- <technology name>, or -- --resume <runId>)
 ├─ tests/
 │  ├─ unit/lib/  one *.test.ts per module, mirroring src/lib (offline: fake site, local server, mocked DNS)
 │  ├─ integration/  store.test.ts (real local database; npm run test:integration)

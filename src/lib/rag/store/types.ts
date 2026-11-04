@@ -19,11 +19,16 @@ export type StoreInput = {
   chunks: Chunk[];
   /** The technology version the text describes, if known (e.g. "4.1"). */
   techVersion?: string;
+  /**
+   * Set when the chunks are the text of one of OUR guides (source.type "guide"). They are then
+   * tied to that guide and no `sources` row is made, because a guide is not a fetched page.
+   */
+  guideId?: string;
 };
 
 export type StoreResult = {
-  /** The row in `sources` for this page. */
-  sourceId: string;
+  /** The row in `sources` for this page, or null for the chunks of one of our own guides. */
+  sourceId: string | null;
   /** Chunks given. */
   total: number;
   /** Chunks that were new and are now saved. */

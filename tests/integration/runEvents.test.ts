@@ -141,14 +141,24 @@ describe("RunEvents (real database)", () => {
       });
     });
 
-    // "SUBSCRIBED" can arrive a moment before the server is really listening for changes.
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    await new RunEvents(runId).emit({
-      type: "outline",
-      sections: [{ key: "a", title: "A" }],
-    });
-
-    await expect.poll(() => received, { timeout: 5000 }).toEqual(["outline"]);
+    // "SUBSCRIBED" can arrive a moment before the server is really listening for changes, and
+    // how long that takes depends on how busy Realtime is (the whole suite runs at once). So an
+    // event is sent every second until the browser has received one.
+    const events = new RunEvents(runId);
+    await expect
+      .poll(
+        async () => {
+          if (received.length === 0) {
+            await events.emit({
+              type: "outline",
+              sections: [{ key: "a", title: "A" }],
+            });
+          }
+          return received.includes("outline");
+        },
+        { timeout: 15_000, interval: 1000 },
+      )
+      .toBe(true);
     await browser.removeChannel(channel);
   });
 });

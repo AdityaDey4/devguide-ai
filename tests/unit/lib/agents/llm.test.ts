@@ -37,7 +37,7 @@ describe("readSettings", () => {
     expect(readSettings("large")).toMatchObject({
       provider: "openai",
       apiKey: "sk-test",
-      model: "gpt-4o",
+      model: "gpt-4o-mini",
       temperature: 0.2,
     });
     expect(readSettings("small")).toMatchObject({
@@ -68,7 +68,7 @@ describe("readSettings", () => {
 
   it("treats an empty override as not set", () => {
     env({ OPENAI_API_KEY: "sk-test", LLM_MODEL_LARGE: "" });
-    expect(readSettings("large").model).toBe("gpt-4o");
+    expect(readSettings("large").model).toBe("gpt-4o-mini");
   });
 
   it("sets the retry count and output limit for every model", () => {

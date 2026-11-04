@@ -10,6 +10,11 @@ export type RunEvent =
       officialUrl: string;
       docsUrl: string;
     }
+  // The name matched several technologies: the run waits until the person picks one.
+  | {
+      type: "needs_choice";
+      candidates: { name: string; description: string; url: string }[];
+    }
   | { type: "docs_found"; count: number }
   | { type: "outline"; sections: { key: string; title: string }[] }
   | { type: "section_started"; key: string; title: string }

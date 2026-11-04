@@ -58,21 +58,24 @@ export async function storeChunks(
       : { embeddings: [], tokens: 0 };
 
   // 4. Record the page (after embedding, so a failed embedding leaves nothing behind).
-  const sourceId = await upsertSource(db, {
-    technologyId,
-    url: source.url,
-    title: source.title,
-    type: source.type,
-    contentHash:
-      source.contentHash ??
-      contentHash(chunks.map((chunk) => chunk.content).join("\n\n")),
-    fetchedAt,
-  });
+  const sourceId = input.guideId
+    ? null // chunks of our own guide: there is no fetched page to record
+    : await upsertSource(db, {
+        technologyId,
+        url: source.url,
+        title: source.title,
+        type: source.type,
+        contentHash:
+          source.contentHash ??
+          contentHash(chunks.map((chunk) => chunk.content).join("\n\n")),
+        fetchedAt,
+      });
 
   // 5. Save the new chunks, with their vectors and expiry.
   const rows: TablesInsert<"chunks">[] = fresh.map((chunk, i) => ({
     technology_id: technologyId,
     source_id: sourceId,
+    guide_id: input.guideId ?? null,
     source_type: source.type,
     content: chunk.content,
     heading_path: chunk.headingPath,

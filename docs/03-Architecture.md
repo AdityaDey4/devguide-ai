@@ -89,11 +89,16 @@ devguide-ai/
 │     └─ mcp/route.ts                   # v1.1
 ├─ lib/
 │  ├─ agents/
-│  │  ├─ generate/  graph.ts state.ts nodes/*.ts prompts.ts
+│  │  ├─ generate/  graph.ts (the wiring) · state.ts sections.ts deps.ts realDeps.ts errors.ts
+│  │  │             nodes/ identify/ (index prompt schema grounding) · askUser.ts (askUser + applyChoice)
+│  │  │             discoverDocs.ts · planOutline/ (index prompt schema repair)
+│  │  │             writeSection/ (index input material prompt citations store config)
+│  │  │             checkSections/ (index check paragraphs codeNames) · rewriteSection/ (index input prompt)
+│  │  │             assembleGuide.ts · guide/saveGuide.ts (the database part of "assemble") · config.ts
 │  │  ├─ chat/      graph.ts state.ts nodes/*.ts prompts.ts
 │  │  ├─ edit/      graph.ts ...
 │  │  └─ shared/    llm/ (index.ts: getModel / largeModel / smallModel · config.ts providers.ts
-│  │                 errors.ts types.ts) · budget/ (index.ts · check.ts update.ts
+│  │                 errors.ts types.ts) · checkpointer/ (index.ts · config.ts errors.ts types.ts) · budget/ (index.ts · check.ts update.ts
 │  │                 config.ts errors.ts types.ts) · events/ (index.ts: class RunEvents ·
 │  │                 row.ts database.ts config.ts types.ts)
 │  ├─ rag/

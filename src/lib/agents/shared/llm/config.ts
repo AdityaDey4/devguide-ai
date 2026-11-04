@@ -7,7 +7,7 @@ import type { LlmSettings, ModelSize, Provider } from "./types";
 
 /** Used when LLM_MODEL_LARGE / LLM_MODEL_SMALL are not set. */
 export const DEFAULT_MODELS: Record<Provider, Record<ModelSize, string>> = {
-  openai: { large: "gpt-4o", small: "gpt-4o-mini" },
+  openai: { large: "gpt-4o-mini", small: "gpt-4o-mini" },
   anthropic: { large: "claude-sonnet-5-5", small: "claude-haiku-5-5" },
 };
 
@@ -68,3 +68,10 @@ export function readSettings(size: ModelSize): LlmSettings {
     maxOutputTokens: MAX_OUTPUT_TOKENS,
   };
 }
+
+/**
+ * A structured answer (a verdict, an outline, a technology) is a few hundred tokens. Capping it
+ * far below MAX_OUTPUT_TOKENS means a model that gets stuck writing one field is cut off after a
+ * few seconds and the call fails fast, instead of running to the full limit and the 60 s timeout.
+ */
+export const STRUCTURED_MAX_OUTPUT_TOKENS = 2048;

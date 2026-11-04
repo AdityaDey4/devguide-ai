@@ -4,6 +4,8 @@ import { createChatModel } from "./providers";
 import type { LlmDeps, ModelSize } from "./types";
 
 export { LlmConfigError } from "./errors";
+export { askStructured } from "./structured";
+export { streamText } from "./streamText";
 export type { LlmSettings, ModelSize, Provider } from "./types";
 
 // The one place graph nodes get a language model from (docs/03-Architecture.md section 5.2).

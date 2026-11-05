@@ -28,6 +28,9 @@ export const serverSchema = z.object({
   LLM_PROVIDER: z.enum(["anthropic", "openai"]).default("openai"),
   ANTHROPIC_API_KEY: optional(z.string().min(1)),
   OPENAI_API_KEY: optional(z.string().min(1)),
+  // Optional overrides; the defaults per provider live in agents/shared/llm/config.ts.
+  LLM_MODEL_LARGE: optional(z.string().min(1)),
+  LLM_MODEL_SMALL: optional(z.string().min(1)),
 
   EMBEDDING_MODEL: z.string().min(1).default("text-embedding-3-small"),
   RERANK_MODEL: z.string().min(1).default("gpt-4o-mini"),

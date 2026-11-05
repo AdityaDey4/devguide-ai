@@ -89,10 +89,19 @@ devguide-ai/
 │     └─ mcp/route.ts                   # v1.1
 ├─ lib/
 │  ├─ agents/
-│  │  ├─ generate/  graph.ts state.ts nodes/*.ts prompts.ts
+│  │  ├─ generate/  graph.ts (the wiring) · state.ts sections.ts deps.ts realDeps.ts errors.ts
+│  │  │             nodes/ identify/ (index prompt schema grounding) · askUser.ts (askUser + applyChoice)
+│  │  │             discoverDocs.ts · planOutline/ (index prompt schema repair)
+│  │  │             writeSection/ (index input material prompt citations store config)
+│  │  │             checkSections/ (index check paragraphs codeNames) · rewriteSection/ (index input prompt)
+│  │  │             assembleGuide.ts · guide/saveGuide.ts (the database part of "assemble") · config.ts
+│  │  │             run/ (index: startGeneration / resumeGeneration · drive failure partial store types)
 │  │  ├─ chat/      graph.ts state.ts nodes/*.ts prompts.ts
 │  │  ├─ edit/      graph.ts ...
-│  │  └─ shared/    llm.ts budget.ts events.ts
+│  │  └─ shared/    llm/ (index.ts: getModel / largeModel / smallModel · config.ts providers.ts
+│  │                 errors.ts types.ts) · checkpointer/ (index.ts · config.ts errors.ts types.ts) · budget/ (index.ts · check.ts update.ts
+│  │                 config.ts errors.ts types.ts) · events/ (index.ts: class RunEvents ·
+│  │                 row.ts database.ts config.ts types.ts)
 │  ├─ rag/
 │  │  ├─ chunker/     index.ts (the recipe: the 4 steps) · parseBlocks.ts buildUnits.ts splitLarge.ts
 │  │  │               pack.ts text.ts headingPath.ts tokens.ts config.ts types.ts
@@ -117,7 +126,7 @@ devguide-ai/
 │  ├─ ingest/     index.ts (the belt: discover, then fetch, clean, chunk, store for each page)
 │  │              ingestPage.ts technology.ts config.ts types.ts
 │  ├─ limiter.ts      (runs at most N async jobs at the same time; used by the crawl, the embedder and ingest)
-│  ├─ mcp/  client.ts (Context7)  server.ts (v1.1)
+│  ├─ mcp/  context7/ (index client parse config types)  server.ts (v1.1)
 │  ├─ supabase/   client.ts server.ts proxy.ts (sign-in clients) · service.ts (service-role client,
 │  │              server only) · database.types.ts (generated) · models.ts (short row names)
 │  ├─ pdf/  render.ts
@@ -125,6 +134,7 @@ devguide-ai/
 ├─ components/  guide/ chat/ progress/ editor/ ui/
 ├─ supabase/migrations/*.sql
 ├─ scripts/  ingest.ts  (npm run ingest -- <docsUrl>)
+│            generate.ts  (npm run generate -- <technology name>, or -- --resume <runId>)
 ├─ tests/
 │  ├─ unit/lib/  one *.test.ts per module, mirroring src/lib (offline: fake site, local server, mocked DNS)
 │  ├─ integration/  store.test.ts (real local database; npm run test:integration)
@@ -255,7 +265,9 @@ create table usage_counters (user_id uuid, day date, generations int default 0, 
 create table api_keys (id uuid primary key default gen_random_uuid(), user_id uuid references auth.users(id), key_hash text unique, name text, created_at timestamptz default now(), revoked_at timestamptz);  -- v1.1
 ```
 
-Row Level Security: enabled on `guides` (forks), `guide_versions`, `chats`, `messages`, `usage_counters`, `api_keys`. Canonical guides and shared chunks are readable by all signed-in users; writes to shared tables happen only on the server with the service key.
+The migrations in `supabase/migrations/` are the source of truth; the SQL above is the shape. M3 differences: one canonical guide per technology is enforced by a partial unique index, `runs` has `finished_at`, and `run_events` is published to Supabase Realtime.
+
+Row Level Security: enabled on `guides` (forks), `guide_versions`, `runs`, `run_events`, `chats`, `messages`, `usage_counters`, `api_keys`. Any signed-in user reads `generate` runs and their events (everyone waiting for a technology watches the same run); other runs only by their owner. Canonical guides and shared chunks are readable by all signed-in users; writes to shared tables happen only on the server with the service key.
 
 ### Hybrid search function (vector + keyword, merged with RRF)
 
@@ -312,7 +324,7 @@ const GenerateState = Annotation.Root({
     default: () => ({}),
   }),
   checkAttempts: Annotation<Record<string, number>>({ reducer: (a, b) => ({ ...a, ...b }), default: () => ({}) }),
-  budget: Annotation<{ steps: number; fetches: number; startedAt: number }>,
+  budget: Annotation<Budget>({ reducer: mergeBudget, default: newBudget }),   // see agents/shared/budget
 });
 
 type SectionDraft = {
@@ -414,24 +426,16 @@ const GradeSchema = z.object({
 
 ### 7.1 Consuming Context7 (MVP)
 
-```ts
-// lib/mcp/client.ts
-import { MultiServerMCPClient } from '@langchain/mcp-adapters';
+Built as `lib/mcp/context7/` on the official `@modelcontextprotocol/sdk` (Streamable HTTP), not on `@langchain/mcp-adapters`: only two tools are called and plain text is wanted back, so the adapter layer added nothing.
 
-export const mcp = new MultiServerMCPClient({
-  mcpServers: {
-    context7: {
-      transport: 'http',
-      url: 'https://mcp.context7.com/mcp',
-      headers: { CONTEXT7_API_KEY: process.env.CONTEXT7_API_KEY! },
-    },
-  },
-});
-export const getContext7Tools = () => mcp.getTools();
+```ts
+const snippets = await fetchSnippets({ library: "Zod", topic: "Installation: show how to install it" });
+// -> [{ title, url: "https://github.com/...", markdown }]   [] when Context7 is slow, limited or down
 ```
 
-- Use the library-resolve tool, then the docs tool with a `topic` built from the grader's `missing` field (check the current Context7 tool names and header format in their docs at build time).
-- Wrap calls with a 10 s timeout; on 429 or error, return an empty result and log (never fail the chat).
+- Endpoint `https://mcp.context7.com/mcp`, key in the `CONTEXT7_API_KEY` header (checked live; tools can also be listed without it). Tool names as of this build: `resolve-library-id` (`libraryName`, `query`) then `query-docs` (`libraryId`, `query`); the answers are plain text, parsed in `parse.ts`. Every snippet carries its own `Source:` address, so it can be cited like any page.
+- Each request times out after 10 s and the whole lookup after 20 s; any error, 429 or timeout returns an empty list and is logged. It never fails a run or a chat.
+- Used by `writeSection` for code-heavy sections: snippets become extra numbered sources after the downloaded pages, are kept in the draft so the checker can look for code names in them, and are stored as `context7` chunks (30 days). The chat's use of Context7 (the grader's `missing` field as the topic) comes with M5.
 
 ### 7.2 Exposing DevGuide as an MCP server (v1.1)
 
@@ -483,6 +487,8 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 DATABASE_URL=                    # for LangGraph checkpointer
 LLM_PROVIDER=anthropic|openai
+LLM_MODEL_LARGE=                 # optional; default per provider (config.ts in agents/shared/llm)
+LLM_MODEL_SMALL=
 ANTHROPIC_API_KEY=
 OPENAI_API_KEY=
 EMBEDDING_MODEL=text-embedding-3-small

@@ -69,15 +69,10 @@ const ambiguous = {
   ...ZOD_ANSWER,
   outcome: "ambiguous" as const,
   name: null,
-  officialUrl: null,
-  docsUrl: null,
+  officialResult: null,
   candidates: [
-    { name: "Zod", description: "Schema validation", url: "https://zod.dev/" },
-    {
-      name: "Zod API",
-      description: "Its API docs",
-      url: "https://zod.dev/api",
-    },
+    { name: "Zod", description: "Schema validation", result: 1 },
+    { name: "Zod API", description: "Its API docs", result: 2 },
   ],
 };
 
@@ -195,7 +190,7 @@ describe("when a run fails", () => {
         ...ZOD_ANSWER,
         outcome: "unknown",
         name: null,
-        officialUrl: null,
+        officialResult: null,
       }),
     });
     const outcome = await startGeneration("asdf", {}, t.deps);
@@ -275,7 +270,7 @@ describe("when a run fails", () => {
         ...ZOD_ANSWER,
         outcome: "unknown",
         name: null,
-        officialUrl: null,
+        officialResult: null,
       }),
     });
     t.deps.store.markFailed = async () => {
@@ -327,7 +322,7 @@ describe("a partial draft", () => {
         ...ZOD_ANSWER,
         outcome: "unknown",
         name: null,
-        officialUrl: null,
+        officialResult: null,
       }),
     });
     await startGeneration("asdf", {}, t.deps);

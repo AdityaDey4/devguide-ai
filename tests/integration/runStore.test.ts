@@ -129,8 +129,7 @@ describe("a whole run with the real run record", () => {
       identify: () => ({
         outcome: "unknown",
         name: null,
-        officialUrl: null,
-        docsUrl: null,
+        officialResult: null,
         candidates: [],
       }),
     });

@@ -279,7 +279,9 @@ describe("discoverDocs", () => {
       "https://docs.example.com/en/java",
     ]);
     expect(update.discoveredPages).toHaveLength(8);
-    expect(technologyOf(update)?.docsUrl).toBe("https://docs.example.com/en/java");
+    expect(technologyOf(update)?.docsUrl).toBe(
+      "https://docs.example.com/en/java",
+    );
     expect(saved[0]).toMatchObject({
       docsUrl: "https://docs.example.com/en/java",
     });

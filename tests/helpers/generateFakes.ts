@@ -28,8 +28,7 @@ export const ZOD_HITS: SearchHit[] = [
 export const ZOD_ANSWER: z.infer<typeof IdentifyAnswer> = {
   outcome: "single",
   name: "Zod",
-  officialUrl: "https://zod.dev/",
-  docsUrl: "https://zod.dev/",
+  officialResult: 1, // ZOD_HITS[0], https://zod.dev/
   candidates: [],
 };
 

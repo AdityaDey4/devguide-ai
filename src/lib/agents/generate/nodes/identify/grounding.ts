@@ -12,6 +12,21 @@ export function isGrounded(url: string | null, hits: SearchHit[]): boolean {
 }
 
 /**
+ * The address of search result number `n` (counting from 1, as the model saw them), without
+ * anchor or query, or null when there is no such result or it is not an https page. The model
+ * only ever says a number; the address always comes from the results.
+ *
+ *   resultUrl(2, [{ url: "https://a.dev" }, { url: "https://zod.dev/api#x?y=1" }]) -> "https://zod.dev/api"
+ *   resultUrl(9, hits)                                                              -> null
+ */
+export function resultUrl(n: number | null, hits: SearchHit[]): string | null {
+  const hit = n === null ? undefined : hits[n - 1];
+  if (!hit || originOf(hit.url) === null) return null;
+  const parsed = new URL(hit.url);
+  return `${parsed.origin}${parsed.pathname}`;
+}
+
+/**
  * The newest version number the search results mention, or null (FR-GEN-2: "if found"). Only
  * explicit forms count: "v4.1.0", "version 15.2", "@1.2.3". It is read with a pattern, not by the
  * model: asked for a version, the small model sometimes never finished writing it.
@@ -46,4 +61,47 @@ export function originOf(url: string | null): string | null {
   } catch {
     return null;
   }
+}
+
+/**
+ * Brings a docs address back to the page that starts the documentation: the model sometimes
+ * answers with a deep page, and discovery (llms.txt, sitemap, crawl) finds nothing from there.
+ * Anchors, queries and file endings go; a path is kept only up to its first segment, and only
+ * when that segment is a docs folder.
+ *
+ *   docsStartPage("https://hono.dev/docs/overview.html#intro")  -> "https://hono.dev/docs"
+ *   docsStartPage("https://zod.dev/api/strings")                -> "https://zod.dev"
+ *   docsStartPage("https://zod.dev")                            -> "https://zod.dev"
+ */
+const DOCS_FOLDERS = new Set([
+  "docs",
+  "doc",
+  "documentation",
+  "guide",
+  "guides",
+]);
+
+export function docsStartPage(url: string): string {
+  const parsed = new URL(url);
+  const first = parsed.pathname.split("/").filter(Boolean)[0]?.toLowerCase();
+  return DOCS_FOLDERS.has(first ?? "")
+    ? `${parsed.origin}/${first}`
+    : parsed.origin;
+}
+
+/**
+ * Where the documentation starts, worked out from the search results instead of the model: the
+ * first result on the official site that sits in a docs folder gives that folder, otherwise the
+ * site root.
+ *
+ *   findDocsStart("https://hono.dev", [{ url: "https://hono.dev/docs/overview.html" }]) -> "https://hono.dev/docs"
+ *   findDocsStart("https://zod.dev/", [{ url: "https://zod.dev/api" }])                 -> "https://zod.dev"
+ */
+export function findDocsStart(officialUrl: string, hits: SearchHit[]): string {
+  const origin = originOf(officialUrl);
+  const inDocs = hits
+    .filter((hit) => originOf(hit.url) === origin)
+    .map((hit) => docsStartPage(hit.url))
+    .find((start) => start !== origin);
+  return inDocs ?? origin ?? officialUrl;
 }

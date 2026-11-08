@@ -16,16 +16,10 @@ const ambiguousAnswer = {
   ...ZOD_ANSWER,
   outcome: "ambiguous" as const,
   name: null,
-  officialUrl: null,
-  docsUrl: null,
-  version: null,
+  officialResult: null,
   candidates: [
-    { name: "Zod", description: "Schema validation", url: "https://zod.dev/" },
-    {
-      name: "Zod API",
-      description: "Its API docs",
-      url: "https://zod.dev/api",
-    },
+    { name: "Zod", description: "Schema validation", result: 1 },
+    { name: "Zod API", description: "Its API docs", result: 2 },
   ],
 };
 
@@ -197,7 +191,7 @@ describe("generation graph", () => {
         ...ZOD_ANSWER,
         outcome: "unknown",
         name: null,
-        officialUrl: null,
+        officialResult: null,
       }),
     });
     const graph = buildGenerateGraph(new MemorySaver(), deps);

@@ -7,8 +7,11 @@ import type {
 import { discoverDocs } from "@/lib/agents/generate/nodes/discoverDocs";
 import { identify } from "@/lib/agents/generate/nodes/identify";
 import {
+  docsStartPage,
+  findDocsStart,
   findVersion,
   isGrounded,
+  resultUrl,
 } from "@/lib/agents/generate/nodes/identify/grounding";
 import { planOutline } from "@/lib/agents/generate/nodes/planOutline";
 import { toOutline } from "@/lib/agents/generate/nodes/planOutline/repair";
@@ -72,6 +75,32 @@ describe("findVersion", () => {
   });
 });
 
+describe("resultUrl", () => {
+  const hits = [
+    { title: "a", url: "https://a.dev/", content: "" },
+    {
+      title: "b",
+      url: "https://docs.oracle.com/en/java/overview.html#Java_1_0_0_1?x=1",
+      content: "",
+    },
+    { title: "c", url: "http://insecure.example", content: "" },
+  ];
+
+  it("looks the address up by number, without anchor or query", () => {
+    expect(resultUrl(1, hits)).toBe("https://a.dev/");
+    expect(resultUrl(2, hits)).toBe(
+      "https://docs.oracle.com/en/java/overview.html",
+    );
+  });
+
+  it("is null for a missing number, a null, or a page that is not https", () => {
+    expect(resultUrl(0, hits)).toBeNull();
+    expect(resultUrl(9, hits)).toBeNull();
+    expect(resultUrl(null, hits)).toBeNull();
+    expect(resultUrl(3, hits)).toBeNull();
+  });
+});
+
 describe("identify", () => {
   it("finds one technology, saves it, and tells the UI", async () => {
     const { deps, events, saved, searches, asked } = fakeDeps();
@@ -84,7 +113,7 @@ describe("identify", () => {
         name: "Zod",
         slug: "zod",
         officialUrl: "https://zod.dev/",
-        docsUrl: "https://zod.dev/",
+        docsUrl: "https://zod.dev",
         latestVersion: "4.0.0",
       },
     ]);
@@ -93,7 +122,7 @@ describe("identify", () => {
       name: "Zod",
       slug: "zod",
       officialUrl: "https://zod.dev/",
-      docsUrl: "https://zod.dev/",
+      docsUrl: "https://zod.dev",
       version: "4.0.0",
     });
     expect(events).toEqual([
@@ -101,29 +130,33 @@ describe("identify", () => {
         type: "identified",
         name: "Zod",
         officialUrl: "https://zod.dev/",
-        docsUrl: "https://zod.dev/",
+        docsUrl: "https://zod.dev",
         version: "4.0.0",
       },
     ]);
     expect(update.budget).toMatchObject({ steps: 1 });
   });
 
-  it("falls back to the official site when the docs address was not in the results", async () => {
+  it("works out the docs start page from the search results, not from the model", async () => {
     const { deps } = fakeDeps({
-      identify: () => ({
-        ...ZOD_ANSWER,
-        docsUrl: "https://invented-docs.example",
-      }),
+      hits: [
+        { title: "Zod", url: "https://zod.dev/", content: "v4.0.0" },
+        {
+          title: "Docs",
+          url: "https://zod.dev/docs/intro.html#x",
+          content: "",
+        },
+      ],
     });
     const update = await identify(stateWith(), deps);
-    expect(technologyOf(update)?.docsUrl).toBe("https://zod.dev/");
+    expect(technologyOf(update)?.docsUrl).toBe("https://zod.dev/docs");
   });
 
   it("refuses an official site the model made up, and saves nothing", async () => {
     const { deps, saved } = fakeDeps({
       identify: () => ({
         ...ZOD_ANSWER,
-        officialUrl: "https://made-up.example",
+        officialResult: 99, // there is no such search result
       }),
     });
     const error = await identify(stateWith(), deps).catch((e) => e);
@@ -138,7 +171,7 @@ describe("identify", () => {
         ...ZOD_ANSWER,
         outcome: "unknown",
         name: null,
-        officialUrl: null,
+        officialResult: null,
       }),
     });
     await expect(identify(stateWith({ query: "asdf" }), deps)).rejects.toThrow(
@@ -146,17 +179,16 @@ describe("identify", () => {
     );
   });
 
-  const candidate = (name: string, url: string) => ({
+  const candidate = (name: string, result: number) => ({
     name,
     description: `${name} thing`,
-    url,
+    result,
   });
   const ambiguous = (candidates: ReturnType<typeof candidate>[]) => ({
     ...ZOD_ANSWER,
     outcome: "ambiguous" as const,
     name: null,
-    officialUrl: null,
-    docsUrl: null,
+    officialResult: null,
     candidates,
   });
 
@@ -164,10 +196,10 @@ describe("identify", () => {
     const { deps, saved } = fakeDeps({
       identify: () =>
         ambiguous([
-          candidate("Zod", "https://zod.dev/"),
-          candidate("Zod API", "https://zod.dev/api"),
-          candidate("Third", "https://zod.dev/x"),
-          candidate("Fourth", "https://zod.dev/y"),
+          candidate("Zod", 1),
+          candidate("Zod API", 2),
+          candidate("Third", 1),
+          candidate("Fourth", 2),
         ]),
     });
     const update = await identify(stateWith(), deps);
@@ -178,11 +210,7 @@ describe("identify", () => {
 
   it("drops candidates whose site is not in the results, and fails if fewer than 2 remain", async () => {
     const { deps } = fakeDeps({
-      identify: () =>
-        ambiguous([
-          candidate("Real", "https://zod.dev/"),
-          candidate("Fake", "https://fake.example"),
-        ]),
+      identify: () => ambiguous([candidate("Real", 1), candidate("Fake", 99)]),
     });
     await expect(identify(stateWith(), deps)).rejects.toBeInstanceOf(
       GenerateError,
@@ -217,6 +245,47 @@ describe("discoverDocs", () => {
     expect(update.discoveredPages).toEqual(ZOD_PAGES);
     expect(events).toEqual([{ type: "docs_found", count: 3 }]);
     expect(update.budget).toMatchObject({ steps: 1, fetches: 1 });
+  });
+
+  it("tries the official site's own address when the docs start page finds too few pages", async () => {
+    const tried: string[] = [];
+    const { deps, saved } = fakeDeps();
+    const many = Array.from({ length: 8 }, (_, i) => ({
+      url: `https://docs.example.com/en/java/p${i}`,
+      title: `Page ${i}`,
+    }));
+    deps.discoverDocs = async (url) => {
+      tried.push(url);
+      const pages = url.endsWith("/en/java") ? many : [many[0]];
+      return {
+        source: "crawl",
+        pages,
+        truncated: false,
+        attempts: [{ source: "crawl", pages: pages.length }],
+      };
+    };
+    const update = await discoverDocs(
+      stateWith({
+        technology: {
+          ...technology,
+          officialUrl: "https://docs.example.com/en/java",
+          docsUrl: "https://docs.example.com",
+        },
+      }),
+      deps,
+    );
+    expect(tried).toEqual([
+      "https://docs.example.com",
+      "https://docs.example.com/en/java",
+    ]);
+    expect(update.discoveredPages).toHaveLength(8);
+    expect(technologyOf(update)?.docsUrl).toBe(
+      "https://docs.example.com/en/java",
+    );
+    expect(saved[0]).toMatchObject({
+      docsUrl: "https://docs.example.com/en/java",
+    });
+    expect(update.budget).toMatchObject({ fetches: 2 });
   });
 
   it("fails clearly when the site lists no pages", async () => {
@@ -314,5 +383,38 @@ describe("planOutline / toOutline", () => {
     expect(events[0]).toMatchObject({ type: "outline" });
     expect((events[0] as { sections: unknown[] }).sections).toHaveLength(7);
     expect(update.budget).toMatchObject({ steps: 1 });
+  });
+});
+
+describe("docsStartPage", () => {
+  it("brings a deep page back to the docs start (the 'hono' search)", () => {
+    expect(
+      docsStartPage("https://hono.dev/docs/overview.html#hono---web-framework"),
+    ).toBe("https://hono.dev/docs");
+  });
+
+  it("keeps a docs folder, drops anything else to the site root", () => {
+    expect(docsStartPage("https://nextjs.org/docs/app/guides?x=1")).toBe(
+      "https://nextjs.org/docs",
+    );
+    expect(docsStartPage("https://zod.dev/api/strings")).toBe(
+      "https://zod.dev",
+    );
+    expect(docsStartPage("https://zod.dev")).toBe("https://zod.dev");
+  });
+});
+
+describe("findDocsStart", () => {
+  it("uses a docs folder seen on the official site, else the site root", () => {
+    const hit = (url: string) => ({ title: "", url, content: "" });
+    expect(
+      findDocsStart("https://hono.dev", [
+        hit("https://other.example/docs"),
+        hit("https://hono.dev/docs/overview.html"),
+      ]),
+    ).toBe("https://hono.dev/docs");
+    expect(
+      findDocsStart("https://zod.dev/", [hit("https://zod.dev/api")]),
+    ).toBe("https://zod.dev");
   });
 });

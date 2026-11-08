@@ -28,6 +28,11 @@ export async function askStructured<S extends z.ZodType>(
       STRUCTURED_MAX_OUTPUT_TOKENS,
     ),
   });
-  const answer = await model.withStructuredOutput(schema).invoke(messages);
+  // "functionCalling" on purpose: with LangChain's default JSON-schema mode gpt-4o-mini sometimes
+  // never stops writing (found on the "hono" search: 100+ s until the token limit); the
+  // tool-call route answers the same question in about a second.
+  const answer = await model
+    .withStructuredOutput(schema, { method: "functionCalling", strict: true })
+    .invoke(messages);
   return answer as z.infer<S>;
 }

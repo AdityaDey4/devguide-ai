@@ -7,7 +7,7 @@ import {
 import type { GenerateDeps } from "../../deps";
 import { GenerateError } from "../../errors";
 import type { GenerateStateType, GenerateUpdate } from "../../state";
-import { findVersion, isGrounded } from "./grounding";
+import { findDocsStart, findVersion, resultUrl } from "./grounding";
 import { buildMessages } from "./prompt";
 import { IdentifyAnswer } from "./schema";
 
@@ -37,29 +37,27 @@ export async function identify(
 
   if (answer.outcome === "ambiguous" && !state.chosenUrl) {
     const candidates = answer.candidates
-      .filter((candidate) => isGrounded(candidate.url, hits))
+      .flatMap(({ name, description, result }) => {
+        const url = resultUrl(result, hits);
+        return url ? [{ name, description, url }] : [];
+      })
       .slice(0, 3);
     if (candidates.length >= 2) {
       return { candidates, technology: null, budget: step };
     }
   }
 
-  // Past this point we need ONE technology whose site is among the search results.
-  const officialUrl = answer.officialUrl ?? "";
-  if (
-    answer.outcome !== "single" ||
-    !answer.name ||
-    !isGrounded(officialUrl, hits)
-  ) {
+  // Past this point we need ONE technology whose site is one of the search results.
+  const officialUrl = resultUrl(answer.officialResult, hits);
+  if (answer.outcome !== "single" || !answer.name || !officialUrl) {
     throw new GenerateError(
       `Could not find the official documentation for "${state.query}"`,
       "technology_not_found",
     );
   }
-  // If the docs address is not trustworthy, the official site is used: discovery then crawls it.
-  const docsUrl = isGrounded(answer.docsUrl, hits)
-    ? answer.docsUrl!
-    : officialUrl;
+  // Not asked of the model (asked, it once repeated a path until the token limit): the docs
+  // start page is worked out from the search results.
+  const docsUrl = findDocsStart(officialUrl, hits);
 
   const version = findVersion(hits);
   const { slug } = technologyFor(docsUrl, { name: answer.name });

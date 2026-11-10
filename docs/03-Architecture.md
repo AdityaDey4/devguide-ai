@@ -125,13 +125,14 @@ devguide-ai/
 │  │                  fromSitemap.ts fromCrawl.ts readLinks.ts scope.ts config.ts shared.ts types.ts
 │  ├─ ingest/     index.ts (the belt: discover, then fetch, clean, chunk, store for each page)
 │  │              ingestPage.ts technology.ts config.ts types.ts
+│  ├─ search/     index.ts (resolveSearch: guide or new run) · normalise.ts find.ts config.ts
 │  ├─ limiter.ts      (runs at most N async jobs at the same time; used by the crawl, the embedder and ingest)
 │  ├─ mcp/  context7/ (index client parse config types)  server.ts (v1.1)
 │  ├─ supabase/   client.ts server.ts proxy.ts (sign-in clients) · service.ts (service-role client,
 │  │              server only) · database.types.ts (generated) · models.ts (short row names)
 │  ├─ pdf/  render.ts
 │  └─ limits/ ratelimit.ts
-├─ components/  guide/ chat/ progress/ editor/ ui/
+├─ components/  search/ (search-form.tsx) guide/ chat/ progress/ editor/ ui/
 ├─ supabase/migrations/*.sql
 ├─ scripts/  ingest.ts  (npm run ingest -- <docsUrl>)
 │            generate.ts  (npm run generate -- <technology name>, or -- --resume <runId>)
@@ -450,7 +451,7 @@ const snippets = await fetchSnippets({ library: "Zod", topic: "Installation: sho
 
 | Method & route | Purpose | Response |
 |---|---|---|
-| `POST /api/search` `{q}` | Lookup → existing guide, or start identify | `{guideSlug}` or `{runId}` |
+| `POST /api/search` `{q}` | Lookup → existing guide, or start a run | `200 {slug}` (guide exists) or `202 {slug, runId}` (run started); `400` bad text, `401`, `413`, `415` |
 | `POST /api/runs/:id` `{choice}` | Resume a run waiting for disambiguation | `{ok}` |
 | `GET /api/runs/:id` | Run status + last event id | JSON |
 | `POST /api/chat` `{chatId, message}` | Ask a question | Streamed text + final `{citations, origin}` event |

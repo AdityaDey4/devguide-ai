@@ -45,6 +45,10 @@ export async function updateSession(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (!signedIn && !isPublic(pathname)) {
+    // A program calling the API wants a status code, not a redirect to the login page.
+    if (pathname.startsWith("/api/")) {
+      return NextResponse.json({ error: "Sign in first" }, { status: 401 });
+    }
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     url.search = `?next=${encodeURIComponent(pathname + request.nextUrl.search)}`;

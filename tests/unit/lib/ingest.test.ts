@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import {
   ingestSite as ingest,
+  slugFromName,
   technologyFor,
   type IngestOptions,
   type PageOutcome,
@@ -165,6 +166,19 @@ describe("ingestSite", () => {
     });
     expect(progress.map((p) => p.done).sort()).toEqual([1, 2, 3]);
     expect(progress.every((p) => p.total === 3)).toBe(true);
+  });
+});
+
+describe("slugFromName", () => {
+  it("makes the slug the search box would look for", () => {
+    expect(slugFromName("Java")).toBe("java");
+    expect(slugFromName("Next.js")).toBe("nextjs");
+    expect(slugFromName(" Vue JS ")).toBe("vuejs");
+  });
+
+  it("is null when the name makes no usable slug", () => {
+    expect(slugFromName("C++")).toBeNull();
+    expect(slugFromName("")).toBeNull();
   });
 });
 

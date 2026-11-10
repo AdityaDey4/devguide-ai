@@ -124,12 +124,12 @@ Each milestone has:
 **Feature:** I type "LangGraph" on Home, see progress while the guide is generated, and then read it with source links.
 
 **Build**
-- [ ] Search box on Home (plain input + submit).
-- [ ] `POST /api/search`: normalise the name (lowercase, trim) → if a guide exists return its slug, else create a run, start the M3 graph with `after()`, return the slug.
-- [ ] Guide page `/g/[slug]`:
-  - [ ] While generating: list of progress steps from `run_events`, **polled every 2 s** (`GET /api/runs/:id/events?after=<id>`). Sections appear when each one is done.
-  - [ ] When complete: render the guide Markdown (sanitised), code blocks with a copy button, citations as superscript links, numbered sources list at the end.
-- [ ] Simple failure message if the run fails.
+- [x] Search box on Home (plain input + submit). *(`components/search/search-form.tsx` on the Home page: autofocus input, 2 to 60 characters checked before sending, "Searching…" while waiting, an error line under the box; it posts `{ q }` to `/api/search` and opens `/g/<slug>` from the `{ slug }` answer. Not verified in a browser (sign-in is a magic link); the route and the guide page are the next two tasks.)*
+- [x] `POST /api/search`: normalise the name (lowercase, trim) → if a guide exists return its slug, else create a run, start the M3 graph with `after()`, return the slug. *(`lib/search/` cleans the name (2 to 60 characters; keeps letters, digits, space and `. - _ + #`), then looks for a shared guide under both slugs, `nextjs` and `next-js`. Found: `200 { slug }`. Not found: a `queued` run is recorded first, the response `202 { slug, runId }` goes out, and `after()` runs the M3 graph (`createGenerationRun` / `executeGeneration` in `run/index.ts`; `maxDuration` 300 s). Needs JSON, a signed-in user (the proxy answers a signed-out `/api/*` call with 401, not a redirect) and a body under 1 KB. The Home form opens `/g/<slug>?run=<runId>`; for a new name the slug is only the typed name's slug, the run decides the real one. Live check on a built server: 401, 415 and 400 refusals; "Oracle" and "  ORACLE " open the existing guide in about 100 ms; an unknown name returns 202 in 37 ms and the run fails 8 s later with a clear message. Not done on purpose (see "Not now"): aliases, joining a run already in progress, rate limits.)*
+- [x] Guide page `/g/[slug]`: *(`app/(app)/g/[slug]/page.tsx`. Three cases: a finished guide is read; `?run=<id>` shows the run's progress; otherwise "No guide here yet" with a link to search. Checked in a real browser on a built server, signed in with a throwaway test user: search "hono" opened `/g/hono?run=…`, steps and tick marks appeared, a reload in the middle of the run restored the same state, and at the end the page moved to `/g/hono` by itself. The existing Java guide shows 13 code blocks, 38 citation links and one numbered source list.)*
+  - [x] While generating: list of progress steps from `run_events`, **polled every 2 s** (`GET /api/runs/:id/events?after=<id>`). Sections appear when each one is done.
+  - [x] When complete: render the guide Markdown (sanitised), code blocks with a copy button, citations as superscript links, numbered sources list at the end.
+- [x] Simple failure message if the run fails. *(built with the progress view, which has to stop on a failed run anyway: "We could not create this guide", the reason, and a "Try another search" button; seen in the browser with a failed run row.)*
 
 **Not now**
 - Supabase Realtime and token-by-token streaming (polling is enough to show progress).

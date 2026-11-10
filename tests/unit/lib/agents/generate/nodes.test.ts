@@ -137,6 +137,30 @@ describe("identify", () => {
     expect(update.budget).toMatchObject({ steps: 1 });
   });
 
+  it("names the technology's slug after the technology, not after the docs host", async () => {
+    const { deps, saved } = fakeDeps({
+      identify: () => ({ ...ZOD_ANSWER, name: "Java" }),
+      hits: [
+        {
+          title: "Java docs",
+          url: "https://docs.oracle.com/en/java",
+          content: "",
+        },
+      ],
+    });
+    const update = await identify(stateWith({ query: "java" }), deps);
+    expect(technologyOf(update)?.slug).toBe("java"); // not "oracle"
+    expect(saved[0]).toMatchObject({ slug: "java" });
+  });
+
+  it("falls back to the docs host when the name makes no usable slug", async () => {
+    const { deps } = fakeDeps({
+      identify: () => ({ ...ZOD_ANSWER, name: "C++" }),
+    });
+    const update = await identify(stateWith({ query: "c++" }), deps);
+    expect(technologyOf(update)?.slug).toBe("zod");
+  });
+
   it("works out the docs start page from the search results, not from the model", async () => {
     const { deps } = fakeDeps({
       hits: [

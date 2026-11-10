@@ -14,7 +14,7 @@ import type {
 } from "./types";
 
 export type { IngestOptions, IngestResult, PageOutcome } from "./types";
-export { technologyFor } from "./technology";
+export { slugFromName, technologyFor } from "./technology";
 
 // Reads a documentation site into the knowledge base (SRS FR-ING-1, FR-GEN-8).
 //

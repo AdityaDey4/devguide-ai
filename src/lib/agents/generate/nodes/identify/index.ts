@@ -1,4 +1,4 @@
-import { technologyFor } from "../../../../ingest/technology";
+import { slugFromName, technologyFor } from "../../../../ingest/technology";
 import {
   combineUpdates,
   enterStep,
@@ -60,7 +60,13 @@ export async function identify(
   const docsUrl = findDocsStart(officialUrl, hits);
 
   const version = findVersion(hits);
-  const { slug } = technologyFor(docsUrl, { name: answer.name });
+  // The slug comes from the name ("Java" -> "java"), not the address (docs.oracle.com -> "oracle");
+  // the address is only the fallback for names that make no usable slug (like "C++").
+  const nameSlug = slugFromName(answer.name);
+  const { slug } = technologyFor(docsUrl, {
+    name: answer.name,
+    ...(nameSlug && { slug: nameSlug }),
+  });
   const id = await deps.saveTechnology({
     name: answer.name,
     slug,

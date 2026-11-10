@@ -29,6 +29,23 @@ export function technologyFor(
   return { slug, name: overrides.name ?? toDisplayName(slug) };
 }
 
+/**
+ * The slug a technology's NAME gives, or null when the name cannot make a usable one. Same
+ * spelling as the search box (lib/search/normalise.ts), so what a person types finds the guide.
+ * Better than the address when the docs live on a shared vendor site:
+ *
+ *   slugFromName("Java")     -> "java"     (the address docs.oracle.com would give "oracle")
+ *   slugFromName("Next.js")  -> "nextjs"
+ *   slugFromName("C++")      -> null       (use the address instead)
+ */
+export function slugFromName(name: string): string | null {
+  const slug = name
+    .toLowerCase()
+    .trim()
+    .replace(/[\s._-]+/g, "");
+  return SLUG_PATTERN.test(slug) ? slug : null;
+}
+
 function guessSlug(url: URL): string {
   const host = url.hostname.toLowerCase();
 

@@ -96,6 +96,32 @@ describe("POST /api/search: the answers", () => {
     expect(mocks.afterCallbacks).toHaveLength(0);
   });
 
+  it("points at the run already writing it (200) without starting another (FR-GEN-12)", async () => {
+    mocks.resolution = { kind: "join", slug: "hono", runId: "run-3" };
+    const response = await call({ q: "hono" });
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ slug: "hono", runId: "run-3" });
+    expect(mocks.createGenerationRun).not.toHaveBeenCalled();
+    expect(mocks.afterCallbacks).toHaveLength(0);
+  });
+
+  it("passes the retry flag on, and refuses one that is not true or false", async () => {
+    mocks.resolution = { kind: "new", query: "Mercury", slug: "mercury" };
+    await call({ q: "mercury", retry: true });
+    expect(mocks.resolveSearch).toHaveBeenLastCalledWith(
+      expect.anything(),
+      "mercury",
+      { retry: true },
+    );
+    await call({ q: "mercury" });
+    expect(mocks.resolveSearch).toHaveBeenLastCalledWith(
+      expect.anything(),
+      "mercury",
+      { retry: undefined },
+    );
+    expect((await call({ q: "mercury", retry: "yes" })).status).toBe(400);
+  });
+
   it("starts a new run: the record is made for this user and the ids are returned (202)", async () => {
     mocks.resolution = { kind: "new", query: "Some Thing", slug: "something" };
     const response = await call({ q: "some thing" });

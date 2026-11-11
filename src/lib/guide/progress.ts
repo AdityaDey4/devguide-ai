@@ -24,7 +24,13 @@ export type SectionProgress = {
   text: string;
 };
 
+export type Candidate = { name: string; description: string; url: string };
+
 export type Progress = {
+  /** The technologies offered when the name was ambiguous, until the run identifies one. */
+  candidates: Candidate[] | null;
+  /** The id of the event that offered them: a new offer is a new question. */
+  choiceId: number;
   name: string | null;
   version: string | null;
   pages: number | null;
@@ -34,6 +40,8 @@ export type Progress = {
 };
 
 export const emptyProgress: Progress = {
+  candidates: null,
+  choiceId: 0,
   name: null,
   version: null,
   pages: null,
@@ -53,9 +61,20 @@ function foldOne(progress: Progress, event: EventRow): Progress {
   const next = { ...progress, lastId: Math.max(progress.lastId, event.id) };
 
   switch (event.type) {
+    case "needs_choice":
+      return {
+        ...next,
+        choiceId: event.id,
+        candidates: asArray(data.candidates).map((item) => ({
+          name: text(item.name) ?? "",
+          description: text(item.description) ?? "",
+          url: text(item.url) ?? "",
+        })),
+      };
     case "identified":
       return {
         ...next,
+        candidates: null,
         name: text(data.name),
         version: text(data.version),
       };
@@ -94,7 +113,7 @@ function foldOne(progress: Progress, event: EventRow): Progress {
     case "checking":
       return { ...next, checking: true };
     default:
-      return next; // needs_choice, completed, failed: the run's status says it all
+      return next; // completed, failed: the run's status says it all
   }
 }
 

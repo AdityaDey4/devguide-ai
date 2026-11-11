@@ -82,7 +82,7 @@ devguide-ai/
 │     ├─ search/route.ts                # lookup / identify / start run
 │     ├─ runs/route.ts                  # POST start run
 │     ├─ runs/[id]/events/route.ts      # GET status + events after an id (built, M4)
-│     ├─ runs/[id]/route.ts             # GET status, POST resume (disambiguation choice)
+│     ├─ runs/[id]/route.ts             # POST resume with the person's choice (built, M5); GET status later
 │     ├─ chat/route.ts                  # POST message → streamed answer
 │     ├─ guides/[id]/versions/route.ts  # list / create / restore
 │     ├─ guides/[id]/edit/route.ts      # agent edit proposal
@@ -128,14 +128,15 @@ devguide-ai/
 │  │              ingestPage.ts technology.ts config.ts types.ts
 │  ├─ guide/      load.ts (read a finished guide) · citations.ts ([n] to links, one source list)
 │  │              progress.ts (run events to what the page shows)
-│  ├─ search/     index.ts (resolveSearch: guide or new run) · normalise.ts find.ts config.ts
+│  ├─ search/     index.ts (resolveSearch: guide, join or new run) · normalise.ts find.ts config.ts
+│  │              client.ts (startSearch, guideHref: browser side, used by Home and Retry)
 │  ├─ limiter.ts      (runs at most N async jobs at the same time; used by the crawl, the embedder and ingest)
 │  ├─ mcp/  context7/ (index client parse config types)  server.ts (v1.1)
 │  ├─ supabase/   client.ts server.ts proxy.ts (sign-in clients) · service.ts (service-role client,
 │  │              server only) · database.types.ts (generated) · models.ts (short row names)
 │  ├─ pdf/  render.ts
 │  └─ limits/ ratelimit.ts
-├─ components/  search/ (search-form.tsx) · guide/ (guide-view guide-markdown code-block run-progress)
+├─ components/  search/ (search-form.tsx) · guide/ (guide-view guide-markdown code-block run-progress run-failed choose-technology)
 │                chat/ progress/ editor/ ui/
 ├─ supabase/migrations/*.sql
 ├─ scripts/  ingest.ts  (npm run ingest -- <docsUrl>)
@@ -455,8 +456,8 @@ const snippets = await fetchSnippets({ library: "Zod", topic: "Installation: sho
 
 | Method & route | Purpose | Response |
 |---|---|---|
-| `POST /api/search` `{q}` | Lookup → existing guide, or start a run | `200 {slug}` (guide exists) or `202 {slug, runId}` (run started); `400` bad text, `401`, `413`, `415` |
-| `POST /api/runs/:id` `{choice}` | Resume a run waiting for disambiguation | `{ok}` |
+| `POST /api/search` `{q, retry?}` | Lookup → existing guide, or start a run | `200 {slug}` (guide exists) or `202 {slug, runId}` (run started); `400` bad text, `401`, `413`, `415` |
+| `POST /api/runs/:id` `{choice:"candidate", url}` or `{choice:"refine", query}` | Resume a run waiting for disambiguation; the address must be one the run offered; only the first answer resumes it | `202 {ok}`; `400`, `401`, `404`, `409` (not waiting / already answered), `413`, `415` |
 | `GET /api/runs/:id/events?after=N` | Run status, failure reason, the technology's slug and the events after id N (the page polls it every 2 s in M4) | `{status, error, slug, events}` |
 | `GET /api/runs/:id` | Run status + last event id | JSON |
 | `POST /api/chat` `{chatId, message}` | Ask a question | Streamed text + final `{citations, origin}` event |

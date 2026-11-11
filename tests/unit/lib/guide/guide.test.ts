@@ -156,3 +156,50 @@ describe("foldEvents (FR-GEN-9, FR-GEN-10)", () => {
     expect(progress.lastId).toBe(2);
   });
 });
+
+describe("foldEvents: the choice (FR-SRCH-5)", () => {
+  const offer = (id: number, names: string[]): EventRow => ({
+    id,
+    type: "needs_choice",
+    payload: {
+      candidates: names.map((name) => ({
+        name,
+        description: `${name} description`,
+        url: `https://${name}.dev`,
+      })),
+    },
+  });
+
+  it("remembers the options and which event offered them", () => {
+    const progress = foldEvents(emptyProgress, [offer(4, ["bun", "bunjs"])]);
+    expect(progress.candidates).toEqual([
+      { name: "bun", description: "bun description", url: "https://bun.dev" },
+      {
+        name: "bunjs",
+        description: "bunjs description",
+        url: "https://bunjs.dev",
+      },
+    ]);
+    expect(progress.choiceId).toBe(4);
+  });
+
+  it("treats a second offer (after None of these) as a new question", () => {
+    const progress = foldEvents(emptyProgress, [
+      offer(4, ["bun", "bunjs"]),
+      offer(9, ["bun runtime", "bun build"]),
+    ]);
+    expect(progress.choiceId).toBe(9);
+    expect(progress.candidates?.map((c) => c.name)).toEqual([
+      "bun runtime",
+      "bun build",
+    ]);
+  });
+
+  it("forgets the options once a technology is identified", () => {
+    const progress = foldEvents(emptyProgress, [
+      offer(4, ["bun"]),
+      { id: 5, type: "identified", payload: { name: "Bun" } },
+    ]);
+    expect(progress.candidates).toBeNull();
+  });
+});

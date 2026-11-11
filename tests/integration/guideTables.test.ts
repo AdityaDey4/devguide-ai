@@ -355,9 +355,14 @@ describe("who can read what (Row Level Security)", () => {
 
   it("shows events by the same rule as the run they belong to", async () => {
     const asA = await signedInAs("a");
-    const runsOfEvents = (
-      await asA.from("run_events").select("run_id")
-    ).data?.map((e) => e.run_id);
+    const runsOfEvents =
+      // only these two runs: an unfiltered read stops at 1000 rows once real runs pile up
+      (
+        await asA
+          .from("run_events")
+          .select("run_id")
+          .in("run_id", [generateRun, editRunOfB])
+      ).data?.map((e) => e.run_id);
     expect(runsOfEvents).toContain(generateRun);
     expect(runsOfEvents).not.toContain(editRunOfB);
   });

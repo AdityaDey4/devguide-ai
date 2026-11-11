@@ -1,19 +1,19 @@
 "use client";
 
 import { CheckIcon, Loader2Icon } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { z } from "zod";
-import { buttonVariants } from "@/components/ui/button";
 import { emptyProgress, foldEvents, type Progress } from "@/lib/guide/progress";
+import { ChooseTechnology } from "./choose-technology";
 import { GuideMarkdown } from "./guide-markdown";
+import { RunFailed } from "./run-failed";
 
 // The page you see while a guide is being written (M4).
 //
 // Asks GET /api/runs/<id>/events every 2 seconds, starting from event 0, so a reload simply
 // replays the run and carries on. When the run is completed it moves to the finished guide; if
-// it fails, it says why.
+// it fails, it says why and offers Retry; if it stops to ask which technology is meant, it shows the choice.
 
 const POLL_MS = 2000;
 
@@ -30,7 +30,14 @@ const Answer = z.object({
   ),
 });
 
-export function RunProgress({ runId }: { runId: string }) {
+export function RunProgress({
+  runId,
+  query,
+}: {
+  runId: string;
+  /** The name that was searched, for Retry. */
+  query: string;
+}) {
   const router = useRouter();
   const [progress, setProgress] = useState<Progress>(emptyProgress);
   const [status, setStatus] = useState("queued");
@@ -75,20 +82,15 @@ export function RunProgress({ runId }: { runId: string }) {
     };
   }, [runId, router]);
 
-  if (status === "failed") {
-    return (
-      <main id="main" className="mx-auto w-full max-w-2xl flex-1 px-6 py-16">
-        <h1 className="text-2xl font-semibold">
-          We could not create this guide
-        </h1>
-        <p role="alert" className="text-muted-foreground mt-3">
-          {error ?? "Something went wrong."}
-        </p>
-        <Link href="/search" className={buttonVariants({ className: "mt-6" })}>
-          Try another search
-        </Link>
-      </main>
-    );
+  // The page can tell more than this view can (for example, that a partial draft exists), so
+  // once the run has failed the server renders the failure again.
+  const failed = status === "failed";
+  useEffect(() => {
+    if (failed) router.refresh();
+  }, [failed, router]);
+
+  if (failed) {
+    return <RunFailed error={error ?? "Something went wrong."} query={query} />;
   }
 
   const written = progress.sections.filter((s) => s.status === "done").length;
@@ -148,12 +150,19 @@ export function RunProgress({ runId }: { runId: string }) {
         ))}
       </ol>
 
-      {status === "waiting_user" && (
-        <p role="status" className="mt-4 rounded-lg border p-3 text-sm">
-          This name could mean more than one technology and needs a choice. That
-          step is not built yet.
-        </p>
-      )}
+      {status === "waiting_user" &&
+        (progress.candidates && progress.candidates.length > 0 ? (
+          // a new offer (after "None of these") is a new question: a new key
+          <ChooseTechnology
+            key={progress.choiceId}
+            runId={runId}
+            candidates={progress.candidates}
+          />
+        ) : (
+          <p role="status" className="text-muted-foreground mt-4 text-sm">
+            Getting the options…
+          </p>
+        ))}
       {connection === "lost" && (
         <p role="status" className="text-muted-foreground mt-4 text-sm">
           Connection lost. Trying again…

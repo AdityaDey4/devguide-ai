@@ -16,7 +16,7 @@ import { GenerateError } from "../errors";
 export class RunConflict extends Error {
   constructor(technologyName: string) {
     super(
-      `Another run is already generating a guide for ${technologyName}. Wait for it to finish.`,
+      `Another run is already generating a guide for ${technologyName}. Search for it again to follow that run.`,
     );
     this.name = "RunConflict";
   }

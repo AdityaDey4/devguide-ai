@@ -259,7 +259,7 @@ describe("when a run fails", () => {
     expect(outcome).toMatchObject({
       status: "failed",
       reason:
-        "Another run is already generating a guide for Zod. Wait for it to finish.",
+        "Another run is already generating a guide for Zod. Search for it again to follow that run.",
     });
     expect(t.fetched).toEqual([]); // it stopped before downloading anything
   });

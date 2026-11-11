@@ -50,27 +50,55 @@ describe("resolveSearch", () => {
   const db = {} as SearchDb;
 
   it("says invalid, and asks the database nothing, for text outside 2 to 60 characters", async () => {
-    const findGuideSlug = vi.fn();
-    expect(await resolveSearch(db, "x", { findGuideSlug })).toEqual({
+    const findExisting = vi.fn();
+    expect(await resolveSearch(db, "x", {}, { findExisting })).toEqual({
       kind: "invalid",
       reason: "too_short",
     });
-    expect(findGuideSlug).not.toHaveBeenCalled();
+    expect(findExisting).not.toHaveBeenCalled();
   });
 
   it("opens an existing guide, found under any spelling (FR-SRCH-2)", async () => {
-    const findGuideSlug = vi.fn(async () => "nextjs");
-    expect(await resolveSearch(db, "Next JS", { findGuideSlug })).toEqual({
+    const findExisting = vi.fn(async () => ({
+      kind: "guide" as const,
+      slug: "nextjs",
+    }));
+    expect(await resolveSearch(db, "Next JS", {}, { findExisting })).toEqual({
       kind: "guide",
       slug: "nextjs",
     });
-    expect(findGuideSlug).toHaveBeenCalledWith(db, ["nextjs", "next-js"]);
+    expect(findExisting).toHaveBeenCalledWith(
+      db,
+      { display: "Next JS", slugs: ["nextjs", "next-js"] },
+      {},
+    );
+  });
+
+  it("joins the run that is already writing it, instead of starting another (FR-GEN-12)", async () => {
+    const findExisting = vi.fn(async () => ({
+      kind: "run" as const,
+      slug: "hono",
+      runId: "run-7",
+    }));
+    expect(await resolveSearch(db, "Hono", {}, { findExisting })).toEqual({
+      kind: "join",
+      slug: "hono",
+      runId: "run-7",
+    });
+  });
+
+  it("passes the retry option on, so a failed run's partial draft is not reopened", async () => {
+    const findExisting = vi.fn(async () => null);
+    await resolveSearch(db, "Mercury", { retry: true }, { findExisting });
+    expect(findExisting).toHaveBeenCalledWith(db, expect.anything(), {
+      retry: true,
+    });
   });
 
   it("starts a new run, with the typed name, when there is no guide", async () => {
-    const findGuideSlug = vi.fn(async () => null);
+    const findExisting = vi.fn(async () => null);
     expect(
-      await resolveSearch(db, "  Some   New Thing ", { findGuideSlug }),
+      await resolveSearch(db, "  Some   New Thing ", {}, { findExisting }),
     ).toEqual({ kind: "new", query: "Some New Thing", slug: "somenewthing" });
   });
 });

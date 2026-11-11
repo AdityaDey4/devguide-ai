@@ -8,9 +8,10 @@ import { resolveSearch } from "@/lib/search";
 import { MAX_QUERY_CHARS, MIN_QUERY_CHARS } from "@/lib/search/config";
 import { createClient } from "@/lib/supabase/server";
 
-// POST /api/search  { "q": "next js" }   (docs/03-Architecture.md section 8, SRS FR-SRCH)
+// POST /api/search  { "q": "next js" }   ("retry": true after a failure: a partial draft is not reopened)   (docs/03-Architecture.md section 8, SRS FR-SRCH)
 //
 //   200 { slug }            a guide exists: open /g/<slug>
+//   200 { slug, runId }     a run is already writing it: open /g/<slug>?run=<runId> and watch
 //   202 { slug, runId }     a new run was started: open /g/<slug>?run=<runId> to watch it
 //   400 / 401 / 413 / 415 { error }
 //
@@ -22,7 +23,7 @@ import { createClient } from "@/lib/supabase/server";
 export const maxDuration = 300;
 
 const MAX_BODY_CHARS = 1024;
-const Body = z.object({ q: z.string() });
+const Body = z.object({ q: z.string(), retry: z.boolean().optional() });
 
 const fail = (error: string, status: number) =>
   Response.json({ error }, { status });
@@ -47,7 +48,9 @@ export async function POST(request: Request) {
     return fail('Send {"q": "technology name"}', 400);
   }
 
-  const result = await resolveSearch(supabase, body.q);
+  const result = await resolveSearch(supabase, body.q, {
+    retry: body.retry,
+  });
   switch (result.kind) {
     case "invalid":
       return fail(
@@ -57,6 +60,10 @@ export async function POST(request: Request) {
 
     case "guide":
       return Response.json({ slug: result.slug });
+
+    // One active run per technology (BR-1): a second person watches the first one's run.
+    case "join":
+      return Response.json({ slug: result.slug, runId: result.runId });
 
     case "new": {
       const runId = await createGenerationRun(data.user.id);

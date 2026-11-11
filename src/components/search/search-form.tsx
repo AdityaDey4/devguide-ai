@@ -4,11 +4,12 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { guideHref, startSearch } from "@/lib/search/client";
 
 // The big search box on Home (M4): a plain input and a submit button, nothing else yet.
 //
 //   types "LangGraph", presses Enter
-//     -> POST /api/search { q: "LangGraph" }          (the next M4 task builds this route)
+//     -> POST /api/search { q: "LangGraph" }
 //     -> { slug: "langgraph" }                 a guide exists: opens /g/langgraph
 //     -> { slug: "hono", runId: "…" }          a new run:      opens /g/hono?run=…  (progress)
 //                                              (the guide page is the next M4 task)
@@ -18,13 +19,6 @@ import { Input } from "@/components/ui/input";
 
 const MIN_CHARS = 2;
 const MAX_CHARS = 60;
-
-function parseAnswer(body: unknown): { slug: string; runId?: string } | null {
-  if (!body || typeof body !== "object" || !("slug" in body)) return null;
-  const slug = String(body.slug);
-  const runId = "runId" in body ? String(body.runId) : undefined;
-  return { slug, runId };
-}
 
 export function SearchForm() {
   const router = useRouter();
@@ -42,28 +36,13 @@ export function SearchForm() {
 
     setBusy(true);
     setError(null);
-    try {
-      const response = await fetch("/api/search", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ q }),
-      });
-      const body: unknown = await response.json().catch(() => null);
-      const answer = response.ok ? parseAnswer(body) : null;
-      if (!answer) {
-        setError("Could not start the search. Please try again.");
-        setBusy(false);
-        return;
-      }
-      router.push(
-        answer.runId
-          ? `/g/${answer.slug}?run=${answer.runId}`
-          : `/g/${answer.slug}`,
-      );
-    } catch {
-      setError("Could not reach the server. Check your connection.");
+    const result = await startSearch(q);
+    if (!result.ok) {
+      setError(result.error);
       setBusy(false);
+      return;
     }
+    router.push(guideHref(result.answer, q));
   }
 
   return (

@@ -16,19 +16,32 @@ export async function savePartial(
   if (written.length === 0) return;
   if (await deps.store.hasGuide(technology.id)) return;
 
-  await deps.generate.saveGuide({
+  const sections = written.map((def) => {
+    const draft = values.sections[def.key];
+    return {
+      key: def.key,
+      title: draft.title,
+      markdown: draft.markdown,
+      citations: draft.citations,
+      needs_review: draft.status !== "ok",
+    };
+  });
+
+  const saved = await deps.generate.saveGuide({
     technologyId: technology.id,
     status: "partial",
     changeNote: "Partial draft: the run stopped before it finished",
-    sections: written.map((def) => {
-      const draft = values.sections[def.key];
-      return {
-        key: def.key,
-        title: draft.title,
-        markdown: draft.markdown,
-        citations: draft.citations,
-        needs_review: draft.status !== "ok",
-      };
-    }),
+    sections,
   });
+
+  // Searchable too, so the chat works on a draft. A failure to index must not hide the draft.
+  try {
+    await deps.generate.indexGuide({
+      technology,
+      guideId: saved.guideId,
+      sections,
+    });
+  } catch {
+    // the draft is saved; it simply is not searchable yet
+  }
 }

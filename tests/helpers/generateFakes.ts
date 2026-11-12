@@ -7,6 +7,7 @@ import { newBudget } from "@/lib/agents/shared/budget";
 import type { RunEvent } from "@/lib/agents/shared/events";
 import type { SearchHit } from "@/lib/agents/shared/tavily";
 import type { SaveGuideInput } from "@/lib/agents/generate/guide/saveGuide";
+import type { IndexGuideInput } from "@/lib/rag/guideIndex";
 import type { StoreInput } from "@/lib/rag/store";
 
 // Fake dependencies for the generation graph: no model, no web, no database. Each fake records
@@ -64,6 +65,7 @@ export function fakeDeps(
   const saved: unknown[] = [];
   const fetched: string[] = [];
   const stored: StoreInput[] = [];
+  const indexed: IndexGuideInput[] = [];
   const guides: SaveGuideInput[] = [];
   const snippetQueries: { name: string; topic: string }[] = [];
   const written: { messages: unknown[] }[] = [];
@@ -134,6 +136,10 @@ export function fakeDeps(
       guides.push(input);
       return { guideId: "guide-1", versionId: "version-1", versionNo: 1 };
     },
+    indexGuide: async (input) => {
+      indexed.push(input);
+      return { inserted: 1, removed: 0 };
+    },
     storeChunks: async (input) => {
       if (answers.storeFails) throw new Error("embeddings are down");
       stored.push(input);
@@ -148,6 +154,7 @@ export function fakeDeps(
     saved,
     fetched,
     stored,
+    indexed,
     written,
     guides,
     snippetQueries,

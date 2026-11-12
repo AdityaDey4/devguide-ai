@@ -97,13 +97,16 @@ devguide-ai/
 │  │  │             checkSections/ (index check paragraphs codeNames) · rewriteSection/ (index input prompt)
 │  │  │             assembleGuide.ts · guide/saveGuide.ts (the database part of "assemble") · config.ts
 │  │  │             run/ (index: startGeneration / resumeGeneration · drive failure partial store types)
-│  │  ├─ chat/      graph.ts state.ts nodes/*.ts prompts.ts
+│  │  ├─ chat/      index.ts (askGuide: one question in, answer + citations out) · graph.ts (the wiring)
+│  │  │             state.ts deps.ts realDeps.ts config.ts
+│  │  │             nodes/ understand/ (index prompt schema) · retrieve.ts · answer/ (index prompt)
 │  │  ├─ edit/      graph.ts ...
 │  │  └─ shared/    llm/ (index.ts: getModel / largeModel / smallModel · config.ts providers.ts
 │  │                 errors.ts types.ts) · checkpointer/ (index.ts · config.ts errors.ts types.ts) · budget/ (index.ts · check.ts update.ts
 │  │                 config.ts errors.ts types.ts) · events/ (index.ts: class RunEvents ·
 │  │                 row.ts database.ts config.ts types.ts)
 │  ├─ rag/
+│  │  ├─ guideIndex/  index.ts (indexGuide: chunk a guide's sections, store them, drop what is gone) · stale.ts
 │  │  ├─ chunker/     index.ts (the recipe: the 4 steps) · parseBlocks.ts buildUnits.ts splitLarge.ts
 │  │  │               pack.ts text.ts headingPath.ts tokens.ts config.ts types.ts
 │  │  ├─ embedder/    index.ts (the recipe: the 5 steps) · batches.ts client.ts config.ts
@@ -128,6 +131,8 @@ devguide-ai/
 │  │              ingestPage.ts technology.ts config.ts types.ts
 │  ├─ guide/      load.ts (read a finished guide) · citations.ts ([n] to links, one source list)
 │  │              progress.ts (run events to what the page shows)
+│  ├─ chat/       request.ts (what /api/chat accepts) · scope.ts (slug to technology + guide) · stream.ts (answer as lines of JSON)
+│  │             client.ts (browser: read the stream) · markers.ts ([n] to links)
 │  ├─ search/     index.ts (resolveSearch: guide, join or new run) · normalise.ts find.ts config.ts
 │  │              client.ts (startSearch, guideHref: browser side, used by Home and Retry)
 │  ├─ limiter.ts      (runs at most N async jobs at the same time; used by the crawl, the embedder and ingest)
@@ -137,6 +142,7 @@ devguide-ai/
 │  ├─ pdf/  render.ts
 │  └─ limits/ ratelimit.ts
 ├─ components/  search/ (search-form.tsx) · guide/ (guide-view guide-markdown code-block run-progress run-failed choose-technology)
+│  chat/ (chat-panel: state + layout · chat-message · chat-input)
 │                chat/ progress/ editor/ ui/
 ├─ supabase/migrations/*.sql
 ├─ scripts/  ingest.ts  (npm run ingest -- <docsUrl>)

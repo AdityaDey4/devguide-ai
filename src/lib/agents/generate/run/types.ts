@@ -41,7 +41,7 @@ export type RunDeps = {
   store: RunStore;
   graph: GenerateGraph;
   /** Only what the runner itself uses: the progress feed and saving a partial guide. */
-  generate: Pick<GenerateDeps, "events" | "saveGuide">;
+  generate: Pick<GenerateDeps, "events" | "saveGuide" | "indexGuide">;
   /** Called with the name of each graph step as it finishes (for progress lines). */
   onStep?: (node: string) => void;
 };

@@ -1,4 +1,3 @@
-import { chunkMarkdown } from "../../../rag/chunker";
 import {
   combineUpdates,
   enterStep,
@@ -51,23 +50,12 @@ export async function assembleGuide(
     status,
   });
 
-  // 3. Make the guide's own text searchable for the chat (sections that cite nothing are only
-  //    "could not be written" notes and are left out).
-  for (const section of sections.filter((s) => s.citations.length > 0)) {
-    await deps.storeChunks({
-      technologyId: technology.id,
-      guideId: saved.guideId,
-      source: {
-        url: `guide:${technology.slug}`,
-        title: `${technology.name} guide`,
-        type: "guide",
-      },
-      chunks: chunkMarkdown(section.markdown, {
-        title: `${technology.name} guide: ${section.title}`,
-      }),
-      ...(technology.version && { techVersion: technology.version }),
-    });
-  }
+  // 3. Make the guide's own text searchable for the chat (and drop the old version's text).
+  await deps.indexGuide({
+    technology,
+    guideId: saved.guideId,
+    sections,
+  });
 
   // 4. Tell the UI.
   await deps.events(state.runId).emit({

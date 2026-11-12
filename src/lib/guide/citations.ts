@@ -23,8 +23,17 @@ export type ReadableSection = {
   needsReview: boolean;
 };
 
-const CODE = /(```[\s\S]*?```|`[^`\n]*`)/; // a code block, or inline code
-const MARKER = /\[(\d+)\]/g; // [1], [23]
+export const CODE = /(```[\s\S]*?```|`[^`\n]*`)/; // a code block, or inline code
+export const MARKER = /\[(\d+)\]/g; // [1], [23]
+
+/**
+ * The address to put in a Markdown link, or null when it is not a web address. Spaces and
+ * brackets would break a Markdown link, so they are escaped.
+ */
+export function linkAddress(url: string): string | null {
+  if (!/^https?:\/\//.test(url)) return null;
+  return encodeURI(url).replace(/\(/g, "%28").replace(/\)/g, "%29");
+}
 
 export function linkCitations(sections: GuideSection[]) {
   const sources: Source[] = [];
@@ -42,13 +51,8 @@ export function linkCitations(sections: GuideSection[]) {
   function linkMarkers(text: string, citations: GuideSection["citations"]) {
     return text.replace(MARKER, (marker, digits: string) => {
       const citation = citations.find((c) => c.n === Number(digits));
-      // only web addresses become links
-      if (!citation || !/^https?:\/\//.test(citation.url)) return marker;
-
-      // spaces and brackets would break a Markdown link
-      const address = encodeURI(citation.url)
-        .replace(/\(/g, "%28")
-        .replace(/\)/g, "%29");
+      const address = citation && linkAddress(citation.url); // only web addresses become links
+      if (!citation || !address) return marker;
       return `[${numberOf(citation.url, citation.title)}](${address})`;
     });
   }
@@ -69,4 +73,18 @@ export function linkCitations(sections: GuideSection[]) {
   });
 
   return { sections: readable, sources };
+}
+
+/**
+ * The text without its [n] markers, for searching and for the chat model: a marker means "source
+ * n of THIS section", which says nothing once the text is a chunk on its own. Markers in code
+ * are left alone, like in linkCitations.
+ *
+ *   withoutMarkers("Zod parses data [1]. Use `a[1]`.")  ->  "Zod parses data. Use `a[1]`."
+ */
+export function withoutMarkers(markdown: string): string {
+  return markdown
+    .split(CODE)
+    .map((part, i) => (i % 2 === 1 ? part : part.replace(/ ?\[\d+\]/g, "")))
+    .join("");
 }

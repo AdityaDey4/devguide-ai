@@ -2,6 +2,7 @@ import type { z } from "zod";
 import type { BaseMessageLike } from "@langchain/core/messages";
 import type { DiscoveryResult } from "../../fetch/discover";
 import type { FetchedPage } from "../../fetch/fetchPage";
+import type { IndexGuideInput, IndexGuideResult } from "../../rag/guideIndex";
 import type { StoreInput, StoreResult, TechnologyInput } from "../../rag/store";
 import type { RunEvents } from "../shared/events";
 import type { Snippet } from "../../mcp/context7";
@@ -39,6 +40,8 @@ export type GenerateDeps = {
   saveTechnology: (input: TechnologyInput) => Promise<string>;
   /** Saves the finished guide as a new version and returns the ids. */
   saveGuide: (input: SaveGuideInput) => Promise<SavedGuide>;
+  /** Makes the saved guide's own text searchable for the chat; drops what the new text lacks. */
+  indexGuide: (input: IndexGuideInput) => Promise<IndexGuideResult>;
   /** Cuts nothing: takes finished chunks, embeds the new ones and saves them. */
   storeChunks: (input: StoreInput) => Promise<StoreResult>;
 };

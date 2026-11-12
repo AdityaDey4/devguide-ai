@@ -166,24 +166,18 @@ describe("assembleGuide", () => {
     expect(guides[0].status).toBe("partial");
   });
 
-  it("makes the guide's own text searchable, tied to the guide and with no source page", async () => {
-    const { deps, stored } = fakeDeps();
+  it("hands the saved guide to the indexer: its id, the technology and every section", async () => {
+    const { deps, indexed } = fakeDeps();
     await assembleGuide(stateFor({}), deps);
 
-    expect(stored).toHaveLength(7); // one per section
-    expect(stored[0]).toMatchObject({
-      technologyId: "tech-1",
+    expect(indexed).toHaveLength(1);
+    expect(indexed[0]).toMatchObject({
       guideId: "guide-1",
-      techVersion: "4.0.0",
-      source: { type: "guide", title: "Zod guide" },
+      technology: { id: "tech-1", slug: "zod", version: "4.0.0" },
     });
-    expect(stored[0].chunks[0].headingPath).toContain("Zod guide: What it is");
-  });
-
-  it("leaves sections that cite nothing out of the searchable text", async () => {
-    const { deps, stored } = fakeDeps();
-    await assembleGuide(stateFor({}, false), deps);
-    expect(stored).toEqual([]);
+    expect(indexed[0].sections.map((s) => s.title)).toEqual(
+      SECTIONS.map((s) => s.title),
+    );
   });
 
   it("tells the UI the guide and version, and returns them", async () => {

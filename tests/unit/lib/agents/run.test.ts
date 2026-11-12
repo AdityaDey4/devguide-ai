@@ -47,11 +47,16 @@ function setup(
   const fake = fakeDeps(answers);
   const run = fakeStore(storeOptions);
   const partialGuides: unknown[] = [];
+  const partialIndexed: unknown[] = [];
   const deps: RunDeps = {
     store: run.store,
     graph: buildGenerateGraph(checkpointer, fake.deps),
     generate: {
       events: fake.deps.events,
+      indexGuide: async (input) => {
+        partialIndexed.push(input);
+        return { inserted: 0, removed: 0 };
+      },
       saveGuide: async (input) => {
         partialGuides.push(input);
         return {
@@ -62,7 +67,7 @@ function setup(
       },
     },
   };
-  return { ...fake, ...run, deps, partialGuides, checkpointer };
+  return { ...fake, ...run, deps, partialGuides, partialIndexed, checkpointer };
 }
 
 const ambiguous = {
@@ -308,6 +313,26 @@ describe("a partial draft", () => {
     expect(saved.status).toBe("partial");
     expect(saved.sections).toHaveLength(7);
     expect(saved.sections.map((s) => s.key)[0]).toBe("what-it-is");
+  });
+
+  it("makes the partial draft searchable too, tied to the draft's guide", async () => {
+    const t = failAtTheEnd(false);
+    await startGeneration("zod", {}, t.deps);
+    expect(t.partialIndexed).toHaveLength(1);
+    expect(t.partialIndexed[0]).toMatchObject({
+      guideId: "partial-guide",
+      technology: { id: "tech-1" },
+    });
+  });
+
+  it("keeps the draft even when making it searchable fails", async () => {
+    const t = failAtTheEnd(false);
+    t.deps.generate.indexGuide = async () => {
+      throw new Error("embeddings are down");
+    };
+    const outcome = await startGeneration("zod", {}, t.deps);
+    expect(outcome.status).toBe("failed");
+    expect(t.partialGuides).toHaveLength(1);
   });
 
   it("never replaces a guide that already exists", async () => {

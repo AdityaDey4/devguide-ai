@@ -1,0 +1,18 @@
+{"id":"stored-01","technology":"nodejs","group":"stored","question":"How do I install Node.js from source?","expected":["guide","stored_docs"],"mentions":["make"]}
+{"id":"stored-02","technology":"nodejs","group":"stored","question":"How do I handle errors in a Node.js callback?","expected":["guide","stored_docs"],"mentions":["error","err"]}
+{"id":"stored-03","technology":"nodejs","group":"stored","question":"What is Node.js and what is it used for?","expected":["guide","stored_docs"],"mentions":["JavaScript","runtime"]}
+{"id":"stored-04","technology":"java","group":"stored","question":"How do I create a thread in Java using the Runnable interface?","expected":["guide","stored_docs"],"mentions":["Runnable"]}
+{"id":"stored-05","technology":"java","group":"stored","question":"How do I install the JDK on Windows?","expected":["guide","stored_docs"],"mentions":["JDK"]}
+{"id":"stored-06","technology":"langchain","group":"stored","question":"How do I pause a LangGraph StateGraph for human approval with interrupt?","expected":["guide","stored_docs"],"mentions":["interrupt"]}
+{"id":"stored-07","technology":"langchain","group":"stored","question":"What are the key concepts of LangChain?","expected":["guide","stored_docs"],"mentions":["chain","prompt","model","agent"]}
+{"id":"outside-01","technology":"nodejs","group":"outside","question":"How do I write to a file in Node.js?","expected":["fetched_now"],"mentions":["writeFile"]}
+{"id":"outside-02","technology":"nodejs","group":"outside","question":"How do I get the current working directory in Node.js?","expected":["fetched_now"],"mentions":["cwd"]}
+{"id":"outside-03","technology":"nodejs","group":"outside","question":"How do I create a directory recursively in Node.js?","expected":["fetched_now"],"mentions":["mkdir"]}
+{"id":"outside-04","technology":"java","group":"outside","question":"How do I read a file line by line in Java?","expected":["fetched_now"],"mentions":["BufferedReader","readLine","Files","Scanner"]}
+{"id":"outside-05","technology":"java","group":"outside","question":"How do I sort a List of strings in Java?","expected":["fetched_now"],"mentions":["sort","Collections","Comparator"]}
+{"id":"outside-06","technology":"langchain","group":"outside","question":"How do I split a long text into chunks with RecursiveCharacterTextSplitter in LangChain?","expected":["fetched_now"],"mentions":["RecursiveCharacterTextSplitter","split"]}
+{"id":"none-01","technology":"nodejs","group":"not_found","question":"How do I bake sourdough bread?","expected":["not_found"]}
+{"id":"none-02","technology":"nodejs","group":"not_found","question":"How do I use the built-in fs.teleport() function in Node.js?","expected":["not_found"]}
+{"id":"none-03","technology":"java","group":"not_found","question":"What is the capital of France?","expected":["not_found"]}
+{"id":"none-04","technology":"java","group":"not_found","question":"How do I use the java.util.TimeMachine class?","expected":["not_found"]}
+{"id":"none-05","technology":"langchain","group":"not_found","question":"How do I configure the HologramMemory class in LangChain?","expected":["not_found"]}

@@ -1,9 +1,11 @@
-import { askGuide } from "@/lib/agents/chat";
+import { after } from "next/server";
+import { askGuide, type AskGuideResult } from "@/lib/agents/chat";
 import {
   ChatRequest,
   MAX_BODY_CHARS,
   MAX_QUESTION_CHARS,
 } from "@/lib/chat/request";
+import { saveFetched } from "@/lib/chat/saveFetched";
 import { findChatScope } from "@/lib/chat/scope";
 import { chatResponse } from "@/lib/chat/stream";
 import { createClient } from "@/lib/supabase/server";
@@ -14,8 +16,10 @@ import { createClient } from "@/lib/supabase/server";
 //   200  a stream of lines: the answer text piece by piece, then its citations (see lib/chat/stream.ts)
 //   400 / 401 / 404 / 413 / 415 { error }     refused before any answering starts
 //
-// The question is answered from what is stored for that technology and its guide. The page keeps
-// the conversation and sends the earlier messages along; nothing is saved here yet.
+// The question is answered from what is stored for that technology and its guide (and, when that
+// is not enough, from Context7 and the official docs read live). Pages found that way and used
+// are saved afterwards for next time. The page keeps the conversation and sends the earlier
+// messages along; the conversation itself is not saved.
 // Rate limits and the per-question budget come later (SEC-8, FR-CHAT-11).
 
 export const maxDuration = 60;
@@ -53,8 +57,16 @@ export async function POST(request: Request) {
   const scope = await findChatScope(supabase, body.data.slug);
   if (!scope) return fail("There is no guide to ask about yet", 404);
 
-  return chatResponse((onToken) =>
-    askGuide(
+  // What the answer found outside the stored text is saved AFTER the response is sent (after()),
+  // so saving never delays the person. `result` is set by then: the response only ends when the
+  // answer has been written.
+  let result: AskGuideResult | undefined;
+  after(async () => {
+    if (result) await saveFetched(scope.technology.id, result.toStore);
+  });
+
+  return chatResponse(async (onToken) => {
+    result = await askGuide(
       {
         technology: scope.technology,
         guideId: scope.guideId,
@@ -62,6 +74,7 @@ export async function POST(request: Request) {
         question: body.data.question,
       },
       onToken,
-    ),
-  );
+    );
+    return result;
+  });
 }

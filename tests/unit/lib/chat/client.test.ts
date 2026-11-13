@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { ChatCitation } from "@/lib/agents/chat";
+import type { ChatCitation, ChatOrigin } from "@/lib/agents/chat";
 import { askChat, parseChatLine } from "@/lib/chat/client";
 import { linkAnswer } from "@/lib/chat/markers";
 
@@ -34,11 +34,15 @@ function setup(response: Response | Error) {
   vi.stubGlobal("fetch", fetchMock);
   const pieces: string[] = [];
   const lists: ChatCitation[][] = [];
+  const origins: ChatOrigin[] = [];
   const handlers = {
     onText: (piece: string) => void pieces.push(piece),
-    onCitations: (list: ChatCitation[]) => void lists.push(list),
+    onDone: (list: ChatCitation[], origin: ChatOrigin) => {
+      lists.push(list);
+      origins.push(origin);
+    },
   };
-  return { fetchMock, pieces, lists, handlers };
+  return { fetchMock, pieces, lists, origins, handlers };
 }
 
 afterEach(() => vi.unstubAllGlobals());
@@ -50,12 +54,24 @@ describe("parseChatLine", () => {
       text: "Hi",
     });
     expect(
-      parseChatLine(JSON.stringify({ type: "citations", citations: [docs] })),
-    ).toEqual({ type: "citations", citations: [docs] });
+      parseChatLine(
+        JSON.stringify({
+          type: "done",
+          citations: [docs],
+          origin: "fetched_now",
+        }),
+      ),
+    ).toEqual({ type: "done", citations: [docs], origin: "fetched_now" });
     expect(parseChatLine('{"type":"error","message":"No"}')).toEqual({
       type: "error",
       message: "No",
     });
+  });
+
+  it("ignores a done line with an origin we do not know", () => {
+    expect(
+      parseChatLine('{"type":"done","citations":[],"origin":"elsewhere"}'),
+    ).toBeNull();
   });
 
   it("ignores what is not one of ours", () => {
@@ -66,11 +82,11 @@ describe("parseChatLine", () => {
 });
 
 describe("askChat", () => {
-  it("sends the question and the history, and hands over text then citations", async () => {
-    const { fetchMock, pieces, lists, handlers } = setup(
+  it("sends the question and the history, and hands over text, then the citations and the origin", async () => {
+    const { fetchMock, pieces, lists, origins, handlers } = setup(
       streamed([
         '{"type":"text","text":"Use "}\n{"type":"text","text":"z.url() [1]."}\n',
-        `{"type":"citations","citations":${JSON.stringify([docs])}}\n`,
+        `{"type":"done","citations":${JSON.stringify([docs])},"origin":"stored_docs"}\n`,
       ]),
     );
     const history = [{ role: "user" as const, content: "earlier" }];
@@ -79,6 +95,7 @@ describe("askChat", () => {
     expect(outcome).toEqual({ ok: true });
     expect(pieces).toEqual(["Use ", "z.url() [1]."]);
     expect(lists).toEqual([[docs]]);
+    expect(origins).toEqual(["stored_docs"]);
     const [url, init] = fetchMock.mock.calls[0] as unknown as [
       string,
       RequestInit,
@@ -93,7 +110,7 @@ describe("askChat", () => {
       streamed([
         line.slice(0, 10),
         line.slice(10, 25),
-        line.slice(25) + '{"type":"citations","citations":[]}\n',
+        line.slice(25) + '{"type":"done","citations":[],"origin":"guide"}\n',
       ]),
     );
     expect(await askChat(request, handlers)).toEqual({ ok: true });
@@ -115,7 +132,7 @@ describe("askChat", () => {
     expect(lists).toEqual([]);
   });
 
-  it("says the answer was cut off when the stream ends without citations", async () => {
+  it("says the answer was cut off when the stream ends without its done line", async () => {
     const { handlers } = setup(streamed(['{"type":"text","text":"Use "}\n']));
     const outcome = await askChat(request, handlers);
     expect(outcome.ok).toBe(false);

@@ -4,6 +4,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 // what is refused before anything is answered, and the shape of the streamed answer (FR-CHAT-10).
 
 const mocks = vi.hoisted(() => ({
+  afterCallbacks: [] as (() => unknown)[],
+  saveFetched: vi.fn(),
   user: { id: "u1" } as { id: string } | null,
   scope: null as unknown,
   findChatScope: vi.fn(),
@@ -17,12 +19,24 @@ vi.mock("@/lib/supabase/server", () => ({
 }));
 vi.mock("@/lib/chat/scope", () => ({ findChatScope: mocks.findChatScope }));
 vi.mock("@/lib/agents/chat", () => ({ askGuide: mocks.askGuide }));
+vi.mock("next/server", () => ({
+  after: (callback: () => unknown) => void mocks.afterCallbacks.push(callback),
+}));
+vi.mock("@/lib/chat/saveFetched", () => ({
+  saveFetched: mocks.saveFetched,
+}));
 
 import { POST } from "@/app/api/chat/route";
 import { CHAT_FAILED } from "@/lib/chat/stream";
 
 const scope = {
-  technology: { id: "t1", name: "Zod", version: "4.1.0" },
+  technology: {
+    id: "t1",
+    name: "Zod",
+    version: "4.1.0",
+    docsUrl: "https://zod.dev",
+    officialUrl: "https://zod.dev",
+  },
   guideId: "g1",
 };
 const valid = { slug: "zod", question: "and a URL?", history: [] };
@@ -47,6 +61,8 @@ const lines = async (response: Response) =>
     .map((line) => JSON.parse(line) as Record<string, unknown>);
 
 beforeEach(() => {
+  mocks.afterCallbacks.length = 0;
+  mocks.saveFetched.mockReset().mockResolvedValue(1);
   mocks.user = { id: "u1" };
   mocks.findChatScope.mockReset().mockResolvedValue(scope);
   mocks.askGuide.mockReset().mockImplementation(async (_input, onToken) => {
@@ -54,12 +70,21 @@ beforeEach(() => {
     await onToken("`z.url()` [1].");
     return {
       answer: "Use `z.url()` [1].",
+      origin: "stored_docs",
       citations: [
         {
           n: 1,
           title: "Defining schemas",
           url: "https://zod.dev/api",
           kind: "docs",
+        },
+      ],
+      toStore: [
+        {
+          url: "https://zod.dev/api",
+          title: "Defining schemas",
+          type: "official",
+          markdown: "text",
         },
       ],
     };
@@ -115,7 +140,7 @@ describe("POST /api/chat: what is refused", () => {
 });
 
 describe("POST /api/chat: the streamed answer", () => {
-  it("sends the text piece by piece, then the citations", async () => {
+  it("sends the text piece by piece, then the citations and the origin", async () => {
     const response = await call(valid);
     expect(response.status).toBe(200);
     expect(response.headers.get("content-type")).toContain(
@@ -125,7 +150,7 @@ describe("POST /api/chat: the streamed answer", () => {
       { type: "text", text: "Use " },
       { type: "text", text: "`z.url()` [1]." },
       {
-        type: "citations",
+        type: "done",
         citations: [
           {
             n: 1,
@@ -134,6 +159,7 @@ describe("POST /api/chat: the streamed answer", () => {
             kind: "docs",
           },
         ],
+        origin: "stored_docs",
       },
     ]);
   });
@@ -170,5 +196,40 @@ describe("POST /api/chat: the streamed answer", () => {
       { type: "error", message: CHAT_FAILED },
     ]);
     expect(JSON.stringify(sent)).not.toContain("sk-secret");
+  });
+});
+
+describe("POST /api/chat: saving what was fetched", () => {
+  it("saves nothing before the response is sent, and the pages used after it", async () => {
+    const response = await call(valid);
+    await response.text(); // the whole answer has been streamed
+
+    expect(mocks.saveFetched).not.toHaveBeenCalled(); // not part of the response itself
+    expect(mocks.afterCallbacks).toHaveLength(1);
+
+    await mocks.afterCallbacks[0]();
+    expect(mocks.saveFetched).toHaveBeenCalledTimes(1);
+    expect(mocks.saveFetched).toHaveBeenCalledWith("t1", [
+      expect.objectContaining({ url: "https://zod.dev/api" }),
+    ]);
+  });
+
+  it("saves nothing when answering failed", async () => {
+    mocks.askGuide.mockRejectedValue(new Error("down"));
+    const quiet = vi.spyOn(console, "error").mockImplementation(() => {});
+    await (await call(valid)).text();
+    quiet.mockRestore();
+
+    await mocks.afterCallbacks[0]();
+    expect(mocks.saveFetched).not.toHaveBeenCalled();
+  });
+
+  it("does not arrange any saving for a refused request", async () => {
+    mocks.user = null;
+    await call(valid);
+    mocks.findChatScope.mockResolvedValue(null);
+    mocks.user = { id: "u1" };
+    await call(valid);
+    expect(mocks.afterCallbacks).toEqual([]);
   });
 });

@@ -1,18 +1,19 @@
 import { z } from "zod";
-import type { ChatCitation, ChatMessage } from "../agents/chat";
+import type { ChatCitation, ChatMessage, ChatOrigin } from "../agents/chat";
 import type { ChatEvent } from "./stream";
 
 // Asking a question from the browser: used by the chat panel.
 //
 //   const outcome = await askChat(
 //     { slug: "zod", question: "and a URL?", history },
-//     { onText: (piece) => show(piece), onCitations: (list) => showSources(list) },
+//     { onText: (piece) => show(piece), onDone: (list, origin) => showSources(list, origin) },
 //   );
 //   outcome -> { ok: true }
 //           |  { ok: false, error: "Something went wrong answering that. Try again." }
 //
 // Reads the lines POST /api/chat streams (see lib/chat/stream.ts): `onText` is called with each
-// piece of the answer as it arrives, `onCitations` once at the end. Browser only.
+// piece of the answer as it arrives, `onDone` once at the end
+// with the citations and the origin of the answer. Browser only.
 
 export type AskRequest = {
   slug: string;
@@ -21,7 +22,7 @@ export type AskRequest = {
 };
 export type AskHandlers = {
   onText: (piece: string) => void;
-  onCitations: (citations: ChatCitation[]) => void;
+  onDone: (citations: ChatCitation[], origin: ChatOrigin) => void;
 };
 export type AskOutcome = { ok: true } | { ok: false; error: string };
 
@@ -33,7 +34,11 @@ const Citation = z.object({
 });
 const Line = z.discriminatedUnion("type", [
   z.object({ type: z.literal("text"), text: z.string() }),
-  z.object({ type: z.literal("citations"), citations: z.array(Citation) }),
+  z.object({
+    type: z.literal("done"),
+    citations: z.array(Citation),
+    origin: z.enum(["guide", "stored_docs", "fetched_now", "not_found"]),
+  }),
   z.object({ type: z.literal("error"), message: z.string() }),
 ]);
 
@@ -69,7 +74,7 @@ export async function askChat(
       .pipeThrough(new TextDecoderStream())
       .getReader();
     let rest = "";
-    let finished = false; // the citations line came: the answer is complete
+    let finished = false; // the "done" line came: the answer is complete
 
     while (true) {
       const { value, done } = await reader.read();
@@ -82,8 +87,8 @@ export async function askChat(
         const event = line.trim() ? parseChatLine(line) : null;
         if (!event) continue;
         if (event.type === "text") handlers.onText(event.text);
-        if (event.type === "citations") {
-          handlers.onCitations(event.citations);
+        if (event.type === "done") {
+          handlers.onDone(event.citations, event.origin);
           finished = true;
         }
         if (event.type === "error") return { ok: false, error: event.message };

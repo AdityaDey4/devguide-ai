@@ -37,6 +37,21 @@ describe("searchWeb (Tavily)", () => {
     });
   });
 
+  it("can be limited to some sites, and says nothing about sites when none are given", async () => {
+    const { deps: d, fetchFake } = deps(() => reply({ results: [] }));
+    await searchWeb("write a file", { includeDomains: ["nodejs.org"] }, d);
+    await searchWeb("write a file", { includeDomains: [] }, d);
+
+    const bodies = fetchFake.mock.calls.map(
+      (call) =>
+        JSON.parse(
+          (call as unknown as [string, RequestInit])[1].body as string,
+        ) as object,
+    );
+    expect(bodies[0]).toMatchObject({ include_domains: ["nodejs.org"] });
+    expect(bodies[1]).not.toHaveProperty("include_domains");
+  });
+
   it("returns title, url and content, skipping results without an address", async () => {
     const { deps: d } = deps(() =>
       reply({

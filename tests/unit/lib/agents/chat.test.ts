@@ -145,6 +145,54 @@ describe("answer", () => {
     expect(update.citations?.map((c) => c.n)).toEqual([1]);
   });
 
+  it("a BAD grade gives the honest reply without asking the model, even when chunks are left", async () => {
+    const { deps, written } = fakeChatDeps();
+    const pieces: string[] = [];
+    const update = await answer(
+      chatStateWith({
+        chunks: [ranked()],
+        grade: { verdict: "BAD", missing: "z.url options" },
+      }),
+      deps,
+      (piece) => void pieces.push(piece),
+    );
+    expect(written).toEqual([]);
+    expect(update).toEqual({
+      reply: NOT_COVERED,
+      citations: [],
+      origin: "not_found",
+    });
+    expect(pieces.join("")).toBe(NOT_COVERED);
+  });
+
+  it("a PARTIAL grade tells the model what is not covered, so the answer says it", async () => {
+    const { deps, written } = fakeChatDeps();
+    await answer(
+      chatStateWith({
+        chunks: [ranked()],
+        grade: { verdict: "PARTIAL", missing: "z.url options" },
+      }),
+      deps,
+      () => {},
+    );
+    const sent = text(written[0]);
+    expect(sent).toContain("cover only part of this question");
+    expect(sent).toContain("Not covered: z.url options");
+  });
+
+  it("a GOOD grade adds no such note", async () => {
+    const { deps, written } = fakeChatDeps();
+    await answer(
+      chatStateWith({
+        chunks: [ranked()],
+        grade: { verdict: "GOOD", missing: "" },
+      }),
+      deps,
+      () => {},
+    );
+    expect(text(written[0])).not.toContain("Not covered");
+  });
+
   it("with no chunks says it does not know, without asking the model", async () => {
     const { deps, written } = fakeChatDeps();
     const pieces: string[] = [];
@@ -154,7 +202,11 @@ describe("answer", () => {
       (p) => void pieces.push(p),
     );
     expect(written).toEqual([]);
-    expect(update).toEqual({ reply: NOT_COVERED, citations: [] });
+    expect(update).toEqual({
+      reply: NOT_COVERED,
+      citations: [],
+      origin: "not_found",
+    });
     expect(pieces.join("")).toBe(NOT_COVERED);
   });
 });
@@ -168,7 +220,13 @@ describe("askGuide (the whole graph)", () => {
     const pieces: string[] = [];
     const result = await askGuide(
       {
-        technology: { id: "t1", name: "Zod", version: null },
+        technology: {
+          id: "t1",
+          name: "Zod",
+          version: null,
+          docsUrl: null,
+          officialUrl: null,
+        },
         guideId: "g1",
         history: [{ role: "user", content: "How do I validate an email?" }],
         question: "and a URL?",
@@ -177,7 +235,7 @@ describe("askGuide (the whole graph)", () => {
       deps,
     );
 
-    expect(asked).toHaveLength(1);
+    expect(asked).toHaveLength(2); // understand, then grade (GOOD: no second grade)
     expect(retrieved[0].technologyId).toBe("t1");
     expect(result.answer).toBe("Use `z.url()` [1].");
     expect(pieces.join("")).toBe(result.answer);
@@ -195,7 +253,13 @@ describe("askGuide (the whole graph)", () => {
     const { deps, written } = fakeChatDeps({ found: [] });
     const result = await askGuide(
       {
-        technology: { id: "t1", name: "Zod", version: null },
+        technology: {
+          id: "t1",
+          name: "Zod",
+          version: null,
+          docsUrl: null,
+          officialUrl: null,
+        },
         history: [],
         question: "How do I bake bread?",
       },
@@ -203,6 +267,11 @@ describe("askGuide (the whole graph)", () => {
       deps,
     );
     expect(written).toEqual([]);
-    expect(result).toEqual({ answer: NOT_COVERED, citations: [] });
+    expect(result).toEqual({
+      answer: NOT_COVERED,
+      citations: [],
+      origin: "not_found",
+      toStore: [],
+    });
   });
 });

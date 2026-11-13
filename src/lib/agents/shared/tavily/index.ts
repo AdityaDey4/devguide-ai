@@ -44,7 +44,12 @@ function apiKey(): string {
 
 export async function searchWeb(
   query: string,
-  options: { maxResults?: number; signal?: AbortSignal } = {},
+  options: {
+    maxResults?: number;
+    signal?: AbortSignal;
+    /** Only return pages on these sites (host names, like "nodejs.org"). */
+    includeDomains?: string[];
+  } = {},
   deps: TavilyDeps = realDeps,
 ): Promise<SearchHit[]> {
   const key = deps.apiKey();
@@ -59,6 +64,9 @@ export async function searchWeb(
       body: JSON.stringify({
         query,
         max_results: options.maxResults ?? DEFAULT_RESULTS,
+        ...(options.includeDomains?.length && {
+          include_domains: options.includeDomains,
+        }),
       }),
       signal: options.signal ?? AbortSignal.timeout(TIMEOUT_MS),
     });

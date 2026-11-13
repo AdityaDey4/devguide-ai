@@ -61,7 +61,7 @@ export function ChatPanel({ slug, name }: { slug: string; name: string }) {
       { slug, question, history },
       {
         onText: (piece) => update(id, { answer: (text += piece) }),
-        onCitations: (citations) => update(id, { citations }),
+        onDone: (citations, origin) => update(id, { citations, origin }),
       },
       abort.current.signal,
     );

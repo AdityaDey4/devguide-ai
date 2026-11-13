@@ -1,6 +1,9 @@
 import type { z } from "zod";
 import type { BaseMessageLike } from "@langchain/core/messages";
+import type { FetchedPage } from "../../fetch/fetchPage";
+import type { Snippet } from "../../mcp/context7";
 import type { Candidate, RetrieveInput } from "../../rag/retriever";
+import type { SearchHit } from "../shared/tavily";
 import type { Ranked, RerankInput } from "../../rag/reranker";
 import type { ModelSize } from "../shared/llm";
 
@@ -19,6 +22,18 @@ export type ChatDeps = {
   retrieve: (input: RetrieveInput) => Promise<Candidate[]>;
   /** Picks the few chunks that really answer the question. */
   rerank: (input: RerankInput) => Promise<Ranked[]>;
+  /** Code snippets for a topic from Context7. Never fails: no snippets is an empty list. */
+  codeSnippets: (technologyName: string, topic: string) => Promise<Snippet[]>;
+  /** Searches the web, only on the given sites when `includeDomains` is set. */
+  searchWeb: (
+    query: string,
+    options?: { includeDomains?: string[]; signal?: AbortSignal },
+  ) => Promise<SearchHit[]>;
+  /** Downloads one page (the safe fetcher: https only, no private addresses). */
+  fetchPage: (
+    url: string,
+    options?: { signal?: AbortSignal },
+  ) => Promise<FetchedPage>;
   /** Asks the large model for text, calling `onToken` with each piece as it arrives. */
   write: (
     messages: BaseMessageLike[],

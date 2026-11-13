@@ -84,7 +84,7 @@ devguide-ai/
 │     ├─ runs/[id]/events/route.ts      # GET status + events after an id (built, M4)
 │     ├─ runs/[id]/route.ts             # POST resume with the person's choice (built, M5); GET status later
 │     ├─ chat/route.ts                  # POST message → streamed answer
-│     ├─ guides/[id]/versions/route.ts  # list / create / restore
+│     ├─ guides/[id]/versions/route.ts  # POST save an edit as a new version (built, M8); list / restore later
 │     ├─ guides/[id]/edit/route.ts      # agent edit proposal
 │     ├─ pdf/[versionId]/route.ts
 │     └─ mcp/route.ts                   # v1.1
@@ -132,6 +132,9 @@ devguide-ai/
 │  │              ingestPage.ts technology.ts config.ts types.ts
 │  ├─ guide/      load.ts (read a finished guide) · citations.ts ([n] to links, one source list)
 │  │              progress.ts (run events to what the page shows)
+│              versions.ts (addVersion: one more version, made current) · client.ts (browser: save an edit)
+│              edit/ request.ts (what the route accepts) · applyEdits.ts (edited text into sections)
+│                    fork.ts (a person's own copy) · saveEdit.ts (the recipe: apply, fork if first, add a version)
 │  ├─ chat/       request.ts (what /api/chat accepts) · scope.ts (slug to technology + guide) · stream.ts (answer as lines of JSON)
 │  │             client.ts (browser: read the stream) · markers.ts ([n] to links) · saveFetched.ts (remember what was fetched)
 │  ├─ search/     index.ts (resolveSearch: guide, join or new run) · normalise.ts find.ts config.ts
@@ -142,7 +145,7 @@ devguide-ai/
 │  │              server only) · database.types.ts (generated) · models.ts (short row names)
 │  ├─ pdf/  render.ts
 │  └─ limits/ ratelimit.ts
-├─ components/  search/ (search-form.tsx) · guide/ (guide-view guide-markdown code-block run-progress run-failed choose-technology)
+├─ components/  search/ (search-form.tsx) · guide/ (guide-view guide-editor guide-markdown code-block run-progress run-failed choose-technology)
 │  chat/ (chat-panel: state + layout · chat-message · chat-input · origin-label)
 │                chat/ progress/ editor/ ui/
 ├─ supabase/migrations/*.sql

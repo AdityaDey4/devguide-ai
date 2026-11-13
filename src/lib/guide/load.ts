@@ -5,15 +5,23 @@ import type { GuideSection } from "../agents/generate/guide/saveGuide";
 
 // Reads a finished guide for the reading page (SRS FR-GUIDE-1).
 //
-//   loadGuide(db, "zod") -> { name: "Zod", version: "4.1.0", status: "ready", versionNo: 2,
+//   loadGuide(db, "zod") -> { guideId: "…", mine: false, name: "Zod", version: "4.1.0", status: "ready", versionNo: 2,
 //                             sections: [{ key, title, markdown, citations, needs_review }, ...] }
-//   loadGuide(db, "nope") -> null      no technology, or no shared guide with content yet
+//   loadGuide(db, "nope") -> null      no technology, or no guide with content yet
+//
+// Shows YOUR copy when you have one (you edited the guide: M8), otherwise the shared guide. Row Level
+// Security lets a person see the shared guide and their own copy only, so no one else's copy can
+// turn up here.
 //
 // Runs as the signed-in person (Row Level Security applies).
 
 export type GuideDb = SupabaseClient<Database>;
 
 export type LoadedGuide = {
+  /** The guide being shown (the shared one, or your copy): where an edit is sent. */
+  guideId: string;
+  /** True when this is your own copy of the guide. */
+  mine: boolean;
   name: string;
   slug: string;
   version: string | null;
@@ -22,7 +30,7 @@ export type LoadedGuide = {
   sections: GuideSection[];
 };
 
-const Sections = z.array(
+export const Sections = z.array(
   z.object({
     key: z.string(),
     title: z.string(),
@@ -45,13 +53,15 @@ export async function loadGuide(
     .maybeSingle();
   if (!technology) return null;
 
-  const { data: guide } = await db
+  // Both the shared guide and (if any) my own copy come back; my copy wins.
+  const { data: guides } = await db
     .from("guides")
-    .select("status, current_version_id")
+    .select("id, owner_id, status, current_version_id")
     .eq("technology_id", technology.id)
-    .is("owner_id", null)
-    .not("current_version_id", "is", null)
-    .maybeSingle();
+    .not("current_version_id", "is", null);
+  const guide =
+    guides?.find((candidate) => candidate.owner_id !== null) ??
+    guides?.find((candidate) => candidate.owner_id === null);
   if (!guide?.current_version_id) return null;
 
   const { data: version } = await db
@@ -65,6 +75,8 @@ export async function loadGuide(
   if (!sections.success) return null;
 
   return {
+    guideId: guide.id,
+    mine: guide.owner_id !== null,
     name: technology.name,
     slug: technology.slug,
     version: technology.latest_version,

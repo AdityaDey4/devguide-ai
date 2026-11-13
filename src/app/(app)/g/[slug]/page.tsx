@@ -12,7 +12,8 @@ import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Guide" };
 
-// /g/<slug>            a finished guide  -> read it
+// /g/<slug>            a finished guide  -> read it (your own copy, if you have edited it)
+// /g/<slug>?edit=1     the same guide with a box per section to edit it (M8)
 // /g/<slug>?run=<id>   a guide being written -> watch the run (reload-safe), then show the guide
 // /g/<slug>            nothing there yet -> say so and point to search
 //
@@ -22,7 +23,7 @@ const ACTIVE = ["queued", "running", "waiting_user"];
 
 type Props = {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ run?: string; q?: string }>;
+  searchParams: Promise<{ run?: string; q?: string; edit?: string }>;
 };
 
 export default function GuidePage({ params, searchParams }: Props) {
@@ -37,7 +38,7 @@ async function GuideOrProgress({ params, searchParams }: Props) {
   // The session check below reads the clock (token expiry): request time, on purpose.
   await connection();
   const { slug } = await params;
-  const { run, q } = await searchParams;
+  const { run, q, edit } = await searchParams;
   const supabase = await createClient();
 
   const guide = await loadGuide(supabase, slug);
@@ -66,7 +67,7 @@ async function GuideOrProgress({ params, searchParams }: Props) {
     }
   }
 
-  if (guide) return <GuideView guide={guide} />;
+  if (guide) return <GuideView guide={guide} editing={edit === "1"} />;
   if (runId.success) {
     return <RunProgress key={runId.data} runId={runId.data} query={query} />;
   }

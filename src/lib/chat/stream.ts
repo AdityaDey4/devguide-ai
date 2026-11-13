@@ -1,18 +1,19 @@
-import type { AskGuideResult, ChatCitation } from "../agents/chat";
+import type { AskGuideResult, ChatCitation, ChatOrigin } from "../agents/chat";
 
 // The chat's answer as a stream of lines, one JSON object per line (SRS FR-CHAT-10):
 //
 //   {"type":"text","text":"Use "}
 //   {"type":"text","text":"`z.url()` [1]."}
-//   {"type":"citations","citations":[{"n":1,"title":"Defining schemas","url":"https://zod.dev/api","kind":"docs"}]}
+//   {"type":"done","citations":[{"n":1,"title":"Defining schemas","url":"https://zod.dev/api","kind":"docs"}],"origin":"stored_docs"}
 //
-// The text comes first, piece by piece, as it is written; the citations come once at the end, when
-// it is known which sources the finished answer used. If something goes wrong half-way the last
+// The text comes first, piece by piece, as it is written; the last line, "done", comes once at the end, when
+// it is known which sources the finished answer used and where it came from (guide, stored_docs,
+// fetched_now or not_found). If something goes wrong half-way the last
 // line is {"type":"error","message":"..."} and the stream ends. The page reads it line by line.
 
 export type ChatEvent =
   | { type: "text"; text: string }
-  | { type: "citations"; citations: ChatCitation[] }
+  | { type: "done"; citations: ChatCitation[]; origin: ChatOrigin }
   | { type: "error"; message: string };
 
 export const CHAT_FAILED = "Something went wrong answering that. Try again.";
@@ -41,7 +42,11 @@ export function chatResponse(
         const result = await answer(async (text) =>
           send({ type: "text", text }),
         );
-        send({ type: "citations", citations: result.citations });
+        send({
+          type: "done",
+          citations: result.citations,
+          origin: result.origin,
+        });
       } catch (error) {
         console.error(
           "chat failed:",

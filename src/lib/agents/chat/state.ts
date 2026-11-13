@@ -1,5 +1,7 @@
 import { Annotation } from "@langchain/langgraph";
 import type { Ranked } from "../../rag/reranker";
+import type { Grade } from "./nodes/grade/schema";
+import type { ChatOrigin } from "./origin";
 
 // What the chat graph remembers while it answers ONE question (docs/03-Architecture.md section
 // 5.2). Nothing is saved between questions in M6: the page keeps the conversation.
@@ -10,6 +12,20 @@ export type ChatTechnology = {
   id: string;
   name: string;
   version: string | null;
+  /** Where its documentation lives, for a live lookup. Null when not known. */
+  docsUrl: string | null;
+  officialUrl: string | null;
+};
+
+/**
+ * A page of text found outside the stored knowledge while answering: a page of the official docs
+ * downloaded just now, or a Context7 snippet. Kept whole so it can be saved afterwards.
+ */
+export type ExternalDoc = {
+  url: string;
+  title: string;
+  type: "official" | "context7";
+  markdown: string;
 };
 
 /** A source the answer cited: `url` is null for the guide's own text. */
@@ -29,6 +45,8 @@ export const ChatState = Annotation.Root({
     id: "",
     name: "",
     version: null,
+    docsUrl: null,
+    officialUrl: null,
   })),
   /** The guide whose own text may be searched too. */
   guideId: latest<string | null>(() => null),
@@ -41,7 +59,16 @@ export const ChatState = Annotation.Root({
   variants: latest<string[]>(() => []),
   /** The few chunks the answer is written from, best first. */
   chunks: latest<Ranked[]>(() => []),
+  /** Whether the chunks are enough to answer; null until graded. */
+  grade: latest<Grade | null>(() => null),
+  /** Found outside the stored text: Context7 and the live lookup both add theirs (no overwriting). */
+  external: Annotation<ExternalDoc[]>({
+    reducer: (all, added) => [...all, ...added],
+    default: () => [],
+  }),
   reply: latest<string>(() => ""),
+  /** Where the answer came from; set with the reply. */
+  origin: latest<ChatOrigin>(() => "not_found"),
   citations: latest<ChatCitation[]>(() => []),
 });
 

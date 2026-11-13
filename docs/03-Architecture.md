@@ -99,7 +99,8 @@ devguide-ai/
 │  │  │             run/ (index: startGeneration / resumeGeneration · drive failure partial store types)
 │  │  ├─ chat/      index.ts (askGuide: one question in, answer + citations out) · graph.ts (the wiring)
 │  │  │             state.ts deps.ts realDeps.ts config.ts
-│  │  │             nodes/ understand/ (index prompt schema) · retrieve.ts · answer/ (index prompt)
+│  │  │             excerpts.ts (numbered excerpts shown to a model) · origin.ts (guide / stored_docs / fetched_now / not_found) · fetched.ts (which found pages are worth keeping)
+│  │             nodes/ understand/ (index prompt schema) · retrieve.ts · grade/ (index prompt schema) · context7.ts · liveFetch.ts · mergeAndRerank.ts · answer/ (index prompt)
 │  │  ├─ edit/      graph.ts ...
 │  │  └─ shared/    llm/ (index.ts: getModel / largeModel / smallModel · config.ts providers.ts
 │  │                 errors.ts types.ts) · checkpointer/ (index.ts · config.ts errors.ts types.ts) · budget/ (index.ts · check.ts update.ts
@@ -132,7 +133,7 @@ devguide-ai/
 │  ├─ guide/      load.ts (read a finished guide) · citations.ts ([n] to links, one source list)
 │  │              progress.ts (run events to what the page shows)
 │  ├─ chat/       request.ts (what /api/chat accepts) · scope.ts (slug to technology + guide) · stream.ts (answer as lines of JSON)
-│  │             client.ts (browser: read the stream) · markers.ts ([n] to links)
+│  │             client.ts (browser: read the stream) · markers.ts ([n] to links) · saveFetched.ts (remember what was fetched)
 │  ├─ search/     index.ts (resolveSearch: guide, join or new run) · normalise.ts find.ts config.ts
 │  │              client.ts (startSearch, guideHref: browser side, used by Home and Retry)
 │  ├─ limiter.ts      (runs at most N async jobs at the same time; used by the crawl, the embedder and ingest)
@@ -142,7 +143,7 @@ devguide-ai/
 │  ├─ pdf/  render.ts
 │  └─ limits/ ratelimit.ts
 ├─ components/  search/ (search-form.tsx) · guide/ (guide-view guide-markdown code-block run-progress run-failed choose-technology)
-│  chat/ (chat-panel: state + layout · chat-message · chat-input)
+│  chat/ (chat-panel: state + layout · chat-message · chat-input · origin-label)
 │                chat/ progress/ editor/ ui/
 ├─ supabase/migrations/*.sql
 ├─ scripts/  ingest.ts  (npm run ingest -- <docsUrl>)
@@ -155,7 +156,11 @@ devguide-ai/
 │  ├─ run-evals.ts  the recipe: load → evaluate each question → report
 │  ├─ retrieval.jsonl  42 questions with the pages that answer them
 │  ├─ load.ts evaluate.ts metrics.ts report.ts types.ts
-│  └─ results/  retrieval.md (comparison table), retrieval.json (per question)
+│  ├─ chat/  (npm run evals:chat; calls OpenAI, Context7 and Tavily, run on demand)
+│  │  ├─ run.ts  the recipe: load → ask the real chat graph → judge → report
+│  │  ├─ questions.jsonl  18 questions with the origin each should get
+│  │  └─ load.ts ask.ts judge.ts report.ts types.ts
+│  └─ results/  retrieval.md/json, chat.md/json (comparison table, per question)
 └─ .env.example
 ```
 

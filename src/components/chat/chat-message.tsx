@@ -1,7 +1,8 @@
-import type { ChatCitation } from "@/lib/agents/chat";
+import type { ChatCitation, ChatOrigin } from "@/lib/agents/chat";
 import { linkAnswer } from "@/lib/chat/markers";
 import { Button } from "@/components/ui/button";
 import { GuideMarkdown } from "@/components/guide/guide-markdown";
+import { OriginLabel } from "./origin-label";
 
 // One question and its answer in the chat panel (M6): the question on the right, the answer on
 // the left as Markdown with its sources listed under it.
@@ -12,6 +13,8 @@ export type Turn = {
   question: string;
   answer: string;
   citations: ChatCitation[];
+  /** Where the answer came from; known once the answer is finished. */
+  origin?: ChatOrigin;
   /** waiting: the answer is being written (it may already have some text). */
   status: "waiting" | "done" | "error";
   error?: string;
@@ -41,6 +44,10 @@ export function ChatMessage({
             {linkAnswer(turn.answer, turn.citations)}
           </GuideMarkdown>
         </div>
+      )}
+
+      {turn.status === "done" && turn.origin && (
+        <OriginLabel origin={turn.origin} />
       )}
 
       {turn.status === "done" && turn.citations.length > 0 && (

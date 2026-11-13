@@ -1,0 +1,614 @@
+[
+  {
+    "question": {
+      "id": "stored-01",
+      "technology": "nodejs",
+      "group": "stored",
+      "question": "How do I install Node.js from source?",
+      "expected": [
+        "guide",
+        "stored_docs"
+      ],
+      "mentions": [
+        "make"
+      ]
+    },
+    "asked": {
+      "origin": "stored_docs",
+      "grade": "GOOD",
+      "reply": "To install Node.js from source, follow these steps:\n\n1. **Install Prerequisites**: Depending on your operating system, install the necessary build tools.\n\n   For Ubuntu or Debian:\n   ```bash\n   sudo apt-get install python3 g++-13 gcc-13 make python3-pip\n   ```\n\n   For Fedora:\n   ```bash\n   sudo dnf install python3 gcc-c++ make python3-pip\n   ```\n\n   For macOS:\n   ```bash\n   xcode-select --install\n   ``` \n   [1][4]\n\n2. **Install Node.js**: If you have the source code, use the following command to install Node.js:\n   ```bash\n   make install\n   ```\n   If you want to install it in a custom directory, use:\n   ```makefile\n   make install PREFIX=~/path\n   ```\n   [1][2][3]\n\nYou can verify the installation by checking the version:\n```bash\nnode -v\n```\n[1] \n\nThe excerpts do not cover any additional details on configuring or setting up a project structure.",
+      "cited": [
+        "Node.js guide: Installation and setup",
+        "Install Node.js with make install",
+        "PREFIX-based Installation into Custom Directories",
+        "Install Node.js with make install"
+      ],
+      "calls": {
+        "context7": 0,
+        "search": 0,
+        "fetch": 0
+      },
+      "firstTokenMs": 17674,
+      "totalMs": 20594
+    },
+    "originOk": true,
+    "mentionsOk": true,
+    "citedOk": true,
+    "pass": true
+  },
+  {
+    "question": {
+      "id": "stored-02",
+      "technology": "nodejs",
+      "group": "stored",
+      "question": "How do I handle errors in a Node.js callback?",
+      "expected": [
+        "guide",
+        "stored_docs"
+      ],
+      "mentions": [
+        "error",
+        "err"
+      ]
+    },
+    "asked": {
+      "origin": "stored_docs",
+      "grade": "GOOD",
+      "reply": "To handle errors in a Node.js callback, you should check the first argument of the callback for an error. If an error occurs, it will be passed as the first argument. Here's an example:\n\n```js\nconst fs = require('node:fs');\nfs.readFile('a file that does not exist', (err, data) => {\n  if (err) {\n    console.error('There was an error reading the file!', err);\n    return;\n  }\n  // Otherwise handle the data\n});\n```\n\nThis code logs the error and returns early if there is an issue, preventing further execution with invalid data [1][2]. \n\nAdditionally, when using EventEmitter, you should register an error event listener to prevent the Node.js process from crashing if an error is emitted:\n\n```cjs\nconst EventEmitter = require('node:events');\nclass MyEmitter extends EventEmitter {}\nconst myEmitter = new MyEmitter();\nmyEmitter.on('error', (err) => {\n  console.error('whoops! there was an error');\n});\nmyEmitter.emit('error', new Error('whoops!'));\n// Prints: whoops! there was an error\n```\n\nThis ensures that emitted errors are handled gracefully [2][4].",
+      "cited": [
+        "Handle errors via callback first argument",
+        "Node.js guide: Common mistakes and gotchas",
+        "Register an error event listener in CommonJS"
+      ],
+      "calls": {
+        "context7": 0,
+        "search": 0,
+        "fetch": 0
+      },
+      "firstTokenMs": 18516,
+      "totalMs": 21276
+    },
+    "originOk": true,
+    "mentionsOk": true,
+    "citedOk": true,
+    "pass": true
+  },
+  {
+    "question": {
+      "id": "stored-03",
+      "technology": "nodejs",
+      "group": "stored",
+      "question": "What is Node.js and what is it used for?",
+      "expected": [
+        "guide",
+        "stored_docs"
+      ],
+      "mentions": [
+        "JavaScript",
+        "runtime"
+      ]
+    },
+    "asked": {
+      "origin": "guide",
+      "grade": "GOOD",
+      "reply": "Node.js is a powerful JavaScript runtime built on Chrome's V8 engine, designed to enable developers to build scalable network applications using an event-driven, non-blocking I/O model, making it efficient for data-intensive real-time applications across distributed devices [1]. It is widely used for building web servers, APIs, and various other applications due to its ability to handle numerous connections simultaneously with high throughput [1]. \n\nNode.js is particularly well-suited for real-time applications, such as chat applications or online gaming, where low latency and high throughput are essential [2]. It is also ideal for developing microservices architectures, allowing applications to be broken down into smaller, independent services that can be deployed and scaled individually [2]. \n\nHowever, Node.js may not be the best choice for CPU-intensive applications or those requiring extensive use of traditional relational databases with complex transactions [2].",
+      "cited": [
+        "Node.js guide: What it is",
+        "Node.js guide: Why use it, and when not to"
+      ],
+      "calls": {
+        "context7": 0,
+        "search": 0,
+        "fetch": 0
+      },
+      "firstTokenMs": 18857,
+      "totalMs": 20994
+    },
+    "originOk": true,
+    "mentionsOk": true,
+    "citedOk": true,
+    "pass": true
+  },
+  {
+    "question": {
+      "id": "stored-04",
+      "technology": "java",
+      "group": "stored",
+      "question": "How do I create a thread in Java using the Runnable interface?",
+      "expected": [
+        "guide",
+        "stored_docs"
+      ],
+      "mentions": [
+        "Runnable"
+      ]
+    },
+    "asked": {
+      "origin": "stored_docs",
+      "grade": "GOOD",
+      "reply": "To create a thread in Java using the `Runnable` interface, you need to follow these steps:\n\n1. Create a class that implements the `Runnable` interface and override the `run()` method with the code you want to execute in the new thread. For example:\n\n```java\n// Implementing Runnable Interface\nclass MyTask implements Runnable {\n    @Override\n    public void run() {\n        System.out.println(\"Thread is running using Runnable interface\");\n    }\n}\n```\n\n2. In your main class, instantiate your `Runnable` class and create a `Thread` object with it. Then, start the thread using the `start()` method:\n\n```java\npublic class MyFirstThread {\n    public static void main(String[] args) {\n        MyTask task = new MyTask(); // Create an instance of MyTask\n        Thread thread = new Thread(task); // Create a Thread object with the task\n        thread.start(); // Start the thread\n    }\n}\n```\n\nWhen you run this program, it will output:\n\n```\nThread is running using Runnable interface\n```\n\nThis confirms that the thread has started and executed the `run()` method defined in the `MyTask` class [1][4].",
+      "cited": [
+        "Java guide: Your first working example",
+        "Java Runnable Interface"
+      ],
+      "calls": {
+        "context7": 0,
+        "search": 0,
+        "fetch": 0
+      },
+      "firstTokenMs": 11445,
+      "totalMs": 16740
+    },
+    "originOk": true,
+    "mentionsOk": true,
+    "citedOk": true,
+    "pass": true
+  },
+  {
+    "question": {
+      "id": "stored-05",
+      "technology": "java",
+      "group": "stored",
+      "question": "How do I install the JDK on Windows?",
+      "expected": [
+        "guide",
+        "stored_docs"
+      ],
+      "mentions": [
+        "JDK"
+      ]
+    },
+    "asked": {
+      "origin": "stored_docs",
+      "grade": "GOOD",
+      "reply": "To install the Java Development Kit (JDK) on Windows, follow these steps:\n\n1. Download the JDK installer (e.g., `jdk-23-windows-x64_bin.exe`) and double-click it to begin the installation process. Follow the prompts in the installation wizard to complete the installation [1][2].\n\n2. After installation, set up the environment variables:\n   - Locate the JDK installation directory, typically found in `C:\\Program Files\\Java\\jdk-{YOUR_JDK_VERSION}` [1][3].\n   - Set the `JAVA_HOME` variable to this directory (excluding the `\\bin` part) by:\n     1. Right-clicking on \"This PC\" or \"My Computer\" and selecting \"Properties.\"\n     2. Clicking on \"Advanced system settings.\"\n     3. In the System Properties window, clicking on the \"Environment Variables\" button.\n     4. Under \"System variables,\" clicking \"New\" and entering `JAVA_HOME` as the variable name and the path to your JDK installation as the variable value [1].\n\n3. Add the JDK's `bin` directory to your system's `PATH` variable:\n   - In the same \"Environment Variables\" window, find the `Path` variable in the \"System variables\" section, select it, and click \"Edit.\" Add a new entry for `%JAVA_HOME%\\bin` [1].\n\n4. Verify your Java installation by opening a command prompt and running the command:\n\n   ```bash\n   java -version\n   ```\n\n   This command should display the installed JDK version. If it does not work, try restarting your system and checking again [1][4].",
+      "cited": [
+        "Java guide: Installation and setup",
+        "Install JDK on Windows > Step 2: Setup the Environment Variables",
+        "Install JDK on Windows > Step 2: Setup the Environment Variables",
+        "Set-Up > Set JAVA_HOME for Windows"
+      ],
+      "calls": {
+        "context7": 0,
+        "search": 0,
+        "fetch": 0
+      },
+      "firstTokenMs": 10380,
+      "totalMs": 15184
+    },
+    "originOk": true,
+    "mentionsOk": true,
+    "citedOk": true,
+    "pass": true
+  },
+  {
+    "question": {
+      "id": "stored-06",
+      "technology": "langchain",
+      "group": "stored",
+      "question": "How do I pause a LangGraph StateGraph for human approval with interrupt?",
+      "expected": [
+        "guide",
+        "stored_docs"
+      ],
+      "mentions": [
+        "interrupt"
+      ]
+    },
+    "asked": {
+      "origin": "stored_docs",
+      "grade": "GOOD",
+      "reply": "To pause a LangGraph StateGraph for human approval with interrupt, you can use the following example code:\n\n```typescript\nimport {\n  Command,\n  MemorySaver,\n  START,\n  END,\n  StateGraph,\n  StateSchema,\n  interrupt,\n} from \"@langchain/langgraph\";\nimport * as z from \"zod\";\n\nconst State = new StateSchema({\n  actionDetails: z.string(),\n  status: z.enum([\"pending\", \"approved\", \"rejected\"]).nullable(),\n});\n\nconst graphBuilder = new StateGraph(State)\n  .addNode(\"approval\", async (state) => {\n    const decision = interrupt({\n      question: \"Approve this action?\",\n      details: state.actionDetails,\n    });\n    return new Command({ goto: decision ? \"proceed\" : \"cancel\" });\n  }, { ends: ['proceed', 'cancel'] })\n  .addNode(\"proceed\", () => ({ status: \"approved\" }))\n  .addNode(\"cancel\", () => ({ status: \"rejected\" }))\n  .addEdge(START, \"approval\")\n  .addEdge(\"proceed\", END)\n  .addEdge(\"cancel\", END);\n\nconst checkpointer = new MemorySaver();\nconst graph = graphBuilder.compile({ checkpointer });\n\nconst config = { configurable: { thread_id: \"approval-123\" } };\nconst initial = await graph.invoke(\n  { actionDetails: \"Transfer $500\", status: \"pending\" },\n  config,\n);\nconsole.log(initial.__interrupt__);\n\n// Resume with the decision; true routes to proceed, false to cancel\nconst resumed = await graph.invoke(new Command({ resume: true }), config);\nconsole.log(resumed.status); // -> \"approved\"\n```\n\nThis code demonstrates how to set up an approval node that interrupts for human approval and how to resume the graph based on the decision made. The part about how to handle the decision after the interrupt is covered, but the specific details of the human approval process are not fully detailed in the excerpts. [1]",
+      "cited": [
+        "Full example: review and edit state with interrupt and MemorySaver"
+      ],
+      "calls": {
+        "context7": 0,
+        "search": 0,
+        "fetch": 0
+      },
+      "firstTokenMs": 12503,
+      "totalMs": 18019
+    },
+    "originOk": true,
+    "mentionsOk": true,
+    "citedOk": true,
+    "pass": true
+  },
+  {
+    "question": {
+      "id": "stored-07",
+      "technology": "langchain",
+      "group": "stored",
+      "question": "What are the key concepts of LangChain?",
+      "expected": [
+        "guide",
+        "stored_docs"
+      ],
+      "mentions": [
+        "chain",
+        "prompt",
+        "model",
+        "agent"
+      ]
+    },
+    "asked": {
+      "origin": "stored_docs",
+      "grade": "GOOD",
+      "reply": "The key concepts of LangChain include:\n\n1. **LLMs (Language Model Models)**: Understanding how to get predictions from a language model is foundational [1].\n2. **Prompt Templates**: Managing prompts for LLMs is crucial for creating dynamic applications [1][3].\n3. **Chains**: Combining LLMs and prompts into multi-step workflows is a powerful feature of LangChain [1][4].\n4. **Agents**: Understanding agents that can determine actions based on user input is essential for creating dynamic applications [1][4].\n5. **Memory**: Adding state to chains and agents can significantly enhance user interactions, especially in chatbots [1].\n\nThese concepts enable developers to build advanced applications that leverage large language models and other computational resources [2].",
+      "cited": [
+        "LangChain guide: Next steps and key links",
+        "LangChain guide: What it is",
+        "LangChain guide: Core concepts",
+        "Quickstart Guide"
+      ],
+      "calls": {
+        "context7": 0,
+        "search": 0,
+        "fetch": 0
+      },
+      "firstTokenMs": 11735,
+      "totalMs": 13558
+    },
+    "originOk": true,
+    "mentionsOk": true,
+    "citedOk": true,
+    "pass": true
+  },
+  {
+    "question": {
+      "id": "outside-01",
+      "technology": "nodejs",
+      "group": "outside",
+      "question": "How do I write to a file in Node.js?",
+      "expected": [
+        "fetched_now"
+      ],
+      "mentions": [
+        "writeFile"
+      ]
+    },
+    "asked": {
+      "origin": "fetched_now",
+      "grade": "GOOD",
+      "reply": "To write to a file in Node.js, you can use the `fsPromises.writeFile` function or the `fs.writeFile` function. Here are examples for both:\n\n### Using `fsPromises.writeFile`\n```js\nimport { writeFile } from 'node:fs/promises';\nimport { Buffer } from 'node:buffer';\n\nconst data = new Uint8Array(Buffer.from('Hello Node.js'));\ntry {\n  await writeFile('message.txt', data);\n  console.log('The file has been saved!');\n} catch (err) {\n  console.error(err);\n}\n```\nThis method asynchronously writes data to a file, replacing the file if it already exists. The `data` can be a string, Buffer, TypedArray, DataView, AsyncIterable, or Iterable. It returns a Promise that fulfills with `undefined` upon success [1][2][3].\n\n### Using `fs.writeFile`\n```js\nimport { writeFile } from 'node:fs';\nimport { Buffer } from 'node:buffer';\n\nconst data = new Uint8Array(Buffer.from('Hello Node.js'));\nwriteFile('message.txt', data, (err) => {\n  if (err) throw err;\n  console.log('The file has been saved!');\n});\n```\nThis method also asynchronously writes data to a file, replacing the file if it already exists. The callback receives an error if the write fails [4].",
+      "cited": [
+        "fsPromises.writeFile(file, data[, options])",
+        "fsPromises.writeFile(file, data[, options])",
+        "fsPromises.writeFile(file, data[, options])",
+        "Write a Uint8Array to a file with fs.writeFile"
+      ],
+      "calls": {
+        "context7": 1,
+        "search": 1,
+        "fetch": 2
+      },
+      "firstTokenMs": 24428,
+      "totalMs": 27737
+    },
+    "originOk": true,
+    "mentionsOk": true,
+    "citedOk": true,
+    "pass": true
+  },
+  {
+    "question": {
+      "id": "outside-02",
+      "technology": "nodejs",
+      "group": "outside",
+      "question": "How do I get the current working directory in Node.js?",
+      "expected": [
+        "fetched_now"
+      ],
+      "mentions": [
+        "cwd"
+      ]
+    },
+    "asked": {
+      "origin": "fetched_now",
+      "grade": "GOOD",
+      "reply": "To get the current working directory in Node.js, you can use the `process.cwd()` method. Here’s how you can do it:\n\n```cjs\nconst { cwd } = require('node:process');\n\nconsole.log(`Current directory: ${cwd()}`);\n```\n\nOr, if you are using ES modules:\n\n```mjs\nimport { cwd } from 'node:process';\n\nconsole.log(`Current directory: ${cwd()}`);\n```\n\nThe `process.cwd()` method returns the current working directory of the Node.js process, which is useful for resolving relative paths or determining the execution context [1][2][3].",
+      "cited": [
+        "process.cwd()",
+        "Get current working directory with process.cwd() in CommonJS",
+        "process.cwd()"
+      ],
+      "calls": {
+        "context7": 1,
+        "search": 1,
+        "fetch": 2
+      },
+      "firstTokenMs": 21850,
+      "totalMs": 23438
+    },
+    "originOk": true,
+    "mentionsOk": true,
+    "citedOk": true,
+    "pass": true
+  },
+  {
+    "question": {
+      "id": "outside-03",
+      "technology": "nodejs",
+      "group": "outside",
+      "question": "How do I create a directory recursively in Node.js?",
+      "expected": [
+        "fetched_now"
+      ],
+      "mentions": [
+        "mkdir"
+      ]
+    },
+    "asked": {
+      "origin": "fetched_now",
+      "grade": "GOOD",
+      "reply": "To create a directory recursively in Node.js, you can use the `fs.mkdir` function or its promise-based version `fsPromises.mkdir`. Here are examples for both:\n\n### Using `fs.mkdir`\n```javascript\nimport { mkdir } from 'node:fs';\n\nmkdir('./tmp/a/apple', { recursive: true }, (err) => {\n  if (err) throw err;\n});\n```\nThis will create the directory `./tmp/a/apple`, along with any necessary parent directories if they do not exist, because `recursive` is set to `true` [1].\n\n### Using `fs.mkdirSync`\nIf you prefer a synchronous approach, you can use `fs.mkdirSync`:\n```javascript\nimport { mkdirSync } from 'node:fs';\n\nmkdirSync('./tmp/a/apple', { recursive: true });\n```\nThis will also create the directory recursively [2][3].\n\n### Using `fsPromises.mkdir`\nFor a promise-based approach, you can use `fsPromises.mkdir`:\n```javascript\nimport { mkdir } from 'node:fs/promises';\n\nawait mkdir('./tmp/a/apple', { recursive: true });\n```\nThis will create the directory recursively as well [4].",
+      "cited": [
+        "fs.mkdir(path[, options], callback)",
+        "fs.mkdirSync(path[, options])",
+        "fs.mkdirSync(path[, options])",
+        "fsPromises.mkdir(path[, options])"
+      ],
+      "calls": {
+        "context7": 1,
+        "search": 1,
+        "fetch": 2
+      },
+      "firstTokenMs": 25779,
+      "totalMs": 29938
+    },
+    "originOk": true,
+    "mentionsOk": true,
+    "citedOk": true,
+    "pass": true
+  },
+  {
+    "question": {
+      "id": "outside-04",
+      "technology": "java",
+      "group": "outside",
+      "question": "How do I read a file line by line in Java?",
+      "expected": [
+        "fetched_now"
+      ],
+      "mentions": [
+        "BufferedReader",
+        "readLine",
+        "Files",
+        "Scanner"
+      ]
+    },
+    "asked": {
+      "origin": "fetched_now",
+      "grade": "GOOD",
+      "reply": "You can read a file line by line in Java using either `BufferedReader` or `Scanner`. Here are examples for both methods:\n\n### Using `BufferedReader` and `FileReader`\n```java\nimport java.io.BufferedReader;\nimport java.io.FileReader;\nimport java.io.IOException;\n\npublic class GFG {\n    public static void main(String[] args) {\n        try (BufferedReader reader = new BufferedReader(new FileReader(\"sample.txt\"))) {\n            String line;\n            while ((line = reader.readLine()) != null) {\n                System.out.println(line);\n            }\n        } catch (IOException e) {\n            System.out.println(\"An error occurred while reading the file: \" + e.getMessage());\n        }\n    }\n}\n```\nThis method uses `BufferedReader` with `FileReader` to read the file line by line until it reaches the end of the file, indicated by `null` [1].\n\n### Using `Scanner`\n```java\nimport java.io.File;\nimport java.io.FileNotFoundException;\nimport java.util.Scanner;\n\npublic class ReadFile {\n    public static void main(String[] args) {\n        try {\n            File Obj = new File(\"myfile.txt\");\n            Scanner Reader = new Scanner(Obj);\n            while (Reader.hasNextLine()) {\n                String data = Reader.nextLine();\n                System.out.println(data);\n            }\n            Reader.close();\n        } catch (FileNotFoundException e) {\n            System.out.println(\"An error has occurred.\");\n            e.printStackTrace();\n        }\n    }\n}\n```\nThis method uses `Scanner` to read the file line by line until it reaches the end of the file [2].\n\nYou can choose either method based on your preference or requirements.",
+      "cited": [
+        "Read file line by line with BufferedReader and FileReader",
+        "Read from a file with Scanner and read()"
+      ],
+      "calls": {
+        "context7": 1,
+        "search": 1,
+        "fetch": 2
+      },
+      "firstTokenMs": 22432,
+      "totalMs": 27049
+    },
+    "originOk": true,
+    "mentionsOk": true,
+    "citedOk": true,
+    "pass": true
+  },
+  {
+    "question": {
+      "id": "outside-05",
+      "technology": "java",
+      "group": "outside",
+      "question": "How do I sort a List of strings in Java?",
+      "expected": [
+        "fetched_now"
+      ],
+      "mentions": [
+        "sort",
+        "Collections",
+        "Comparator"
+      ]
+    },
+    "asked": {
+      "origin": "fetched_now",
+      "grade": "GOOD",
+      "reply": "To sort a List of strings in Java, you can use one of the following methods:\n\n1. Using `Collections.sort()`:\n   ```java\n   import java.util.*;\n\n   public class GFG {\n       public static void main(String[] args) {\n           ArrayList<String> list = new ArrayList<>();\n           list.add(\"Geeks\");\n           list.add(\"For\");\n           list.add(\"ForGeeks\");\n           list.add(\"GeeksForGeeks\");\n           list.add(\"A computer portal\");\n\n           Collections.sort(list);\n           System.out.println(\"Sorted ArrayList in Ascending order: \" + list);\n       }\n   }\n   ```\n   This sorts the list in ascending natural order and modifies the original list in-place [1][4].\n\n2. Using `List.sort(null)`:\n   ```java\n   import java.util.*;\n\n   public class GFG {\n       public static void main(String[] args) {\n           ArrayList<String> list = new ArrayList<>(\n               Arrays.asList(\"Geeks\", \"For\", \"ForGeeks\", \"GeeksForGeeks\", \"A computer portal\")\n           );\n           list.sort(null); // natural ascending order\n           System.out.println(\"Sorted ArrayList: \" + list);\n       }\n   }\n   ```\n   This also sorts the list in ascending natural order [2].\n\n3. Using `List.sort(Comparator.naturalOrder())`:\n   ```java\n   import java.util.ArrayList;\n   import java.util.Arrays;\n   import java.util.Comparator;\n\n   public class GFG {\n       public static void main(String[] args) {\n           ArrayList<String> list = new ArrayList<>(\n               Arrays.asList(\"Geeks\", \"For\", \"ForGeeks\", \"GeeksForGeeks\", \"A computer portal\")\n           );\n           list.sort(Comparator.naturalOrder());\n           System.out.println(\"Sorted ArrayList in Ascending Order: \" + list);\n       }\n   }\n   ```\n   This method explicitly uses a comparator for natural ordering [3].\n\nAll methods will result in the list being sorted in ascending order.",
+      "cited": [
+        "Sort ArrayList with Collections.sort()",
+        "Sort ArrayList with List.sort(null)",
+        "Sort ArrayList with List.sort(Comparator.naturalOrder())",
+        "Sort ArrayList in ascending order using Collections.sort()"
+      ],
+      "calls": {
+        "context7": 1,
+        "search": 1,
+        "fetch": 2
+      },
+      "firstTokenMs": 21052,
+      "totalMs": 27508
+    },
+    "originOk": true,
+    "mentionsOk": true,
+    "citedOk": true,
+    "pass": true
+  },
+  {
+    "question": {
+      "id": "outside-06",
+      "technology": "langchain",
+      "group": "outside",
+      "question": "How do I split a long text into chunks with RecursiveCharacterTextSplitter in LangChain?",
+      "expected": [
+        "fetched_now"
+      ],
+      "mentions": [
+        "RecursiveCharacterTextSplitter",
+        "split"
+      ]
+    },
+    "asked": {
+      "origin": "fetched_now",
+      "grade": "GOOD",
+      "reply": "To split a long text into chunks using the `RecursiveCharacterTextSplitter` class in LangChain, you can use the following code:\n\n```python\nfrom langchain_text_splitters import RecursiveCharacterTextSplitter\n\ntext_splitter = RecursiveCharacterTextSplitter(\n    chunk_size=1000, chunk_overlap=200, add_start_index=True\n)\nall_splits = text_splitter.split_documents(docs)\n\nprint(len(all_splits))\n```\n\nThis code sets the `chunk_size` to 1000 and `chunk_overlap` to 200, while also enabling `add_start_index` to keep character offsets. The resulting number of splits can be printed out, which in the example is 516 [1].",
+      "cited": [
+        "Split documents with RecursiveCharacterTextSplitter"
+      ],
+      "calls": {
+        "context7": 1,
+        "search": 1,
+        "fetch": 2
+      },
+      "firstTokenMs": 20525,
+      "totalMs": 22887
+    },
+    "originOk": true,
+    "mentionsOk": true,
+    "citedOk": true,
+    "pass": true
+  },
+  {
+    "question": {
+      "id": "none-01",
+      "technology": "nodejs",
+      "group": "not_found",
+      "question": "How do I bake sourdough bread?",
+      "expected": [
+        "not_found"
+      ]
+    },
+    "asked": {
+      "origin": "not_found",
+      "grade": "BAD",
+      "reply": "I couldn't find the answer to that in this guide or in the documentation I could look up.",
+      "cited": [],
+      "calls": {
+        "context7": 1,
+        "search": 1,
+        "fetch": 2
+      },
+      "firstTokenMs": 22457,
+      "totalMs": 22458
+    },
+    "originOk": true,
+    "mentionsOk": null,
+    "citedOk": null,
+    "pass": true
+  },
+  {
+    "question": {
+      "id": "none-02",
+      "technology": "nodejs",
+      "group": "not_found",
+      "question": "How do I use the built-in fs.teleport() function in Node.js?",
+      "expected": [
+        "not_found"
+      ]
+    },
+    "asked": {
+      "origin": "not_found",
+      "grade": "BAD",
+      "reply": "I couldn't find the answer to that in this guide or in the documentation I could look up.",
+      "cited": [],
+      "calls": {
+        "context7": 1,
+        "search": 1,
+        "fetch": 2
+      },
+      "firstTokenMs": 23011,
+      "totalMs": 23013
+    },
+    "originOk": true,
+    "mentionsOk": null,
+    "citedOk": null,
+    "pass": true
+  },
+  {
+    "question": {
+      "id": "none-03",
+      "technology": "java",
+      "group": "not_found",
+      "question": "What is the capital of France?",
+      "expected": [
+        "not_found"
+      ]
+    },
+    "asked": {
+      "origin": "not_found",
+      "grade": "BAD",
+      "reply": "I couldn't find the answer to that in this guide or in the documentation I could look up.",
+      "cited": [],
+      "calls": {
+        "context7": 1,
+        "search": 1,
+        "fetch": 2
+      },
+      "firstTokenMs": 30443,
+      "totalMs": 30445
+    },
+    "originOk": true,
+    "mentionsOk": null,
+    "citedOk": null,
+    "pass": true
+  },
+  {
+    "question": {
+      "id": "none-04",
+      "technology": "java",
+      "group": "not_found",
+      "question": "How do I use the java.util.TimeMachine class?",
+      "expected": [
+        "not_found"
+      ]
+    },
+    "asked": {
+      "origin": "not_found",
+      "grade": "BAD",
+      "reply": "I couldn't find the answer to that in this guide or in the documentation I could look up.",
+      "cited": [],
+      "calls": {
+        "context7": 1,
+        "search": 1,
+        "fetch": 2
+      },
+      "firstTokenMs": 21043,
+      "totalMs": 21045
+    },
+    "originOk": true,
+    "mentionsOk": null,
+    "citedOk": null,
+    "pass": true
+  },
+  {
+    "question": {
+      "id": "none-05",
+      "technology": "langchain",
+      "group": "not_found",
+      "question": "How do I configure the HologramMemory class in LangChain?",
+      "expected": [
+        "not_found"
+      ]
+    },
+    "asked": {
+      "origin": "not_found",
+      "grade": "BAD",
+      "reply": "I couldn't find the answer to that in this guide or in the documentation I could look up.",
+      "cited": [],
+      "calls": {
+        "context7": 1,
+        "search": 1,
+        "fetch": 2
+      },
+      "firstTokenMs": 24400,
+      "totalMs": 24401
+    },
+    "originOk": true,
+    "mentionsOk": null,
+    "citedOk": null,
+    "pass": true
+  }
+]

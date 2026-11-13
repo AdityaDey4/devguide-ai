@@ -1,8 +1,17 @@
 import type { ChatDeps } from "./deps";
+import { docsWorthKeeping } from "./fetched";
 import { buildChatGraph } from "./graph";
-import type { ChatCitation, ChatMessage, ChatTechnology } from "./state";
+import type { ChatOrigin } from "./origin";
+import type {
+  ChatCitation,
+  ChatMessage,
+  ChatTechnology,
+  ExternalDoc,
+} from "./state";
 
 export type { ChatCitation, ChatMessage, ChatTechnology } from "./state";
+export type { ChatOrigin } from "./origin";
+export type { ExternalDoc } from "./state";
 
 // Answers one question about a technology from what is stored (SRS FR-CHAT-1 to FR-CHAT-3).
 //
@@ -11,6 +20,7 @@ export type { ChatCitation, ChatMessage, ChatTechnology } from "./state";
 //     (piece) => send(piece),          // called with the answer text as it is written
 //   );
 //   citations -> [{ n: 1, title: "Defining schemas", url: "https://zod.dev/api", kind: "docs" }]
+//   origin    -> "stored_docs"   (guide | stored_docs | fetched_now | not_found)
 //
 // Steps: understand the question (small model) -> find and rerank stored chunks -> write the
 // answer with citations (large model). Read graph.ts for the arrows. Server only.
@@ -24,7 +34,13 @@ export type AskGuideInput = {
   question: string;
 };
 
-export type AskGuideResult = { answer: string; citations: ChatCitation[] };
+export type AskGuideResult = {
+  answer: string;
+  citations: ChatCitation[];
+  origin: ChatOrigin;
+  /** Pages found outside the stored text that the answer used: worth saving for next time. */
+  toStore: ExternalDoc[];
+};
 
 export async function askGuide(
   input: AskGuideInput,
@@ -38,5 +54,14 @@ export async function askGuide(
     history: input.history,
     question: input.question,
   });
-  return { answer: finished.reply, citations: finished.citations };
+  return {
+    answer: finished.reply,
+    citations: finished.citations,
+    origin: finished.origin,
+    toStore: docsWorthKeeping(
+      finished.external,
+      finished.chunks,
+      finished.origin,
+    ),
+  };
 }

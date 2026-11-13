@@ -17,7 +17,7 @@ export async function findChatScope(
 ): Promise<ChatScope | null> {
   const { data: technology } = await db
     .from("technologies")
-    .select("id, name, latest_version")
+    .select("id, name, latest_version, docs_url, official_url")
     .eq("slug", slug)
     .maybeSingle();
   if (!technology) return null;
@@ -36,6 +36,8 @@ export async function findChatScope(
       id: technology.id,
       name: technology.name,
       version: technology.latest_version,
+      docsUrl: technology.docs_url,
+      officialUrl: technology.official_url,
     },
     guideId: guide.id,
   };

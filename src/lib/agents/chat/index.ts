@@ -29,6 +29,10 @@ export type AskGuideInput = {
   technology: ChatTechnology;
   /** The guide whose own text may be searched too. */
   guideId?: string;
+  /** The shared guide, when `guideId` is a person's copy. */
+  alsoGuideId?: string;
+  /** Fingerprints of shared passages the person's copy replaced (see lib/chat/scope.ts). */
+  hiddenHashes?: string[];
   /** The messages before this question, oldest first. */
   history: ChatMessage[];
   question: string;
@@ -51,6 +55,8 @@ export async function askGuide(
   const finished = await graph.invoke({
     technology: input.technology,
     guideId: input.guideId ?? null,
+    alsoGuideId: input.alsoGuideId ?? null,
+    hiddenHashes: input.hiddenHashes ?? [],
     history: input.history,
     question: input.question,
   });

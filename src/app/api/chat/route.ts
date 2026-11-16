@@ -70,6 +70,8 @@ export async function POST(request: Request) {
       {
         technology: scope.technology,
         guideId: scope.guideId,
+        alsoGuideId: scope.alsoGuideId,
+        hiddenHashes: scope.hiddenHashes,
         history: body.data.history,
         question: body.data.question,
       },

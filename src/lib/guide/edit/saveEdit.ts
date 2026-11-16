@@ -1,3 +1,4 @@
+import { indexGuide, type IndexGuideInput } from "../../rag/guideIndex";
 import type { ServiceClient } from "../../supabase/service";
 import { Sections } from "../load";
 import { addVersion } from "../versions";
@@ -16,6 +17,10 @@ import { createFork, findFork, type GuideRow } from "./fork";
 // 3. The edit is applied and checked FIRST: a save that changes nothing makes no copy and no version.
 // 4. The first edit of a shared guide makes the person's copy (its version 1 is the shared text);
 //    the edit becomes the next version of the copy. The shared guide is never touched.
+//
+// 5. The copy's text is then made searchable for the chat (the M6 indexing), so answers follow the
+//    edit. If that fails the version is still saved (the person's work is never lost) and the
+//    next save indexes again.
 //
 // Server only. It writes, so `db` is the service-role client; the caller has already checked who
 // the person is.
@@ -40,9 +45,14 @@ export type SaveEditResult =
 
 const COLUMNS = "id, technology_id, owner_id, status, current_version_id";
 
+export type SaveEditDeps = {
+  index: (input: IndexGuideInput) => Promise<unknown>;
+};
+
 export async function saveEdit(
   db: ServiceClient,
   input: SaveEditInput,
+  deps: SaveEditDeps = { index: (index) => indexGuide(index) },
 ): Promise<SaveEditResult> {
   // 1. The guide shown, if the person may see it.
   const { data: guide, error } = await db
@@ -88,6 +98,8 @@ export async function saveEdit(
     changeNote: input.note?.trim() || `Edited ${titles}`.slice(0, 200),
   });
 
+  await indexCopy(db, deps, guide.technology_id, forkId, applied.sections);
+
   return { ok: true, guideId: forkId, ...saved, forked };
 }
 
@@ -100,4 +112,33 @@ async function sectionsOf(db: ServiceClient, guide: GuideRow) {
     .maybeSingle();
   const parsed = Sections.safeParse(data?.sections);
   return parsed.success ? parsed.data : null;
+}
+
+async function indexCopy(
+  db: ServiceClient,
+  deps: SaveEditDeps,
+  technologyId: string,
+  guideId: string,
+  sections: IndexGuideInput["sections"],
+) {
+  try {
+    const { data: technology } = await db
+      .from("technologies")
+      .select("id, name, slug, latest_version")
+      .eq("id", technologyId)
+      .single();
+    if (!technology) return;
+    await deps.index({
+      technology: {
+        id: technology.id,
+        name: technology.name,
+        slug: technology.slug,
+        version: technology.latest_version,
+      },
+      guideId,
+      sections,
+    });
+  } catch (error) {
+    console.error("Could not make the edited guide searchable", error);
+  }
 }

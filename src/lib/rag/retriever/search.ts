@@ -13,6 +13,7 @@ export async function searchOne(
     vector: number[];
     technologyId: string;
     guideId?: string;
+    alsoGuideId?: string;
     mode?: SearchMode;
   },
 ): Promise<Candidate[]> {
@@ -21,6 +22,7 @@ export async function searchOne(
     query_embedding: JSON.stringify(search.vector), // pgvector reads "[0.1,0.2,...]"
     tech_id: search.technologyId,
     p_guide_id: search.guideId,
+    p_extra_guide_id: search.alsoGuideId,
     match_count: MATCH_COUNT,
     search_mode: search.mode,
   });

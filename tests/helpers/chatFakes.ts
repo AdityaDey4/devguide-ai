@@ -148,6 +148,8 @@ export function chatStateWith(
       officialUrl: "https://zod.dev",
     },
     guideId: "g1",
+    alsoGuideId: null,
+    hiddenHashes: [],
     history: [],
     question: "and a URL?",
     standaloneQuery: "How do I validate a URL with Zod?",

@@ -1,5 +1,6 @@
 import { withoutMarkers } from "../../guide/citations";
 import { chunkMarkdown } from "../chunker";
+import type { Chunk } from "../chunker";
 import { contentHash, storeChunks } from "../store";
 import type { StoreInput, StoreResult } from "../store";
 import { createServiceClient } from "../../supabase/service";
@@ -51,18 +52,26 @@ const realDeps: IndexGuideDeps = {
     removeStaleGuideChunks(createServiceClient(), guideId, keep),
 };
 
+/** The chunks a guide's text is cut into (what is stored, and what the chat can find). */
+export function guideChunks(
+  technologyName: string,
+  sections: IndexableSection[],
+): Chunk[] {
+  return sections
+    .filter((section) => section.citations.length > 0)
+    .flatMap((section) =>
+      chunkMarkdown(withoutMarkers(section.markdown), {
+        title: `${technologyName} guide: ${section.title}`,
+      }),
+    );
+}
+
 export async function indexGuide(
   { technology, guideId, sections }: IndexGuideInput,
   deps: IndexGuideDeps = realDeps,
 ): Promise<IndexGuideResult> {
   // 1. chunks of every section that is backed by sources
-  const chunks = sections
-    .filter((section) => section.citations.length > 0)
-    .flatMap((section) =>
-      chunkMarkdown(withoutMarkers(section.markdown), {
-        title: `${technology.name} guide: ${section.title}`,
-      }),
-    );
+  const chunks = guideChunks(technology.name, sections);
 
   // 2. store the new text
   const stored =

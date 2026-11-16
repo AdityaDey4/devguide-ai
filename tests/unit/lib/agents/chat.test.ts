@@ -3,6 +3,7 @@ import { askGuide } from "@/lib/agents/chat";
 import { MIN_RELEVANCE, NOT_COVERED } from "@/lib/agents/chat/config";
 import { answer } from "@/lib/agents/chat/nodes/answer";
 import { retrieve } from "@/lib/agents/chat/nodes/retrieve";
+import { contentHash } from "@/lib/rag/store";
 import { understand } from "@/lib/agents/chat/nodes/understand";
 import {
   chatStateWith,
@@ -67,6 +68,26 @@ describe("retrieve", () => {
     const { deps, retrieved } = fakeChatDeps();
     await retrieve(chatStateWith({ guideId: null }), deps);
     expect("guideId" in retrieved[0]).toBe(false);
+  });
+
+  it("on a person's copy, also searches the shared guide and ignores shared passages the copy replaced", async () => {
+    const old = "Old text the person rewrote.";
+    const { deps, retrieved, reranked } = fakeChatDeps({
+      found: [ranked({ id: "old", content: old }), ranked({ id: "new" })],
+    });
+    await retrieve(
+      chatStateWith({
+        guideId: "mine",
+        alsoGuideId: "shared",
+        hiddenHashes: [contentHash(old)],
+      }),
+      deps,
+    );
+    expect(retrieved[0]).toMatchObject({
+      guideId: "mine",
+      alsoGuideId: "shared",
+    });
+    expect(reranked[0].map((c) => c.id)).toEqual(["new"]);
   });
 
   it("drops chunks the reranker found weak", async () => {

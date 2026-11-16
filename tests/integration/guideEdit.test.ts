@@ -1,11 +1,15 @@
 import { createClient } from "@supabase/supabase-js";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import {
   saveGuide,
   type GuideSection,
 } from "@/lib/agents/generate/guide/saveGuide";
 import { saveEdit } from "@/lib/guide/edit/saveEdit";
 import { loadGuide } from "@/lib/guide/load";
+import { findChatScope } from "@/lib/chat/scope";
+import { indexGuide, guideChunks } from "@/lib/rag/guideIndex";
+import { removeStaleGuideChunks } from "@/lib/rag/guideIndex/stale";
+import { contentHash, storeChunks } from "@/lib/rag/store";
 import type { Database } from "@/lib/supabase/database.types";
 import { createServiceClient } from "@/lib/supabase/service";
 
@@ -19,6 +23,18 @@ const slug = `test-guide-edit-${stamp}`;
 let technologyId = "";
 let sharedId = "";
 let sharedVersionId = "";
+
+// Making text searchable uses a fake embedder here (no cost).
+const embed = vi.fn(async (texts: string[]) => ({
+  embeddings: texts.map(() => Array.from({ length: 1536 }, () => 0.01)),
+  tokens: texts.length,
+}));
+const index = (input: Parameters<typeof indexGuide>[0]) =>
+  indexGuide(input, {
+    store: (stored) =>
+      storeChunks(stored, { db: () => db, embed, now: () => new Date() }),
+    removeStale: (id, keep) => removeStaleGuideChunks(db, id, keep),
+  });
 
 const sections: GuideSection[] = [
   {
@@ -38,7 +54,17 @@ const sections: GuideSection[] = [
 ];
 
 type Person = { id: string; email: string; password: string };
-const people: Record<"ann" | "ben" | "cy", Person> = {
+const people: Record<"ann" | "ben" | "cy" | "dee" | "eve", Person> = {
+  dee: {
+    id: "",
+    email: `dee-${stamp}@edit-test.local`,
+    password: crypto.randomUUID(),
+  },
+  eve: {
+    id: "",
+    email: `eve-${stamp}@edit-test.local`,
+    password: crypto.randomUUID(),
+  },
   ann: {
     id: "",
     email: `ann-${stamp}@edit-test.local`,
@@ -73,7 +99,7 @@ const edit = (
   guideId: string,
   edits: { key: string; markdown: string }[],
   note?: string,
-) => saveEdit(db, { guideId, userId: who.id, edits, note });
+) => saveEdit(db, { guideId, userId: who.id, edits, note }, { index });
 
 const versionsOf = async (guideId: string) =>
   (
@@ -116,6 +142,11 @@ beforeAll(async () => {
   });
   sharedId = saved.guideId;
   sharedVersionId = saved.versionId;
+  await index({
+    technology: { id: technologyId, name: slug, slug, version: null },
+    guideId: sharedId,
+    sections,
+  });
 });
 
 afterAll(async () => {
@@ -289,5 +320,85 @@ describe("two people editing", () => {
     const numbers = (await versionsOf(copies[0].id)).map((v) => v.version_no);
     expect(new Set(numbers).size).toBe(numbers.length);
     expect(numbers.length).toBeGreaterThanOrEqual(3); // a copy of the shared text, and both edits
+  });
+});
+
+describe("when making the edit searchable fails", () => {
+  it("the version is still saved", async () => {
+    const quiet = vi.spyOn(console, "error").mockImplementation(() => {});
+    const saved = await saveEdit(
+      db,
+      {
+        guideId: sharedId,
+        userId: people.cy.id,
+        edits: [{ key: "gotchas", markdown: "Different warning [1]." }],
+      },
+      { index: async () => Promise.reject(new Error("embedding is down")) },
+    );
+    quiet.mockRestore();
+    expect(saved).toMatchObject({ ok: true });
+  });
+});
+
+describe("the chat sees a person's edit", () => {
+  const searchWords = async (text: string, own: string, shared?: string) =>
+    (
+      await db.rpc("hybrid_search", {
+        query_text: text,
+        query_embedding: JSON.stringify(Array(1536).fill(0.01)),
+        tech_id: technologyId,
+        p_guide_id: own,
+        p_extra_guide_id: shared,
+        search_mode: "keyword",
+      })
+    ).data?.map((row) => row.content) ?? [];
+
+  it("searches the copy and the shared guide, and hides the shared passage the copy replaced", async () => {
+    const saved = await edit(people.dee, sharedId, [
+      { key: "install", markdown: "Run `bun add thing` [1]." },
+    ]);
+    expect(saved.ok).toBe(true);
+    if (!saved.ok) return;
+
+    const scope = await findChatScope(await asPerson(people.dee), slug);
+    expect(scope).toMatchObject({
+      guideId: saved.guideId,
+      alsoGuideId: sharedId,
+    });
+    const replaced = contentHash(
+      guideChunks(slug, sections.slice(0, 1))[0].content,
+    );
+    const kept = contentHash(guideChunks(slug, sections.slice(1))[0].content);
+    expect(scope?.hiddenHashes).toContain(replaced);
+    expect(scope?.hiddenHashes).not.toContain(kept);
+
+    const found = await searchWords("add thing watch", saved.guideId, sharedId);
+    expect(found.some((text) => text.includes("bun add"))).toBe(true); // the edit
+    expect(found.some((text) => text.includes("Watch out"))).toBe(true); // the shared, unchanged part
+  });
+
+  it("never finds another person's edit", async () => {
+    const found = await searchWords(
+      "add thing",
+      (await guidesOf()).find((g) => g.owner_id === people.dee.id)!.id,
+      sharedId,
+    );
+    expect(found.some((text) => text.includes("pnpm"))).toBe(false); // ann's edit
+  });
+
+  it("someone with no copy searches the shared guide only", async () => {
+    const scope = await findChatScope(await asPerson(people.eve), slug);
+    expect(scope).toMatchObject({ guideId: sharedId, hiddenHashes: [] });
+    expect(scope?.alsoGuideId).toBeUndefined();
+  });
+
+  it("a later edit drops the earlier edit's passage", async () => {
+    const mine = (await guidesOf()).find((g) => g.owner_id === people.dee.id)!;
+    await edit(people.dee, mine.id, [
+      { key: "install", markdown: "Run `deno add thing` [1]." },
+    ]);
+    const found = await searchWords("add thing", mine.id, sharedId);
+    expect(found.some((text) => text.includes("deno add"))).toBe(true);
+    expect(found.some((text) => text.includes("bun add"))).toBe(false);
   });
 });

@@ -118,6 +118,23 @@ describe("retrieve", () => {
     expect(rpc.mock.calls[0][1]).toMatchObject({ p_guide_id: "guide-9" });
   });
 
+  it("passes the second guide along too", async () => {
+    const { rpc, deps } = setup(() => []);
+    await retrieve(
+      {
+        technologyId: "t",
+        queries: ["q"],
+        guideId: "mine",
+        alsoGuideId: "shared",
+      },
+      deps,
+    );
+    expect(rpc.mock.calls[0][1]).toMatchObject({
+      p_guide_id: "mine",
+      p_extra_guide_id: "shared",
+    });
+  });
+
   it("merges the searches by chunk id and maps the columns to camelCase", async () => {
     const { deps } = setup((q) =>
       q === "one" ? [row("A", 0.03), row("B", 0.02)] : [row("B", 0.04)],

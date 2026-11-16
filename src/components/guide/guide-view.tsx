@@ -2,21 +2,31 @@ import Link from "next/link";
 import { ChatPanel } from "@/components/chat/chat-panel";
 import { buttonVariants } from "@/components/ui/button";
 import { linkCitations } from "@/lib/guide/citations";
+import type { VersionEntry } from "@/lib/guide/history";
 import type { LoadedGuide } from "@/lib/guide/load";
 import { GuideEditor } from "./guide-editor";
 import { GuideMarkdown } from "./guide-markdown";
+import { RestoreButton } from "./restore-button";
+import { VersionList } from "./version-list";
 
 // A finished guide: title, the sections in order, then one numbered list of sources (M4), with the
 // chat panel beside it (M6). An Edit button turns the sections into boxes to edit (M8): with
 // `editing` the editor is shown in place of the sections. When the guide is the person's own copy
-// the header says so.
+// the header says so. A History link shows the version list (`versions`); an older version opens
+// read-only with a Restore button (your own copy only).
 export function GuideView({
   guide,
-  editing = false,
+  editing: editingRequested = false,
+  versions,
 }: {
   guide: LoadedGuide;
   editing?: boolean;
+  /** Set to show the version history in place of the sections. */
+  versions?: VersionEntry[];
 }) {
+  const older = guide.versionNo !== guide.currentVersionNo;
+  // An edit always starts from the current version, so an old one is never put in the editor.
+  const editing = editingRequested && !older;
   const { sections, sources } = linkCitations(guide.sections);
 
   return (
@@ -34,12 +44,30 @@ export function GuideView({
                 {guide.versionNo}
               </p>
             </div>
-            {!editing && (
+            {!editing && !versions && (
+              <div className="flex shrink-0 gap-2">
+                <Link
+                  href="?versions=1"
+                  className={buttonVariants({ variant: "ghost" })}
+                >
+                  History
+                </Link>
+                {!older && (
+                  <Link
+                    href="?edit=1"
+                    className={buttonVariants({ variant: "outline" })}
+                  >
+                    Edit
+                  </Link>
+                )}
+              </div>
+            )}
+            {versions && (
               <Link
-                href="?edit=1"
+                href={`/g/${guide.slug}`}
                 className={buttonVariants({ variant: "outline" })}
               >
-                Edit
+                Back to the guide
               </Link>
             )}
           </div>
@@ -54,7 +82,39 @@ export function GuideView({
           )}
         </header>
 
-        {editing ? (
+        {older && !editing && !versions && (
+          <div
+            role="note"
+            className="mb-8 flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3 text-sm"
+          >
+            <p>
+              You are viewing version {guide.versionNo}. The current version is{" "}
+              {guide.currentVersionNo}.{" "}
+              <Link
+                href={`/g/${guide.slug}`}
+                className="text-primary underline underline-offset-2"
+              >
+                Back to the current version
+              </Link>
+            </p>
+            {guide.mine ? (
+              <RestoreButton
+                guideId={guide.guideId}
+                slug={guide.slug}
+                versionNo={guide.versionNo}
+              />
+            ) : (
+              <p className="text-muted-foreground">
+                Go back to the current version and edit it to get your own copy,
+                which can restore versions.
+              </p>
+            )}
+          </div>
+        )}
+
+        {versions ? (
+          <VersionList slug={guide.slug} versions={versions} />
+        ) : editing ? (
           <GuideEditor guide={guide} />
         ) : (
           <>

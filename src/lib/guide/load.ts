@@ -13,6 +13,10 @@ import type { GuideSection } from "../agents/generate/guide/saveGuide";
 // Security lets a person see the shared guide and their own copy only, so no one else's copy can
 // turn up here.
 //
+// `{ versionNo: 2 }` shows that older version of the same guide instead of the current one (the
+// version history, M8); an unknown number falls back to the current version. `currentVersionNo`
+// is always the newest, so the page can tell it is showing an old one.
+//
 // Runs as the signed-in person (Row Level Security applies).
 
 export type GuideDb = SupabaseClient<Database>;
@@ -27,6 +31,8 @@ export type LoadedGuide = {
   version: string | null;
   status: string;
   versionNo: number;
+  /** The newest version's number; differs from `versionNo` when an old version is shown. */
+  currentVersionNo: number;
   sections: GuideSection[];
 };
 
@@ -45,6 +51,7 @@ export const Sections = z.array(
 export async function loadGuide(
   db: GuideDb,
   slug: string,
+  options: { versionNo?: number } = {},
 ): Promise<LoadedGuide | null> {
   const { data: technology } = await db
     .from("technologies")
@@ -71,7 +78,21 @@ export async function loadGuide(
     .maybeSingle();
   if (!version) return null;
 
-  const sections = Sections.safeParse(version.sections);
+  // An older version of this same guide, if one was asked for and exists.
+  const older =
+    options.versionNo && options.versionNo !== version.version_no
+      ? (
+          await db
+            .from("guide_versions")
+            .select("version_no, sections")
+            .eq("guide_id", guide.id)
+            .eq("version_no", options.versionNo)
+            .maybeSingle()
+        ).data
+      : null;
+  const shown = older ?? version;
+
+  const sections = Sections.safeParse(shown.sections);
   if (!sections.success) return null;
 
   return {
@@ -81,7 +102,8 @@ export async function loadGuide(
     slug: technology.slug,
     version: technology.latest_version,
     status: guide.status,
-    versionNo: version.version_no,
+    versionNo: shown.version_no,
+    currentVersionNo: version.version_no,
     sections: sections.data,
   };
 }

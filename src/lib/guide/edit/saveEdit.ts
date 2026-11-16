@@ -1,9 +1,9 @@
-import { indexGuide, type IndexGuideInput } from "../../rag/guideIndex";
 import type { ServiceClient } from "../../supabase/service";
 import { Sections } from "../load";
 import { addVersion } from "../versions";
 import { applyEdits, type EditEntry } from "./applyEdits";
 import { createFork, findFork, type GuideRow } from "./fork";
+import { indexCopy, realIndexDeps, type IndexDeps } from "./indexCopy";
 
 // Saves a person's edit of a guide as a new version (SRS FR-GUIDE-3, docs/05 M8).
 //
@@ -45,14 +45,12 @@ export type SaveEditResult =
 
 const COLUMNS = "id, technology_id, owner_id, status, current_version_id";
 
-export type SaveEditDeps = {
-  index: (input: IndexGuideInput) => Promise<unknown>;
-};
+export type SaveEditDeps = IndexDeps;
 
 export async function saveEdit(
   db: ServiceClient,
   input: SaveEditInput,
-  deps: SaveEditDeps = { index: (index) => indexGuide(index) },
+  deps: SaveEditDeps = realIndexDeps,
 ): Promise<SaveEditResult> {
   // 1. The guide shown, if the person may see it.
   const { data: guide, error } = await db
@@ -112,33 +110,4 @@ async function sectionsOf(db: ServiceClient, guide: GuideRow) {
     .maybeSingle();
   const parsed = Sections.safeParse(data?.sections);
   return parsed.success ? parsed.data : null;
-}
-
-async function indexCopy(
-  db: ServiceClient,
-  deps: SaveEditDeps,
-  technologyId: string,
-  guideId: string,
-  sections: IndexGuideInput["sections"],
-) {
-  try {
-    const { data: technology } = await db
-      .from("technologies")
-      .select("id, name, slug, latest_version")
-      .eq("id", technologyId)
-      .single();
-    if (!technology) return;
-    await deps.index({
-      technology: {
-        id: technology.id,
-        name: technology.name,
-        slug: technology.slug,
-        version: technology.latest_version,
-      },
-      guideId,
-      sections,
-    });
-  } catch (error) {
-    console.error("Could not make the edited guide searchable", error);
-  }
 }

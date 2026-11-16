@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { GuideSection } from "@/lib/agents/generate/guide/saveGuide";
-import { saveGuideEdit } from "@/lib/guide/client";
+import { restoreGuideVersion, saveGuideEdit } from "@/lib/guide/client";
 import { applyEdits } from "@/lib/guide/edit/applyEdits";
 import {
   EditRequest,
@@ -201,6 +201,59 @@ describe("saveGuideEdit (browser)", () => {
       }),
     );
     expect(await saveGuideEdit("g", [], "")).toEqual({
+      ok: false,
+      error: "Could not reach the server. Check your connection.",
+    });
+  });
+});
+
+describe("restoreGuideVersion (browser)", () => {
+  afterEach(() => vi.unstubAllGlobals());
+  const reply = (status: number, body: unknown) =>
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => new Response(JSON.stringify(body), { status })),
+    );
+
+  it("posts the version number to the guide's restore address and says ok", async () => {
+    const fetchMock = vi.fn(async () => new Response("{}", { status: 201 }));
+    vi.stubGlobal("fetch", fetchMock);
+    expect(await restoreGuideVersion("g1", 2)).toEqual({ ok: true });
+    const [url, init] = fetchMock.mock.calls[0] as unknown as [
+      string,
+      RequestInit,
+    ];
+    expect(url).toBe("/api/guides/g1/restore");
+    expect(JSON.parse(String(init.body))).toEqual({ versionNo: 2 });
+  });
+
+  it("shows the server's message for 400 and 404, a plain one for 401, and hides other errors", async () => {
+    reply(400, { error: "That is already the current version" });
+    expect(await restoreGuideVersion("g1", 2)).toEqual({
+      ok: false,
+      error: "That is already the current version",
+    });
+    reply(404, { error: "There is no such version" });
+    expect(await restoreGuideVersion("g1", 2)).toEqual({
+      ok: false,
+      error: "There is no such version",
+    });
+    reply(401, { error: "Sign in first" });
+    expect(await restoreGuideVersion("g1", 2)).toEqual({
+      ok: false,
+      error: "Sign in again to restore.",
+    });
+    reply(500, { error: "stack trace" });
+    expect(await restoreGuideVersion("g1", 2)).toEqual({
+      ok: false,
+      error: "Could not restore. Please try again.",
+    });
+  });
+
+  it("says so when the server cannot be reached", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("offline")));
+    const result = await restoreGuideVersion("g1", 2);
+    expect(result).toEqual({
       ok: false,
       error: "Could not reach the server. Check your connection.",
     });

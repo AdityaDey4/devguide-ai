@@ -42,3 +42,40 @@ export async function saveGuideEdit(
     };
   }
 }
+
+// Restoring an older version of the person's own copy: used by the version screen.
+//
+//   await restoreGuideVersion(guideId, 1) -> { ok: true } | { ok: false, error: "That is already the current version" }
+//
+// The restore becomes a new version; nothing is deleted. Browser only.
+export async function restoreGuideVersion(
+  guideId: string,
+  versionNo: number,
+): Promise<SaveResult> {
+  try {
+    const response = await fetch(`/api/guides/${guideId}/restore`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ versionNo }),
+    });
+    if (response.ok) return { ok: true };
+
+    const body: unknown = await response.json().catch(() => null);
+    const message =
+      body && typeof body === "object" && "error" in body
+        ? String(body.error)
+        : null;
+    if (response.status === 401) {
+      return { ok: false, error: "Sign in again to restore." };
+    }
+    if ((response.status === 400 || response.status === 404) && message) {
+      return { ok: false, error: message };
+    }
+    return { ok: false, error: "Could not restore. Please try again." };
+  } catch {
+    return {
+      ok: false,
+      error: "Could not reach the server. Check your connection.",
+    };
+  }
+}

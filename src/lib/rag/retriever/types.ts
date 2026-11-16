@@ -10,6 +10,8 @@ export type RetrieveInput = {
   queries: string[];
   /** Include this guide's own chunks too (other guides' chunks are never returned). */
   guideId?: string;
+  /** A second guide whose chunks are included too: the shared guide, when `guideId` is a person's copy. */
+  alsoGuideId?: string;
   /** Only the evals set this, to measure each half of the search alone. Default: "hybrid". */
   mode?: SearchMode;
 };

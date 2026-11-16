@@ -50,6 +50,10 @@ export const ChatState = Annotation.Root({
   })),
   /** The guide whose own text may be searched too. */
   guideId: latest<string | null>(() => null),
+  /** The shared guide, when `guideId` is a person's copy: its text is searched too. */
+  alsoGuideId: latest<string | null>(() => null),
+  /** Fingerprints of shared-guide passages this person's copy replaced: never used for them. */
+  hiddenHashes: latest<string[]>(() => []),
   /** The messages before this question, oldest first. */
   history: latest<ChatMessage[]>(() => []),
   question: latest<string>(() => ""),

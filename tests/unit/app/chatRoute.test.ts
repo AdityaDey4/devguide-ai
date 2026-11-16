@@ -176,6 +176,21 @@ describe("POST /api/chat: the streamed answer", () => {
     });
   });
 
+  it("hands over the shared guide and replaced passages when the person has a copy", async () => {
+    mocks.findChatScope.mockResolvedValue({
+      ...scope,
+      guideId: "mine",
+      alsoGuideId: "g1",
+      hiddenHashes: ["abc"],
+    });
+    await (await call(valid)).text();
+    expect(mocks.askGuide.mock.calls[0][0]).toMatchObject({
+      guideId: "mine",
+      alsoGuideId: "g1",
+      hiddenHashes: ["abc"],
+    });
+  });
+
   it("trims the question", async () => {
     await (await call({ ...valid, question: "  and a URL?  " })).text();
     expect(mocks.askGuide.mock.calls[0][0].question).toBe("and a URL?");

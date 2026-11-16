@@ -42,6 +42,7 @@ export async function retrieve(
       vector: embeddings[i],
       technologyId: input.technologyId,
       guideId: input.guideId,
+      alsoGuideId: input.alsoGuideId,
       mode: input.mode,
     }),
   );

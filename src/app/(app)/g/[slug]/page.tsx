@@ -7,12 +7,16 @@ import { GuideView } from "@/components/guide/guide-view";
 import { RunFailed } from "@/components/guide/run-failed";
 import { RunProgress } from "@/components/guide/run-progress";
 import { buttonVariants } from "@/components/ui/button";
+import { listVersions } from "@/lib/guide/history";
 import { loadGuide } from "@/lib/guide/load";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Guide" };
 
-// /g/<slug>            a finished guide  -> read it
+// /g/<slug>            a finished guide  -> read it (your own copy, if you have edited it)
+// /g/<slug>?edit=1     the same guide with a box per section to edit it (M8)
+// /g/<slug>?versions=1 the list of versions of the guide (M8)
+// /g/<slug>?version=2  version 2 of the guide, read-only, with Restore on your own copy (M8)
 // /g/<slug>?run=<id>   a guide being written -> watch the run (reload-safe), then show the guide
 // /g/<slug>            nothing there yet -> say so and point to search
 //
@@ -22,7 +26,13 @@ const ACTIVE = ["queued", "running", "waiting_user"];
 
 type Props = {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ run?: string; q?: string }>;
+  searchParams: Promise<{
+    run?: string;
+    q?: string;
+    edit?: string;
+    versions?: string;
+    version?: string;
+  }>;
 };
 
 export default function GuidePage({ params, searchParams }: Props) {
@@ -37,10 +47,15 @@ async function GuideOrProgress({ params, searchParams }: Props) {
   // The session check below reads the clock (token expiry): request time, on purpose.
   await connection();
   const { slug } = await params;
-  const { run, q } = await searchParams;
+  const { run, q, edit, versions, version } = await searchParams;
   const supabase = await createClient();
 
-  const guide = await loadGuide(supabase, slug);
+  const versionNo = Number.parseInt(version ?? "", 10);
+  const guide = await loadGuide(
+    supabase,
+    slug,
+    versionNo > 0 ? { versionNo } : {},
+  );
   const runId = z.uuid().safeParse(run);
   const query = q?.trim() ? q : slug; // the name that was searched, for Retry
 
@@ -66,7 +81,19 @@ async function GuideOrProgress({ params, searchParams }: Props) {
     }
   }
 
-  if (guide) return <GuideView guide={guide} />;
+  if (guide) {
+    return (
+      <GuideView
+        guide={guide}
+        editing={edit === "1"}
+        versions={
+          versions === "1"
+            ? await listVersions(supabase, guide.guideId)
+            : undefined
+        }
+      />
+    );
+  }
   if (runId.success) {
     return <RunProgress key={runId.data} runId={runId.data} query={query} />;
   }

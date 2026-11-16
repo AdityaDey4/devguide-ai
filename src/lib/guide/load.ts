@@ -5,24 +5,38 @@ import type { GuideSection } from "../agents/generate/guide/saveGuide";
 
 // Reads a finished guide for the reading page (SRS FR-GUIDE-1).
 //
-//   loadGuide(db, "zod") -> { name: "Zod", version: "4.1.0", status: "ready", versionNo: 2,
+//   loadGuide(db, "zod") -> { guideId: "…", mine: false, name: "Zod", version: "4.1.0", status: "ready", versionNo: 2,
 //                             sections: [{ key, title, markdown, citations, needs_review }, ...] }
-//   loadGuide(db, "nope") -> null      no technology, or no shared guide with content yet
+//   loadGuide(db, "nope") -> null      no technology, or no guide with content yet
+//
+// Shows YOUR copy when you have one (you edited the guide: M8), otherwise the shared guide. Row Level
+// Security lets a person see the shared guide and their own copy only, so no one else's copy can
+// turn up here.
+//
+// `{ versionNo: 2 }` shows that older version of the same guide instead of the current one (the
+// version history, M8); an unknown number falls back to the current version. `currentVersionNo`
+// is always the newest, so the page can tell it is showing an old one.
 //
 // Runs as the signed-in person (Row Level Security applies).
 
 export type GuideDb = SupabaseClient<Database>;
 
 export type LoadedGuide = {
+  /** The guide being shown (the shared one, or your copy): where an edit is sent. */
+  guideId: string;
+  /** True when this is your own copy of the guide. */
+  mine: boolean;
   name: string;
   slug: string;
   version: string | null;
   status: string;
   versionNo: number;
+  /** The newest version's number; differs from `versionNo` when an old version is shown. */
+  currentVersionNo: number;
   sections: GuideSection[];
 };
 
-const Sections = z.array(
+export const Sections = z.array(
   z.object({
     key: z.string(),
     title: z.string(),
@@ -37,6 +51,7 @@ const Sections = z.array(
 export async function loadGuide(
   db: GuideDb,
   slug: string,
+  options: { versionNo?: number } = {},
 ): Promise<LoadedGuide | null> {
   const { data: technology } = await db
     .from("technologies")
@@ -45,13 +60,15 @@ export async function loadGuide(
     .maybeSingle();
   if (!technology) return null;
 
-  const { data: guide } = await db
+  // Both the shared guide and (if any) my own copy come back; my copy wins.
+  const { data: guides } = await db
     .from("guides")
-    .select("status, current_version_id")
+    .select("id, owner_id, status, current_version_id")
     .eq("technology_id", technology.id)
-    .is("owner_id", null)
-    .not("current_version_id", "is", null)
-    .maybeSingle();
+    .not("current_version_id", "is", null);
+  const guide =
+    guides?.find((candidate) => candidate.owner_id !== null) ??
+    guides?.find((candidate) => candidate.owner_id === null);
   if (!guide?.current_version_id) return null;
 
   const { data: version } = await db
@@ -61,15 +78,32 @@ export async function loadGuide(
     .maybeSingle();
   if (!version) return null;
 
-  const sections = Sections.safeParse(version.sections);
+  // An older version of this same guide, if one was asked for and exists.
+  const older =
+    options.versionNo && options.versionNo !== version.version_no
+      ? (
+          await db
+            .from("guide_versions")
+            .select("version_no, sections")
+            .eq("guide_id", guide.id)
+            .eq("version_no", options.versionNo)
+            .maybeSingle()
+        ).data
+      : null;
+  const shown = older ?? version;
+
+  const sections = Sections.safeParse(shown.sections);
   if (!sections.success) return null;
 
   return {
+    guideId: guide.id,
+    mine: guide.owner_id !== null,
     name: technology.name,
     slug: technology.slug,
     version: technology.latest_version,
     status: guide.status,
-    versionNo: version.version_no,
+    versionNo: shown.version_no,
+    currentVersionNo: version.version_no,
     sections: sections.data,
   };
 }

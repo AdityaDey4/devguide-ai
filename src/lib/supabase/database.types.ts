@@ -337,6 +337,7 @@ export type Database = {
       hybrid_search: {
         Args: {
           match_count?: number;
+          p_extra_guide_id?: string;
           p_guide_id?: string;
           query_embedding: string;
           query_text: string;

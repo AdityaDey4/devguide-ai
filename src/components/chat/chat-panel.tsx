@@ -84,14 +84,14 @@ export function ChatPanel({ slug, name }: { slug: string; name: string }) {
       <Button
         type="button"
         onClick={() => setOpen(true)}
-        className="fixed right-4 bottom-4 z-30 h-11 rounded-full px-4 shadow-lg lg:hidden"
+        className="fixed right-4 bottom-4 z-30 h-11 rounded-full px-4 shadow-lg lg:hidden print:hidden"
       >
         <MessageCircleIcon aria-hidden /> Ask
       </Button>
 
       <aside
         aria-label={`Ask about ${name}`}
-        className={`bg-background flex-col ${open ? "fixed inset-0 z-50 flex" : "hidden"} lg:sticky lg:top-14 lg:z-auto lg:flex lg:h-[calc(100vh-3.5rem)] lg:w-96 lg:shrink-0 lg:border-l`}
+        className={`bg-background flex-col print:hidden! ${open ? "fixed inset-0 z-50 flex" : "hidden"} lg:sticky lg:top-14 lg:z-auto lg:flex lg:h-[calc(100vh-3.5rem)] lg:w-96 lg:shrink-0 lg:border-l`}
       >
         <header className="flex items-center justify-between gap-2 border-b px-4 py-3">
           <h2 className="truncate font-semibold">Ask about {name}</h2>

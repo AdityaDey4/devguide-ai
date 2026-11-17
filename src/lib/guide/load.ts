@@ -33,6 +33,8 @@ export type LoadedGuide = {
   versionNo: number;
   /** The newest version's number; differs from `versionNo` when an old version is shown. */
   currentVersionNo: number;
+  /** When the version shown was saved (ISO). */
+  createdAt: string;
   sections: GuideSection[];
 };
 
@@ -73,7 +75,7 @@ export async function loadGuide(
 
   const { data: version } = await db
     .from("guide_versions")
-    .select("version_no, sections")
+    .select("version_no, sections, created_at")
     .eq("id", guide.current_version_id)
     .maybeSingle();
   if (!version) return null;
@@ -84,7 +86,7 @@ export async function loadGuide(
       ? (
           await db
             .from("guide_versions")
-            .select("version_no, sections")
+            .select("version_no, sections, created_at")
             .eq("guide_id", guide.id)
             .eq("version_no", options.versionNo)
             .maybeSingle()
@@ -104,6 +106,7 @@ export async function loadGuide(
     status: guide.status,
     versionNo: shown.version_no,
     currentVersionNo: version.version_no,
+    createdAt: shown.created_at,
     sections: sections.data,
   };
 }

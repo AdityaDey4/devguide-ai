@@ -135,6 +135,7 @@ describe("viewing an older version", () => {
       currentVersionNo: 3,
     });
     expect(older?.sections).toEqual(sections);
+    expect(Number.isNaN(Date.parse(older!.createdAt))).toBe(false);
   });
 
   it("falls back to the current version for a number that does not exist", async () => {

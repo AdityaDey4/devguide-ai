@@ -56,19 +56,22 @@
   --radius: 0.5rem;
 }
 
-.dark {
-  --bg: #0e1012;
-  --surface: #16191c;
-  --surface-2: #1d2125;
-  --border: #2a2f34;
-  --text: #ececea;
-  --text-muted: #9a9c9e;
-  --brand: #6e8eff;
-  --brand-foreground: #0e1012;
-  --success: #3cc57a;
-  --warning: #f0a93b;
-  --danger: #f0675d;
-  --fetched: #3bb7de;
+/* Screens only: a printed guide is always dark text on white paper (see the print rules below). */
+@media screen {
+  .dark {
+    --bg: #0e1012;
+    --surface: #16191c;
+    --surface-2: #1d2125;
+    --border: #2a2f34;
+    --text: #ececea;
+    --text-muted: #9a9c9e;
+    --brand: #6e8eff;
+    --brand-foreground: #0e1012;
+    --success: #3cc57a;
+    --warning: #f0a93b;
+    --danger: #f0675d;
+    --fetched: #3bb7de;
+  }
 }
 
 @theme inline {
@@ -145,5 +148,55 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/*
+ * Printing a guide (M9, SRS FR-PDF-2): "Download PDF" is the browser's print dialog, so this is
+ * what the PDF looks like. The page chrome is hidden with Tailwind's `print:hidden` where it is
+ * built (top bar, chat, Edit/History, copy buttons); the rest of the page is shaped here.
+ */
+@media print {
+  @page {
+    margin: 16mm 14mm;
+  }
+  html {
+    color-scheme: light;
+    font-size: 11pt;
+  }
+  body {
+    background: #fff;
+    color: #111;
+  }
+  /* The guide fills the paper: no side column, no page padding. */
+  .print-fill {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    break-after: avoid;
+  }
+  /* Code is wrapped, never cut off or scrolled, and kept on one page when it fits on one. */
+  pre {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    overflow: visible !important;
+    padding-right: 1rem !important;
+    font-size: 9.5pt;
+    break-inside: avoid;
+  }
+  table,
+  blockquote {
+    break-inside: avoid;
+  }
+  /* Paper has no links to click: the sources list shows each address. */
+  .print-url a::after {
+    content: " (" attr(href) ")";
+    overflow-wrap: anywhere;
+    color: #444;
+    text-decoration: none;
   }
 }

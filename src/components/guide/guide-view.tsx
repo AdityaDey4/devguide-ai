@@ -4,6 +4,8 @@ import { buttonVariants } from "@/components/ui/button";
 import { linkCitations } from "@/lib/guide/citations";
 import type { VersionEntry } from "@/lib/guide/history";
 import type { LoadedGuide } from "@/lib/guide/load";
+import { guideDate } from "@/lib/guide/pdf";
+import { DownloadPdf } from "./download-pdf";
 import { GuideEditor } from "./guide-editor";
 import { GuideMarkdown } from "./guide-markdown";
 import { RestoreButton } from "./restore-button";
@@ -31,7 +33,7 @@ export function GuideView({
 
   return (
     <div className="flex flex-1">
-      <article className="mx-auto w-full max-w-3xl min-w-0 flex-1 px-6 py-10">
+      <article className="print-fill mx-auto w-full max-w-3xl min-w-0 flex-1 px-6 py-10">
         <header className="mb-8">
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -42,10 +44,15 @@ export function GuideView({
                 {guide.mine ? "Your copy · " : ""}
                 {guide.version ? `Version ${guide.version} · ` : ""}Guide v
                 {guide.versionNo}
+                <span className="hidden print:inline">
+                  {" "}
+                  · Generated {guideDate(guide.createdAt)}
+                </span>
               </p>
             </div>
             {!editing && !versions && (
-              <div className="flex shrink-0 gap-2">
+              <div className="flex shrink-0 gap-2 print:hidden">
+                <DownloadPdf slug={guide.slug} versionNo={guide.versionNo} />
                 <Link
                   href="?versions=1"
                   className={buttonVariants({ variant: "ghost" })}
@@ -85,7 +92,7 @@ export function GuideView({
         {older && !editing && !versions && (
           <div
             role="note"
-            className="mb-8 flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3 text-sm"
+            className="mb-8 flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3 text-sm print:hidden"
           >
             <p>
               You are viewing version {guide.versionNo}. The current version is{" "}
@@ -142,7 +149,7 @@ export function GuideView({
                 <h2 id="sources-heading" className="text-xl font-semibold">
                   Sources
                 </h2>
-                <ol className="mt-3 space-y-1.5 text-sm">
+                <ol className="print-url mt-3 space-y-1.5 text-sm">
                   {sources.map((source) => (
                     <li key={source.n} className="flex gap-2">
                       <span className="text-muted-foreground w-6 shrink-0 text-right">

@@ -35,7 +35,7 @@ Landing (public)
       └─ Settings                 (profile, usage limits, MCP API keys in v1.1)
 ```
 
-**Top bar (all app screens):** logo (→ Home) · compact search field (`/` focuses it) · Library · avatar menu (Settings, Sign out). On mobile: logo, search icon, menu icon.
+**Top bar (all app screens):** logo (→ Home) · avatar menu (dark/light mode, Sign out). Search, Library and Settings are left out of the bar for now (their pages still exist).
 
 ---
 

@@ -55,7 +55,8 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (signedIn && pathname === "/login") {
+  // Someone already signed in has no use for the landing page or the sign-in page.
+  if (signedIn && (pathname === "/login" || pathname === "/")) {
     const url = request.nextUrl.clone();
     url.pathname = "/search";
     url.search = "";

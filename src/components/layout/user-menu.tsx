@@ -1,7 +1,7 @@
 "use client";
 
-import { LibraryIcon, LogOutIcon, SettingsIcon } from "lucide-react";
-import Link from "next/link";
+import { LogOutIcon, MoonIcon, SunIcon } from "lucide-react";
+import { useTheme } from "next-themes";
 import { signOut } from "@/app/(app)/actions";
 import {
   DropdownMenu,
@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export function UserMenu({ email }: { email: string }) {
+  const { resolvedTheme, setTheme } = useTheme();
   const initial = email.charAt(0).toUpperCase() || "?";
 
   return (
@@ -31,15 +32,15 @@ export function UserMenu({ email }: { email: string }) {
           </DropdownMenuLabel>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        {/* Library is also in the bar on desktop; here it serves small screens. */}
+        {/* Both icons are always rendered and CSS picks one by the `dark` class (no hydration mismatch). */}
         <DropdownMenuItem
-          render={<Link href="/library" />}
-          className="md:hidden"
+          closeOnClick={false}
+          onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
         >
-          <LibraryIcon aria-hidden /> Library
-        </DropdownMenuItem>
-        <DropdownMenuItem render={<Link href="/settings" />}>
-          <SettingsIcon aria-hidden /> Settings
+          <SunIcon aria-hidden className="dark:hidden" />
+          <MoonIcon aria-hidden className="hidden dark:block" />
+          <span className="dark:hidden">Dark mode</span>
+          <span className="hidden dark:inline">Light mode</span>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => signOut()}>
           <LogOutIcon aria-hidden /> Sign out

@@ -5,9 +5,9 @@ import { linkCitations } from "@/lib/guide/citations";
 import type { VersionEntry } from "@/lib/guide/history";
 import type { LoadedGuide } from "@/lib/guide/load";
 import { guideDate } from "@/lib/guide/pdf";
-import { DownloadPdf } from "./download-pdf";
 import { GuideEditor } from "./guide-editor";
 import { GuideMarkdown } from "./guide-markdown";
+import { GuideMenu } from "./guide-menu";
 import { RestoreButton } from "./restore-button";
 import { VersionList } from "./version-list";
 
@@ -41,9 +41,12 @@ export function GuideView({
                 {guide.name}
               </h1>
               <p className="text-muted-foreground mt-1 text-sm">
-                {guide.mine ? "Your copy · " : ""}
-                {guide.version ? `Version ${guide.version} · ` : ""}Guide v
-                {guide.versionNo}
+                {[
+                  guide.version ? `Version ${guide.version}` : null,
+                  guide.mine ? `Your copy v${guide.versionNo}` : null,
+                ]
+                  .filter(Boolean)
+                  .join(" · ")}
                 <span className="hidden print:inline">
                   {" "}
                   · Generated {guideDate(guide.createdAt)}
@@ -51,14 +54,7 @@ export function GuideView({
               </p>
             </div>
             {!editing && !versions && (
-              <div className="flex shrink-0 gap-2 print:hidden">
-                <DownloadPdf slug={guide.slug} versionNo={guide.versionNo} />
-                <Link
-                  href="?versions=1"
-                  className={buttonVariants({ variant: "ghost" })}
-                >
-                  History
-                </Link>
+              <div className="flex shrink-0 items-center gap-2 print:hidden">
                 {!older && (
                   <Link
                     href="?edit=1"
@@ -67,6 +63,7 @@ export function GuideView({
                     Edit
                   </Link>
                 )}
+                <GuideMenu slug={guide.slug} versionNo={guide.versionNo} />
               </div>
             )}
             {versions && (

@@ -25,7 +25,7 @@ export function CodeBlock({ children }: { children: ReactNode }) {
         type="button"
         onClick={copy}
         aria-label={copied ? "Copied" : "Copy code"}
-        className="text-muted-foreground hover:text-foreground bg-surface absolute top-2 right-2 inline-flex items-center gap-1 rounded border px-2 py-1 text-xs"
+        className="text-muted-foreground hover:text-foreground bg-surface absolute top-2 right-2 inline-flex items-center gap-1 rounded border px-2 py-1 text-xs print:hidden"
       >
         {copied ? (
           <CheckIcon className="size-3.5" />

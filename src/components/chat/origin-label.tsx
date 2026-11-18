@@ -12,7 +12,7 @@ import type { ChatOrigin } from "@/lib/agents/chat";
 // an answer that was not found from one that was.
 
 const ORIGINS: Record<
-  ChatOrigin,
+  Exclude<ChatOrigin, "none">,
   { text: string; icon: LucideIcon; className: string }
 > = {
   guide: {
@@ -38,6 +38,7 @@ const ORIGINS: Record<
 };
 
 export function OriginLabel({ origin }: { origin: ChatOrigin }) {
+  if (origin === "none") return null; // a greeting or a non-question has no source
   const { text, icon: Icon, className } = ORIGINS[origin];
   return (
     <p className={`flex items-center gap-1.5 text-xs font-medium ${className}`}>

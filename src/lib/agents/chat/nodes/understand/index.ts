@@ -10,6 +10,9 @@ import { UnderstandAnswer } from "./schema";
 //   history: "how do I validate an email?" / "Use z.email()..."   question: "and a URL?"
 //     -> { standaloneQuery: "How do I validate a URL with Zod?", variants: ["z.url schema", ...] }
 //
+// It also says what kind of message this is (`intent`): a greeting, gibberish or a question about
+// something else is answered directly (directReply.ts) instead of being searched for in the docs,
+// where it would only find text about the technology for a message that has nothing to do with it.
 // Only the last 6 messages are looked at. One call to the small model.
 
 export async function understand(
@@ -24,6 +27,7 @@ export async function understand(
   );
 
   return {
+    intent: answer.intent,
     // an empty rewrite must never replace the question itself
     standaloneQuery: answer.standalone.trim() || state.question,
     variants: answer.variants,

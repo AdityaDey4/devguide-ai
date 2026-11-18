@@ -33,6 +33,8 @@ ${`${title} explains how this part of the library works, with examples. `.repeat
 
 export function fakeChatDeps(
   answers: {
+    /** What kind of message the understand step finds (default: a question). */
+    intent?: "question" | "greeting" | "unclear" | "other_topic";
     standalone?: string;
     variants?: string[];
     /** What the search finds and what the reranker keeps. */
@@ -76,6 +78,7 @@ export function fakeChatDeps(
         ) as never;
       }
       return {
+        intent: answers.intent ?? "question",
         standalone: answers.standalone ?? "How do I validate a URL with Zod?",
         variants: answers.variants ?? [
           "z.url schema",
@@ -151,6 +154,7 @@ export function chatStateWith(
     alsoGuideId: null,
     hiddenHashes: [],
     history: [],
+    intent: "question",
     question: "and a URL?",
     standaloneQuery: "How do I validate a URL with Zod?",
     variants: [],

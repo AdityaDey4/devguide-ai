@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { askGuide } from "@/lib/agents/chat";
-import { MIN_RELEVANCE, NOT_COVERED } from "@/lib/agents/chat/config";
+import {
+  DIRECT_REPLIES,
+  MIN_RELEVANCE,
+  NOT_COVERED,
+} from "@/lib/agents/chat/config";
 import { answer } from "@/lib/agents/chat/nodes/answer";
 import { retrieve } from "@/lib/agents/chat/nodes/retrieve";
 import { contentHash } from "@/lib/rag/store";
@@ -39,6 +43,7 @@ describe("understand", () => {
       variants: ["z.url"],
     });
     expect(await understand(chatStateWith(), deps)).toEqual({
+      intent: "question",
       standaloneQuery: "How do I validate a URL with Zod?",
       variants: ["z.url"],
     });
@@ -229,6 +234,72 @@ describe("answer", () => {
       origin: "not_found",
     });
     expect(pieces.join("")).toBe(NOT_COVERED);
+  });
+});
+
+describe("a message that is not a question about the technology", () => {
+  const zod = {
+    id: "t1",
+    name: "Zod",
+    version: null,
+    docsUrl: null,
+    officialUrl: null,
+  };
+  const ask = (intent: "greeting" | "unclear" | "other_topic") => {
+    const fake = fakeChatDeps({
+      intent,
+      found: [ranked()],
+      text: "should never be written",
+    });
+    const pieces: string[] = [];
+    return {
+      ...fake,
+      pieces,
+      run: (question: string) =>
+        askGuide(
+          { technology: zod, guideId: "g1", history: [], question },
+          (piece) => void pieces.push(piece),
+          fake.deps,
+        ),
+    };
+  };
+
+  it.each([
+    ["greeting", "Hi"],
+    ["unclear", "kfjrkferljk"],
+    ["other_topic", "What is Java"],
+  ] as const)(
+    "%s (%s) gets a short fixed reply, with nothing searched, graded or written",
+    async (intent, message) => {
+      const { run, asked, retrieved, written, pieces } = ask(intent);
+      const result = await run(message);
+
+      expect(result.answer).toBe(DIRECT_REPLIES[intent]("Zod"));
+      expect(pieces.join("")).toBe(result.answer);
+      expect(result.citations).toEqual([]);
+      expect(result.origin).toBe("none");
+      expect(result.toStore).toEqual([]);
+      expect(asked).toHaveLength(1); // only the understand step
+      expect(retrieved).toHaveLength(0);
+      expect(written).toHaveLength(0);
+    },
+  );
+
+  it("names the technology and never mentions another one", () => {
+    for (const reply of Object.values(DIRECT_REPLIES)) {
+      expect(reply("Zod")).toContain("Zod");
+    }
+  });
+
+  it("tells the model what each intent means and to keep follow-ups as questions", async () => {
+    const { deps, asked } = fakeChatDeps();
+    await understand(chatStateWith({ question: "and a URL?" }), deps);
+    const prompt = text(asked[0]);
+    for (const intent of ["question", "greeting", "unclear", "other_topic"]) {
+      expect(prompt).toContain(`"${intent}"`);
+    }
+    expect(prompt).toContain("Zod"); // the technology is named in the rules
+    expect(prompt).toContain("and a URL?");
   });
 });
 

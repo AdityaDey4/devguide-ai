@@ -27,3 +27,13 @@ export const LIVE_MAX_CHARS = 20_000;
  * candidates in all (the stored chunks kept so far come first).
  */
 export const MAX_EXTERNAL_CHUNKS = 30;
+
+/** What the chat says to a message that is not a question about the technology (see understand). */
+export const DIRECT_REPLIES = {
+  greeting: (name: string) =>
+    `I'm here to help with ${name}. Ask me anything and I'll answer from its documentation.`,
+  unclear: (name: string) =>
+    `I didn't understand that. Try asking a question about ${name}, for example how to install it or how to use one of its features.`,
+  other_topic: (name: string) =>
+    `This chat is about ${name}, so I can't help with that here. Ask me something about ${name}.`,
+} as const;

@@ -48,6 +48,12 @@ function setup(response: Response | Error) {
 afterEach(() => vi.unstubAllGlobals());
 
 describe("parseChatLine", () => {
+  it("accepts the origin of a message that is not a question (none)", () => {
+    expect(
+      parseChatLine('{"type":"done","citations":[],"origin":"none"}'),
+    ).toEqual({ type: "done", citations: [], origin: "none" });
+  });
+
   it("reads the three kinds of line", () => {
     expect(parseChatLine('{"type":"text","text":"Hi"}')).toEqual({
       type: "text",

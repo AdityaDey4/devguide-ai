@@ -37,7 +37,13 @@ const Line = z.discriminatedUnion("type", [
   z.object({
     type: z.literal("done"),
     citations: z.array(Citation),
-    origin: z.enum(["guide", "stored_docs", "fetched_now", "not_found"]),
+    origin: z.enum([
+      "guide",
+      "stored_docs",
+      "fetched_now",
+      "not_found",
+      "none",
+    ]),
   }),
   z.object({ type: z.literal("error"), message: z.string() }),
 ]);

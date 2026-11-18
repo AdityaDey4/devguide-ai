@@ -46,11 +46,11 @@ export function ChatInput({
           value={value}
           onChange={(event) => setValue(event.target.value)}
           onKeyDown={onKeyDown}
-          rows={2}
+          rows={3}
           maxLength={MAX_QUESTION_CHARS}
           aria-label="Your question"
           placeholder="Ask a question…"
-          className="border-input focus-visible:ring-ring/50 max-h-40 min-h-12 w-full resize-y rounded-lg border bg-transparent px-2.5 py-2 text-sm outline-none focus-visible:ring-3"
+          className="border-input focus-visible:ring-ring/50 max-h-40 min-h-20 w-full resize-y rounded-lg border bg-transparent px-2.5 py-2 text-sm outline-none focus-visible:ring-3"
         />
         <Button
           type="submit"

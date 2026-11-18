@@ -33,7 +33,7 @@ export function GuideView({
 
   return (
     <div className="flex flex-1">
-      <article className="print-fill mx-auto w-full max-w-3xl min-w-0 flex-1 px-6 py-10">
+      <article className="print-fill mx-auto w-full max-w-3xl min-w-0 flex-1 px-6 py-10 lg:max-w-none lg:px-10">
         <header className="mb-8">
           <div className="flex items-start justify-between gap-4">
             <div>

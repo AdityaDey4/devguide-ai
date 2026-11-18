@@ -6,11 +6,13 @@ import type { Ranked } from "../../rag/reranker";
 //   stored_docs   documentation we already had stored (official pages, Context7 snippets)
 //   fetched_now   text found just now, outside the stored knowledge, while answering this question
 //   not_found     nothing answered it
+//   none          not a question about the technology (greeting, gibberish, another topic): no label
 //
 // It is worked out from the chunks the answer actually cited. If it cites text found just now,
 // that is what the person should hear about; otherwise stored docs; otherwise the guide alone.
 
-export type ChatOrigin = "guide" | "stored_docs" | "fetched_now" | "not_found";
+export type ChatOrigin =
+  "guide" | "stored_docs" | "fetched_now" | "not_found" | "none";
 
 /** Ids of chunks found just now start with this (set in mergeAndRerank); stored chunks have UUIDs. */
 export const FRESH_PREFIX = "fresh:";

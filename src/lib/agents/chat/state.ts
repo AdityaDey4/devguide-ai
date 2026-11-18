@@ -1,6 +1,7 @@
 import { Annotation } from "@langchain/langgraph";
 import type { Ranked } from "../../rag/reranker";
 import type { Grade } from "./nodes/grade/schema";
+import type { Intent } from "./nodes/understand/schema";
 import type { ChatOrigin } from "./origin";
 
 // What the chat graph remembers while it answers ONE question (docs/03-Architecture.md section
@@ -57,6 +58,8 @@ export const ChatState = Annotation.Root({
   /** The messages before this question, oldest first. */
   history: latest<ChatMessage[]>(() => []),
   question: latest<string>(() => ""),
+  /** What kind of message it is; only a "question" is searched for (see understand). */
+  intent: latest<Intent>(() => "question"),
   /** The question rewritten so it makes sense on its own. */
   standaloneQuery: latest<string>(() => ""),
   /** Other ways to ask the same thing, for the search. */

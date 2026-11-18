@@ -18,7 +18,7 @@ export function docsWorthKeeping(
   chunks: Ranked[],
   origin: ChatOrigin,
 ): ExternalDoc[] {
-  if (origin === "not_found") return [];
+  if (origin === "not_found" || origin === "none") return [];
 
   const used = new Set(chunks.filter(isFresh).map((chunk) => chunk.sourceUrl));
   const seen = new Set<string>();

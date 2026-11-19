@@ -25,6 +25,8 @@ export type Asked = {
   /** The final grade, or null if the question failed before grading. */
   grade: "GOOD" | "PARTIAL" | "BAD" | null;
   reply: string;
+  /** The numbered excerpts the answer was written from, exactly as the model read them. */
+  excerpts: string;
   /** Titles (or addresses) of the sources the answer cited. */
   cited: string[];
   /** Outside calls made while answering: all zero means the stored text was enough. */

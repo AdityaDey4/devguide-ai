@@ -1,5 +1,6 @@
 import { runConfig } from "../../shared/checkpointer";
 import type { Budget } from "../../shared/budget";
+import { flushTraces, traceConfig } from "../../shared/tracing";
 import type { GenerateStateType } from "../state";
 import { describeFailure, RunConflict } from "./failure";
 import { savePartial } from "./partial";
@@ -20,7 +21,7 @@ export async function drive(
   input: unknown,
   deps: RunDeps,
 ): Promise<RunOutcome> {
-  const config = runConfig(runId);
+  const config = { ...runConfig(runId), ...traceConfig("generate", { runId }) };
   try {
     await deps.store.markRunning(runId);
 
@@ -35,9 +36,14 @@ export async function drive(
         if (node === "identify") await claimTechnology(runId, change, deps);
       }
     }
-    return await finish(runId, deps);
+    const outcome = await finish(runId, deps);
+    await flushTraces();
+    return outcome;
   } catch (error) {
-    return await fail(runId, error, deps);
+    const outcome = await fail(runId, error, deps);
+    // A refused duplicate leaves its abandoned graph still running; waiting for that would stall.
+    if (!(error instanceof RunConflict)) await flushTraces();
+    return outcome;
   }
 }
 

@@ -1,3 +1,4 @@
+import { formatExcerpts } from "../../src/lib/agents/chat/excerpts";
 import { buildChatGraph } from "../../src/lib/agents/chat/graph";
 import type { ChatDeps } from "../../src/lib/agents/chat/deps";
 import { realDeps } from "../../src/lib/agents/chat/realDeps";
@@ -53,6 +54,7 @@ export async function askChat(question: ChatQuestion): Promise<Asked> {
       origin: state.origin,
       grade: state.grade?.verdict ?? null,
       reply: state.reply,
+      excerpts: formatExcerpts(state.chunks),
       cited: state.citations.map((c) => c.title),
       calls,
       firstTokenMs,
@@ -63,6 +65,7 @@ export async function askChat(question: ChatQuestion): Promise<Asked> {
       origin: "not_found",
       grade: null,
       reply: "",
+      excerpts: "",
       cited: [],
       calls,
       firstTokenMs,

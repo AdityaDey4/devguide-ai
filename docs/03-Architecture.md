@@ -161,7 +161,7 @@ devguide-ai/
 │  ├─ run-evals.ts  the recipe: load → evaluate each question → report
 │  ├─ retrieval.jsonl  42 questions with the pages that answer them
 │  ├─ load.ts evaluate.ts metrics.ts report.ts types.ts
-│  ├─ chat/  (npm run evals:chat; calls OpenAI, Context7 and Tavily, run on demand)
+│  ├─ chat/  (npm run evals:chat; calls OpenAI, Context7 and Tavily, run on demand; npm run evals:langsmith runs the same questions as a LangSmith experiment)
 │  │  ├─ run.ts  the recipe: load → ask the real chat graph → judge → report
 │  │  ├─ questions.jsonl  18 questions with the origin each should get
 │  │  └─ load.ts ask.ts judge.ts report.ts types.ts

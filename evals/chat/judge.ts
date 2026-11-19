@@ -11,7 +11,9 @@ import type { Asked, ChatQuestion, Judged } from "./types";
 //   - if it should be refused: it says so, with no citations
 
 export function judge(question: ChatQuestion, asked: Asked): Judged {
-  const refusal = question.expected.every((origin) => origin === "not_found");
+  const refusal = question.expected.every(
+    (origin) => origin === "not_found" || origin === "none",
+  );
   const originOk = !asked.error && question.expected.includes(asked.origin);
 
   const mentionsOk =
@@ -58,7 +60,9 @@ export function summarise(judged: Judged[]): Summary {
     if (j.originOk) group.originRight++;
   }
 
-  const wasRefused = (j: Judged) => j.asked.origin === "not_found";
+  // "none": the chat declined without searching (another topic, gibberish)
+  const wasRefused = (j: Judged) =>
+    j.asked.origin === "not_found" || j.asked.origin === "none";
   const shouldRefuse = (j: Judged) => j.question.group === "not_found";
   const checked = judged.filter((j) => j.mentionsOk !== null);
 

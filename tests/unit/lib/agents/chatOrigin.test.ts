@@ -103,6 +103,34 @@ describe("mergeAndRerank: fresh chunks", () => {
   });
 });
 
+describe("mergeAndRerank: many pages", () => {
+  it("lets a later page into the reranker even when the first page has more chunks than fit", async () => {
+    const { deps } = fakeChatDeps();
+    const seen: string[][] = [];
+    const rerank = deps.rerank;
+    deps.rerank = async (input) => {
+      seen.push(input.candidates.map((c) => c.sourceUrl ?? ""));
+      return rerank(input);
+    };
+    const page = (url: string) => ({
+      url,
+      title: url,
+      type: "official" as const,
+      markdown: Array.from(
+        { length: 60 },
+        (_, i) => `## Part ${i} of ${url}\n\n${longPage(`${url} ${i}`)}`,
+      ).join("\n\n"),
+    });
+    await mergeAndRerank(
+      chatStateWith({
+        external: [page("https://first.test/a"), page("https://second.test/b")],
+      }),
+      deps,
+    );
+    expect(seen[0].some((u) => u.includes("second.test"))).toBe(true);
+  });
+});
+
 describe("the whole graph: origin", () => {
   const input = {
     technology: chatStateWith().technology,

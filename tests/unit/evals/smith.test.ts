@@ -23,6 +23,7 @@ const asked = (change: Partial<Asked> = {}): Asked => ({
   origin: "guide",
   grade: "GOOD",
   reply: "Run make.",
+  excerpts: "=== EXCERPT [1] ===\nRun make.",
   cited: ["Install"],
   calls: { context7: 0, search: 0, fetch: 0 },
   firstTokenMs: 1,

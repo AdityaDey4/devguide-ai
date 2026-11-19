@@ -6,7 +6,13 @@ import type { ChatQuestion } from "./types";
 //
 //   loadChatQuestions("evals/chat/questions.jsonl") -> [{ id: "stored-01", group: "stored", ... }, ...]
 
-const origin = z.enum(["guide", "stored_docs", "fetched_now", "not_found"]);
+const origin = z.enum([
+  "guide",
+  "stored_docs",
+  "fetched_now",
+  "not_found",
+  "none",
+]);
 
 const line = z.object({
   id: z.string().min(1),

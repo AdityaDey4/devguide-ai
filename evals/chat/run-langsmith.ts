@@ -3,6 +3,7 @@ import type { Example, Run } from "langsmith/schemas";
 import { evaluate } from "langsmith/evaluation";
 import { flushTraces } from "../../src/lib/agents/shared/tracing";
 import { askChat } from "./ask";
+import { judgeGroundedness } from "./groundedness";
 import { loadChatQuestions } from "./load";
 import { fromExample, scoreRun, toExample } from "./smith";
 import type { Asked } from "./types";
@@ -24,6 +25,17 @@ const DATASET = "devguide-chat-evals";
 const QUESTIONS_FILE = "evals/chat/questions.jsonl";
 const AT_A_TIME = 3;
 
+/** JSON with sorted keys, so the same content compares equal whatever order LangSmith returns. */
+function canonical(value: unknown): string {
+  return JSON.stringify(value, (_, v) =>
+    v && typeof v === "object" && !Array.isArray(v)
+      ? Object.fromEntries(
+          Object.entries(v).sort(([a], [b]) => a.localeCompare(b)),
+        )
+      : v,
+  );
+}
+
 async function syncDataset(client: Client) {
   const questions = loadChatQuestions(QUESTIONS_FILE);
   if (!(await client.hasDataset({ datasetName: DATASET }))) {
@@ -37,11 +49,7 @@ async function syncDataset(client: Client) {
   for await (const example of client.listExamples({ datasetName: DATASET })) {
     existing.set(String(example.metadata?.id), {
       id: example.id,
-      question: JSON.stringify([
-        example.inputs,
-        example.outputs,
-        example.metadata,
-      ]),
+      question: canonical([example.inputs, example.outputs, example.metadata]),
     });
   }
 
@@ -50,7 +58,7 @@ async function syncDataset(client: Client) {
   for (const q of questions) {
     const fields = toExample(q);
     const known = existing.get(q.id);
-    const fingerprint = JSON.stringify([
+    const fingerprint = canonical([
       fields.inputs,
       fields.outputs,
       fields.metadata,
@@ -87,6 +95,27 @@ async function main() {
       evaluators: [
         (run: Run, example?: Example) =>
           scoreRun(fromExample(example!), run.outputs as unknown as Asked),
+        // LLM as a judge: are the answer's claims all in the excerpts it was written from?
+        async (run: Run, example?: Example) => {
+          const question = fromExample(example!);
+          const found = await judgeGroundedness(
+            question.question,
+            run.outputs as unknown as Asked,
+          );
+          return {
+            key: "grounded",
+            score: found === null ? null : +found.grounded,
+            comment: found
+              ? [
+                  `${found.checked} specific claims checked`,
+                  ...found.unsupported.map((c) => `NO EVIDENCE: ${c}`),
+                  ...found.fakeEvidence.map(
+                    (c) => `EVIDENCE NOT IN EXCERPTS: ${c}`,
+                  ),
+                ].join("\n")
+              : undefined,
+          };
+        },
       ],
     },
   );

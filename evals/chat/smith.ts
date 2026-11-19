@@ -46,7 +46,7 @@ const mark = (value: boolean | null) => (value === null ? null : +value);
 /** One run's scores. A check that does not apply to the question scores null (left out). */
 export function scoreRun(question: ChatQuestion, asked: Asked): Score[] {
   const j = judge(question, asked);
-  const refused = asked.origin === "not_found";
+  const refused = asked.origin === "not_found" || asked.origin === "none";
   return [
     { key: "pass", score: mark(j.pass) },
     {

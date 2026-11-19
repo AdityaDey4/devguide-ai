@@ -35,6 +35,7 @@ const asked = (over: Partial<Asked> = {}): Asked => ({
   origin: "fetched_now",
   grade: "GOOD",
   reply: "Use fs.writeFile(...) [1].",
+  excerpts: "",
   cited: ["fs docs"],
   calls: { context7: 1, search: 1, fetch: 2 },
   firstTokenMs: 9000,
@@ -190,7 +191,11 @@ describe("the real question set", () => {
 
   it("expects what its group says", () => {
     for (const q of questions) {
-      if (q.group === "not_found") expect(q.expected).toEqual(["not_found"]);
+      // a refusal is "not_found", or "none" when the chat declined without searching
+      if (q.group === "not_found")
+        expect(q.expected.every((o) => o === "not_found" || o === "none")).toBe(
+          true,
+        );
       if (q.group === "outside") expect(q.expected).toEqual(["fetched_now"]);
       if (q.group === "stored") expect(q.expected).not.toContain("fetched_now");
     }

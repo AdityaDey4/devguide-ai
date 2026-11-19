@@ -1,3 +1,4 @@
+import { flushTraces, traceConfig } from "../shared/tracing";
 import type { ChatDeps } from "./deps";
 import { docsWorthKeeping } from "./fetched";
 import { buildChatGraph } from "./graph";
@@ -52,14 +53,23 @@ export async function askGuide(
   deps?: ChatDeps,
 ): Promise<AskGuideResult> {
   const graph = buildChatGraph(onToken, deps);
-  const finished = await graph.invoke({
-    technology: input.technology,
-    guideId: input.guideId ?? null,
-    alsoGuideId: input.alsoGuideId ?? null,
-    hiddenHashes: input.hiddenHashes ?? [],
-    history: input.history,
-    question: input.question,
-  });
+  const finished = await graph
+    .invoke(
+      {
+        technology: input.technology,
+        guideId: input.guideId ?? null,
+        alsoGuideId: input.alsoGuideId ?? null,
+        hiddenHashes: input.hiddenHashes ?? [],
+        history: input.history,
+        question: input.question,
+      },
+      traceConfig("chat", {
+        technology: input.technology.name,
+        technologyId: input.technology.id,
+        guideId: input.guideId,
+      }),
+    )
+    .finally(flushTraces);
   return {
     answer: finished.reply,
     citations: finished.citations,

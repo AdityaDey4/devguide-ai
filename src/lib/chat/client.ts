@@ -6,7 +6,7 @@ import type { ChatEvent } from "./stream";
 //
 //   const outcome = await askChat(
 //     { slug: "zod", question: "and a URL?", history },
-//     { onText: (piece) => show(piece), onDone: (list, origin) => showSources(list, origin) },
+//     { onText: (piece) => show(piece), onDone: (list, origin, cached) => showSources(list, origin, cached) },
 //   );
 //   outcome -> { ok: true }
 //           |  { ok: false, error: "Something went wrong answering that. Try again." }
@@ -22,7 +22,11 @@ export type AskRequest = {
 };
 export type AskHandlers = {
   onText: (piece: string) => void;
-  onDone: (citations: ChatCitation[], origin: ChatOrigin) => void;
+  onDone: (
+    citations: ChatCitation[],
+    origin: ChatOrigin,
+    cached: boolean,
+  ) => void;
 };
 export type AskOutcome = { ok: true } | { ok: false; error: string };
 
@@ -44,6 +48,7 @@ const Line = z.discriminatedUnion("type", [
       "not_found",
       "none",
     ]),
+    cached: z.boolean().default(false),
   }),
   z.object({ type: z.literal("error"), message: z.string() }),
 ]);
@@ -94,7 +99,7 @@ export async function askChat(
         if (!event) continue;
         if (event.type === "text") handlers.onText(event.text);
         if (event.type === "done") {
-          handlers.onDone(event.citations, event.origin);
+          handlers.onDone(event.citations, event.origin, event.cached);
           finished = true;
         }
         if (event.type === "error") return { ok: false, error: event.message };

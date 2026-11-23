@@ -35,14 +35,16 @@ function setup(response: Response | Error) {
   const pieces: string[] = [];
   const lists: ChatCitation[][] = [];
   const origins: ChatOrigin[] = [];
+  const cachedFlags: boolean[] = [];
   const handlers = {
     onText: (piece: string) => void pieces.push(piece),
-    onDone: (list: ChatCitation[], origin: ChatOrigin) => {
+    onDone: (list: ChatCitation[], origin: ChatOrigin, cached: boolean) => {
       lists.push(list);
       origins.push(origin);
+      cachedFlags.push(cached);
     },
   };
-  return { fetchMock, pieces, lists, origins, handlers };
+  return { fetchMock, pieces, lists, origins, cachedFlags, handlers };
 }
 
 afterEach(() => vi.unstubAllGlobals());
@@ -51,7 +53,7 @@ describe("parseChatLine", () => {
   it("accepts the origin of a message that is not a question (none)", () => {
     expect(
       parseChatLine('{"type":"done","citations":[],"origin":"none"}'),
-    ).toEqual({ type: "done", citations: [], origin: "none" });
+    ).toEqual({ type: "done", citations: [], origin: "none", cached: false });
   });
 
   it("reads the three kinds of line", () => {
@@ -67,7 +69,12 @@ describe("parseChatLine", () => {
           origin: "fetched_now",
         }),
       ),
-    ).toEqual({ type: "done", citations: [docs], origin: "fetched_now" });
+    ).toEqual({
+      type: "done",
+      citations: [docs],
+      origin: "fetched_now",
+      cached: false,
+    });
     expect(parseChatLine('{"type":"error","message":"No"}')).toEqual({
       type: "error",
       message: "No",
@@ -84,6 +91,24 @@ describe("parseChatLine", () => {
     expect(parseChatLine("not json")).toBeNull();
     expect(parseChatLine('{"type":"other"}')).toBeNull();
     expect(parseChatLine('{"type":"text"}')).toBeNull();
+  });
+});
+
+describe("a saved answer", () => {
+  it("is marked cached when the done line says so, and not when it says nothing", async () => {
+    const saved = setup(
+      streamed([
+        '{"type":"done","citations":[],"origin":"guide","cached":true}\n',
+      ]),
+    );
+    await askChat(request, saved.handlers);
+    expect(saved.cachedFlags).toEqual([true]);
+
+    const older = setup(
+      streamed(['{"type":"done","citations":[],"origin":"guide"}\n']),
+    );
+    await askChat(request, older.handlers);
+    expect(older.cachedFlags).toEqual([false]);
   });
 });
 

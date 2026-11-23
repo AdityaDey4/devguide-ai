@@ -77,6 +77,8 @@ export const ChatState = Annotation.Root({
   /** Where the answer came from; set with the reply. */
   origin: latest<ChatOrigin>(() => "not_found"),
   citations: latest<ChatCitation[]>(() => []),
+  /** True when the reply is a saved answer: nothing was searched or written. */
+  fromCache: latest<boolean>(() => false),
 });
 
 export type ChatStateType = typeof ChatState.State;

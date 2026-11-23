@@ -37,9 +37,27 @@ const ORIGINS: Record<
   },
 };
 
-export function OriginLabel({ origin }: { origin: ChatOrigin }) {
+// A saved answer (lib/chat/cache) is said to be saved, and never "fetched just now": it was
+// written earlier, even when the text it rests on was read live back then.
+const SAVED: Partial<Record<ChatOrigin, string>> = {
+  guide: "From this guide · saved answer",
+  stored_docs: "From stored docs · saved answer",
+  fetched_now: "From the docs · saved answer",
+};
+
+export function OriginLabel({
+  origin,
+  cached = false,
+}: {
+  origin: ChatOrigin;
+  cached?: boolean;
+}) {
   if (origin === "none") return null; // a greeting or a non-question has no source
-  const { text, icon: Icon, className } = ORIGINS[origin];
+  const shown = ORIGINS[origin];
+  const saved = cached ? SAVED[origin] : undefined;
+  const { icon: Icon } = shown;
+  const text = saved ?? shown.text;
+  const className = saved ? "text-muted-foreground" : shown.className;
   return (
     <p className={`flex items-center gap-1.5 text-xs font-medium ${className}`}>
       <Icon aria-hidden className="size-3.5" />

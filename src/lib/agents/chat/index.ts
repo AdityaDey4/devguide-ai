@@ -45,6 +45,12 @@ export type AskGuideResult = {
   origin: ChatOrigin;
   /** Pages found outside the stored text that the answer used: worth saving for next time. */
   toStore: ExternalDoc[];
+  /** True when the answer is one saved earlier: nothing was searched or written. */
+  cached: boolean;
+  /** The question as the chat understood it on its own (what the answer cache is keyed on). */
+  standaloneQuery: string;
+  /** The last grade of the text the answer was written from; null if it was never graded. */
+  grade: "GOOD" | "PARTIAL" | "BAD" | null;
 };
 
 export async function askGuide(
@@ -74,6 +80,9 @@ export async function askGuide(
     answer: finished.reply,
     citations: finished.citations,
     origin: finished.origin,
+    cached: finished.fromCache,
+    standaloneQuery: finished.standaloneQuery,
+    grade: finished.grade?.verdict ?? null,
     toStore: docsWorthKeeping(
       finished.external,
       finished.chunks,

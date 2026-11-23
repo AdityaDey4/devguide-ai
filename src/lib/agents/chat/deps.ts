@@ -6,6 +6,15 @@ import type { Candidate, RetrieveInput } from "../../rag/retriever";
 import type { SearchHit } from "../shared/tavily";
 import type { Ranked, RerankInput } from "../../rag/reranker";
 import type { ModelSize } from "../shared/llm";
+import type { ChatOrigin } from "./origin";
+import type { ChatCitation } from "./state";
+
+/** An answer saved earlier for a question that means the same (see lib/chat/cache). */
+export type CachedChatAnswer = {
+  answer: string;
+  citations: ChatCitation[];
+  origin: ChatOrigin;
+};
 
 /**
  * Everything the chat nodes need from the outside world. The graph gets the real ones by default;
@@ -39,4 +48,10 @@ export type ChatDeps = {
     messages: BaseMessageLike[],
     onToken: (piece: string) => void | Promise<void>,
   ) => Promise<string>;
+  /**
+   * Looks for a saved answer to this (standalone) question. Left out when the question must not
+   * be answered from the cache (a person's edited copy, the evals): the graph then never looks.
+   * Never throws: no answer, or a failed lookup, is null.
+   */
+  lookupCache?: (question: string) => Promise<CachedChatAnswer | null>;
 };

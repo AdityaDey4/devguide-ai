@@ -1,5 +1,12 @@
 import { after } from "next/server";
 import { askGuide, type AskGuideResult } from "@/lib/agents/chat";
+import type { ChatDeps } from "@/lib/agents/chat/deps";
+import { realDeps } from "@/lib/agents/chat/realDeps";
+import {
+  cacheScope,
+  lookupCachedAnswer,
+  saveCachedAnswer,
+} from "@/lib/chat/cache";
 import {
   ChatRequest,
   MAX_BODY_CHARS,
@@ -9,6 +16,7 @@ import { saveFetched } from "@/lib/chat/saveFetched";
 import { findChatScope } from "@/lib/chat/scope";
 import { chatResponse } from "@/lib/chat/stream";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/service";
 
 // POST /api/chat  { "slug": "zod", "question": "and a URL?", "history": [...] }
 // (docs/03-Architecture.md section 8, SRS FR-CHAT)
@@ -57,12 +65,46 @@ export async function POST(request: Request) {
   const scope = await findChatScope(supabase, body.data.slug);
   if (!scope) return fail("There is no guide to ask about yet", 404);
 
-  // What the answer found outside the stored text is saved AFTER the response is sent (after()),
-  // so saving never delays the person. `result` is set by then: the response only ends when the
-  // answer has been written.
+  // A question about the shared guide may be answered from a saved answer, and a good new answer
+  // is saved for next time (see lib/chat/cache). A person's edited copy is never cached: the
+  // answer would not follow their text.
+  const db = createServiceClient();
+  const where = await cacheScope(db, scope);
+  const deps: ChatDeps = where
+    ? {
+        ...realDeps,
+        lookupCache: async (question) => {
+          const hit = await lookupCachedAnswer(db, where, question);
+          // one line per lookup, so the hit rate can be counted in the logs
+          console.info(
+            JSON.stringify({
+              event: "chat_cache",
+              result: hit ? "hit" : "miss",
+              similarity: hit ? Number(hit.similarity.toFixed(3)) : null,
+              technologyId: where.technologyId,
+            }),
+          );
+          return hit;
+        },
+      }
+    : realDeps;
+
+  // What the answer found outside the stored text, and the answer itself, are saved AFTER the
+  // response is sent (after()), so saving never delays the person. `result` is set by then: the
+  // response only ends when the answer has been written, and stays unset if answering failed.
   let result: AskGuideResult | undefined;
   after(async () => {
-    if (result) await saveFetched(scope.technology.id, result.toStore);
+    if (!result) return;
+    await saveFetched(scope.technology.id, result.toStore);
+    if (where && !result.cached) {
+      await saveCachedAnswer(db, where, {
+        question: result.standaloneQuery,
+        answer: result.answer,
+        citations: result.citations,
+        origin: result.origin,
+        grade: result.grade,
+      });
+    }
   });
 
   return chatResponse(async (onToken) => {
@@ -76,6 +118,7 @@ export async function POST(request: Request) {
         question: body.data.question,
       },
       onToken,
+      deps,
     );
     return result;
   });

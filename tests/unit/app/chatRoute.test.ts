@@ -10,6 +10,9 @@ const mocks = vi.hoisted(() => ({
   scope: null as unknown,
   findChatScope: vi.fn(),
   askGuide: vi.fn(),
+  cacheScope: vi.fn(),
+  lookupCachedAnswer: vi.fn(),
+  saveCachedAnswer: vi.fn(),
 }));
 
 vi.mock("@/lib/supabase/server", () => ({
@@ -19,6 +22,13 @@ vi.mock("@/lib/supabase/server", () => ({
 }));
 vi.mock("@/lib/chat/scope", () => ({ findChatScope: mocks.findChatScope }));
 vi.mock("@/lib/agents/chat", () => ({ askGuide: mocks.askGuide }));
+vi.mock("@/lib/agents/chat/realDeps", () => ({ realDeps: { real: true } }));
+vi.mock("@/lib/supabase/service", () => ({ createServiceClient: () => ({}) }));
+vi.mock("@/lib/chat/cache", () => ({
+  cacheScope: mocks.cacheScope,
+  lookupCachedAnswer: mocks.lookupCachedAnswer,
+  saveCachedAnswer: mocks.saveCachedAnswer,
+}));
 vi.mock("next/server", () => ({
   after: (callback: () => unknown) => void mocks.afterCallbacks.push(callback),
 }));
@@ -65,12 +75,18 @@ beforeEach(() => {
   mocks.saveFetched.mockReset().mockResolvedValue(1);
   mocks.user = { id: "u1" };
   mocks.findChatScope.mockReset().mockResolvedValue(scope);
+  mocks.cacheScope.mockReset().mockResolvedValue(null);
+  mocks.lookupCachedAnswer.mockReset().mockResolvedValue(null);
+  mocks.saveCachedAnswer.mockReset().mockResolvedValue(true);
   mocks.askGuide.mockReset().mockImplementation(async (_input, onToken) => {
     await onToken("Use ");
     await onToken("`z.url()` [1].");
     return {
       answer: "Use `z.url()` [1].",
       origin: "stored_docs",
+      cached: false,
+      standaloneQuery: "How do I validate a URL with Zod?",
+      grade: "GOOD",
       citations: [
         {
           n: 1,
@@ -160,6 +176,7 @@ describe("POST /api/chat: the streamed answer", () => {
           },
         ],
         origin: "stored_docs",
+        cached: false,
       },
     ]);
   });
@@ -189,6 +206,55 @@ describe("POST /api/chat: the streamed answer", () => {
       alsoGuideId: "g1",
       hiddenHashes: ["abc"],
     });
+  });
+
+  it("answers without the cache when the question is not cacheable (an edited copy)", async () => {
+    await (await call(valid)).text();
+    expect(mocks.cacheScope).toHaveBeenCalledWith(expect.anything(), scope);
+    expect(mocks.askGuide.mock.calls[0][2]).toEqual({ real: true });
+  });
+
+  it("gives the chat a cache lookup for the shared guide's scope, and logs each lookup", async () => {
+    const where = { technologyId: "t1", guideId: "g1", guideVersionId: "v1" };
+    mocks.cacheScope.mockResolvedValue(where);
+    const info = vi.spyOn(console, "info").mockImplementation(() => {});
+    await (await call(valid)).text();
+
+    const deps = mocks.askGuide.mock.calls[0][2];
+    expect(deps.real).toBe(true);
+
+    mocks.lookupCachedAnswer.mockResolvedValueOnce({
+      answer: "saved",
+      similarity: 0.97123,
+    });
+    expect(await deps.lookupCache("How do I validate a URL?")).toMatchObject({
+      answer: "saved",
+    });
+    expect(mocks.lookupCachedAnswer).toHaveBeenCalledWith(
+      expect.anything(),
+      where,
+      "How do I validate a URL?",
+    );
+
+    mocks.lookupCachedAnswer.mockResolvedValueOnce(null);
+    expect(await deps.lookupCache("Something new?")).toBeNull();
+
+    const logged = info.mock.calls.map((c) => JSON.parse(String(c[0])));
+    expect(logged).toEqual([
+      {
+        event: "chat_cache",
+        result: "hit",
+        similarity: 0.971,
+        technologyId: "t1",
+      },
+      {
+        event: "chat_cache",
+        result: "miss",
+        similarity: null,
+        technologyId: "t1",
+      },
+    ]);
+    info.mockRestore();
   });
 
   it("trims the question", async () => {
@@ -246,5 +312,57 @@ describe("POST /api/chat: saving what was fetched", () => {
     mocks.user = { id: "u1" };
     await call(valid);
     expect(mocks.afterCallbacks).toEqual([]);
+  });
+});
+
+describe("POST /api/chat: saving the answer for next time", () => {
+  const where = { technologyId: "t1", guideId: "g1", guideVersionId: "v1" };
+
+  it("saves a good answer to the shared guide after the response, keyed on the rewritten question", async () => {
+    mocks.cacheScope.mockResolvedValue(where);
+    await (await call(valid)).text();
+    expect(mocks.saveCachedAnswer).not.toHaveBeenCalled(); // never before the response is sent
+
+    await mocks.afterCallbacks[0]();
+    expect(mocks.saveCachedAnswer).toHaveBeenCalledWith(
+      expect.anything(),
+      where,
+      {
+        question: "How do I validate a URL with Zod?",
+        answer: "Use `z.url()` [1].",
+        citations: [expect.objectContaining({ n: 1 })],
+        origin: "stored_docs",
+        grade: "GOOD",
+      },
+    );
+  });
+
+  it("does not save an answer that came from the cache", async () => {
+    mocks.cacheScope.mockResolvedValue(where);
+    const answered = await mocks.askGuide.getMockImplementation()!(
+      {},
+      () => {},
+    );
+    mocks.askGuide.mockResolvedValue({ ...answered, cached: true });
+    await (await call(valid)).text();
+    await mocks.afterCallbacks[0]();
+    expect(mocks.saveCachedAnswer).not.toHaveBeenCalled();
+  });
+
+  it("does not save when there is no cache scope (a person's edited copy)", async () => {
+    await (await call(valid)).text();
+    await mocks.afterCallbacks[0]();
+    expect(mocks.saveCachedAnswer).not.toHaveBeenCalled();
+    expect(mocks.saveFetched).toHaveBeenCalled(); // the other saving is unaffected
+  });
+
+  it("does not save when answering failed", async () => {
+    mocks.cacheScope.mockResolvedValue(where);
+    mocks.askGuide.mockRejectedValue(new Error("down"));
+    const quiet = vi.spyOn(console, "error").mockImplementation(() => {});
+    await (await call(valid)).text();
+    quiet.mockRestore();
+    await mocks.afterCallbacks[0]();
+    expect(mocks.saveCachedAnswer).not.toHaveBeenCalled();
   });
 });

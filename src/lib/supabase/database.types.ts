@@ -9,6 +9,74 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      chat_cache: {
+        Row: {
+          answer: string;
+          citations: NonNullable<Json>;
+          created_at: string;
+          expires_at: string;
+          guide_id: string;
+          guide_version_id: string;
+          hit_count: number;
+          id: string;
+          origin: string;
+          question: string;
+          question_embedding: string;
+          technology_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          answer: string;
+          citations?: NonNullable<Json>;
+          created_at?: string;
+          expires_at: string;
+          guide_id: string;
+          guide_version_id: string;
+          hit_count?: number;
+          id?: string;
+          origin: string;
+          question: string;
+          question_embedding: string;
+          technology_id: string;
+        };
+        Update: {
+          answer?: string;
+          citations?: NonNullable<Json>;
+          created_at?: string;
+          expires_at?: string;
+          guide_id?: string;
+          guide_version_id?: string;
+          hit_count?: number;
+          id?: string;
+          origin?: string;
+          question?: string;
+          question_embedding?: string;
+          technology_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "chat_cache_guide_id_fkey";
+            columns: ["guide_id"];
+            isOneToOne: false;
+            referencedRelation: "guides";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "chat_cache_guide_version_id_fkey";
+            columns: ["guide_version_id"];
+            isOneToOne: false;
+            referencedRelation: "guide_versions";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "chat_cache_technology_id_fkey";
+            columns: ["technology_id"];
+            isOneToOne: false;
+            referencedRelation: "technologies";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       chunks: {
         Row: {
           content: string;
@@ -356,6 +424,23 @@ export type Database = {
           source_url: string;
         }[];
       };
+      match_chat_cache: {
+        Args: {
+          min_similarity?: number;
+          p_guide_version_id: string;
+          p_technology_id: string;
+          query_embedding: string;
+        };
+        Returns: {
+          answer: string;
+          citations: Json;
+          id: string;
+          origin: string;
+          question: string;
+          similarity: number;
+        }[];
+      };
+      record_chat_cache_hit: { Args: { p_id: string }; Returns: undefined };
       show_limit: { Args: Record<PropertyKey, never>; Returns: number };
       show_trgm: { Args: { "": string }; Returns: string[] };
     };

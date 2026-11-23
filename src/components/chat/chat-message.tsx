@@ -15,6 +15,8 @@ export type Turn = {
   citations: ChatCitation[];
   /** Where the answer came from; known once the answer is finished. */
   origin?: ChatOrigin;
+  /** True when the answer is one saved earlier, not written just now. */
+  cached?: boolean;
   /** waiting: the answer is being written (it may already have some text). */
   status: "waiting" | "done" | "error";
   error?: string;
@@ -47,7 +49,7 @@ export function ChatMessage({
       )}
 
       {turn.status === "done" && turn.origin && (
-        <OriginLabel origin={turn.origin} />
+        <OriginLabel origin={turn.origin} cached={turn.cached} />
       )}
 
       {turn.status === "done" && turn.citations.length > 0 && (

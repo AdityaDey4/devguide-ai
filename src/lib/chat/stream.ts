@@ -4,7 +4,7 @@ import type { AskGuideResult, ChatCitation, ChatOrigin } from "../agents/chat";
 //
 //   {"type":"text","text":"Use "}
 //   {"type":"text","text":"`z.url()` [1]."}
-//   {"type":"done","citations":[{"n":1,"title":"Defining schemas","url":"https://zod.dev/api","kind":"docs"}],"origin":"stored_docs"}
+//   {"type":"done","citations":[{"n":1,"title":"Defining schemas","url":"https://zod.dev/api","kind":"docs"}],"origin":"stored_docs","cached":false}
 //
 // The text comes first, piece by piece, as it is written; the last line, "done", comes once at the end, when
 // it is known which sources the finished answer used and where it came from (guide, stored_docs,
@@ -13,7 +13,13 @@ import type { AskGuideResult, ChatCitation, ChatOrigin } from "../agents/chat";
 
 export type ChatEvent =
   | { type: "text"; text: string }
-  | { type: "done"; citations: ChatCitation[]; origin: ChatOrigin }
+  | {
+      type: "done";
+      citations: ChatCitation[];
+      origin: ChatOrigin;
+      /** True when the answer is one saved earlier (see lib/chat/cache). */
+      cached: boolean;
+    }
   | { type: "error"; message: string };
 
 export const CHAT_FAILED = "Something went wrong answering that. Try again.";
@@ -46,6 +52,7 @@ export function chatResponse(
           type: "done",
           citations: result.citations,
           origin: result.origin,
+          cached: result.cached,
         });
       } catch (error) {
         console.error(

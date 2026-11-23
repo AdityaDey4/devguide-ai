@@ -1,4 +1,4 @@
-import type { ChatDeps } from "@/lib/agents/chat/deps";
+import type { CachedChatAnswer, ChatDeps } from "@/lib/agents/chat/deps";
 import { GradeAnswer, type Grade } from "@/lib/agents/chat/nodes/grade/schema";
 import type { ChatStateType } from "@/lib/agents/chat/state";
 import type { Snippet } from "@/lib/mcp/context7";
@@ -55,6 +55,11 @@ export function fakeChatDeps(
     brokenUrls?: string[];
     /** Make the whole web search fail. */
     searchFails?: boolean;
+    /**
+     * Turns the answer cache on: this is what it finds for a question (null: a miss). Without this
+     * option the graph has no cache at all, like a person's edited copy.
+     */
+    cached?: CachedChatAnswer | null;
   } = {},
 ) {
   const asked: unknown[][] = [];
@@ -65,6 +70,7 @@ export function fakeChatDeps(
   const snippetQueries: { name: string; topic: string }[] = [];
   const searches: { query: string; domains?: string[] }[] = [];
   const fetched: string[] = [];
+  const cacheLookups: string[] = [];
 
   const deps: ChatDeps = {
     ask: async (_size, givenSchema, messages) => {
@@ -125,6 +131,12 @@ export function fakeChatDeps(
       return text;
     },
   };
+  if (answers.cached !== undefined) {
+    deps.lookupCache = async (question) => {
+      cacheLookups.push(question);
+      return answers.cached ?? null;
+    };
+  }
   return {
     deps,
     asked,
@@ -135,6 +147,7 @@ export function fakeChatDeps(
     snippetQueries,
     searches,
     fetched,
+    cacheLookups,
   };
 }
 
@@ -164,6 +177,7 @@ export function chatStateWith(
     reply: "",
     origin: "not_found",
     citations: [],
+    fromCache: false,
     ...overrides,
   };
 }

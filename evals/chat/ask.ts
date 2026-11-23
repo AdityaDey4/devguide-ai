@@ -10,6 +10,9 @@ import type { Asked, ChatQuestion } from "./types";
 // records what happened. It counts every outside call, so a question the stored text should answer
 // can be checked for making none.
 //
+// It never uses the answer cache either: `realDeps` has no `lookupCache` (only the chat route adds
+// one), so every question runs the whole graph and the scores measure the chat, not the cache.
+//
 // It does NOT save what the chat fetches (the route does that after answering), so running the
 // evals never changes what is stored.
 

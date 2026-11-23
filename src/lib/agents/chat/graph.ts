@@ -1,6 +1,7 @@
 import { END, START, StateGraph } from "@langchain/langgraph";
 import type { ChatDeps } from "./deps";
 import { answer } from "./nodes/answer";
+import { cacheLookup } from "./nodes/cacheLookup";
 import { context7 } from "./nodes/context7";
 import { directReply } from "./nodes/directReply";
 import { grade } from "./nodes/grade";
@@ -14,6 +15,10 @@ import { ChatState, type ChatStateType } from "./state";
 // The chat graph (docs/03-Architecture.md section 5.2, corrective hybrid RAG).
 //
 //   START -> understand --not a question--> directReply -> END   ("Hi", gibberish, another topic)
+//   START -> understand --a question, and a cache is available--> cacheLookup --saved answer--> END
+//                                                                       |
+//                                                                      miss
+//                                                                       v
 //   START -> understand -> retrieve -> gradeChunks --GOOD--------------------------------> answer -> END
 //                                          |                                                 ^
 //                                  PARTIAL / BAD                                             |
@@ -40,11 +45,14 @@ export function buildChatGraph(
     .addNode("regrade", (state) => grade(state, deps))
     .addNode("answer", (state) => answer(state, deps, onToken))
     .addNode("directReply", (state) => directReply(state, onToken))
+    .addNode("cacheLookup", (state) => cacheLookup(state, deps, onToken))
     .addEdge(START, "understand")
-    .addConditionalEdges("understand", afterUnderstand, [
-      "retrieve",
-      "directReply",
-    ])
+    .addConditionalEdges(
+      "understand",
+      (state) => afterUnderstand(state, deps),
+      ["retrieve", "directReply", "cacheLookup"],
+    )
+    .addConditionalEdges("cacheLookup", afterCacheLookup, ["retrieve", END])
     .addEdge("retrieve", "gradeChunks")
     .addConditionalEdges("gradeChunks", afterGrade, [
       "answer",
@@ -60,8 +68,17 @@ export function buildChatGraph(
 }
 
 /** Only a question is searched for; a greeting, gibberish or another topic gets a direct reply. */
-function afterUnderstand(state: ChatStateType): "retrieve" | "directReply" {
-  return state.intent === "question" ? "retrieve" : "directReply";
+function afterUnderstand(
+  state: ChatStateType,
+  deps: ChatDeps,
+): "retrieve" | "directReply" | "cacheLookup" {
+  if (state.intent !== "question") return "directReply";
+  return deps.lookupCache ? "cacheLookup" : "retrieve";
+}
+
+/** A saved answer is the reply: done. Otherwise the question is searched for as usual. */
+function afterCacheLookup(state: ChatStateType): "retrieve" | typeof END {
+  return state.fromCache ? END : "retrieve";
 }
 
 /** GOOD: write the answer. Otherwise look outside the stored text, both ways at once. */

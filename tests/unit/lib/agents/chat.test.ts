@@ -363,7 +363,114 @@ describe("askGuide (the whole graph)", () => {
       answer: NOT_COVERED,
       citations: [],
       origin: "not_found",
+      cached: false,
+      standaloneQuery: "How do I validate a URL with Zod?",
+      grade: "BAD",
       toStore: [],
+    });
+  });
+});
+
+describe("the answer cache in the graph", () => {
+  const input = {
+    technology: chatStateWith().technology,
+    guideId: "g1",
+    history: [],
+    question: "and a URL?",
+  };
+  const saved = {
+    answer: "Saved: use `z.url()` [1].",
+    citations: [
+      {
+        n: 1,
+        title: "Strings",
+        url: "https://zod.dev/api",
+        kind: "docs" as const,
+      },
+    ],
+    origin: "stored_docs" as const,
+  };
+
+  it("answers from the saved answer and searches, grades and writes nothing", async () => {
+    const f = fakeChatDeps({ cached: saved, found: [ranked()] });
+    const pieces: string[] = [];
+    const result = await askGuide(input, (p) => void pieces.push(p), f.deps);
+
+    expect(result).toMatchObject({
+      answer: saved.answer,
+      citations: saved.citations,
+      origin: "stored_docs",
+      cached: true,
+      toStore: [],
+    });
+    expect(pieces.join("")).toBe(saved.answer);
+    expect(f.retrieved).toEqual([]);
+    expect(f.grades).toEqual([]);
+    expect(f.written).toEqual([]);
+    expect(f.fetched).toEqual([]);
+  });
+
+  it("looks up the question as the chat rewrote it, not the raw message", async () => {
+    const f = fakeChatDeps({
+      cached: saved,
+      standalone: "How do I validate a URL with Zod?",
+    });
+    await askGuide(input, () => {}, f.deps);
+    expect(f.cacheLookups).toEqual(["How do I validate a URL with Zod?"]);
+  });
+
+  it("carries on with the normal search when nothing is saved", async () => {
+    const f = fakeChatDeps({
+      cached: null,
+      found: [ranked()],
+      text: "Fresh answer [1].",
+    });
+    const result = await askGuide(input, () => {}, f.deps);
+    expect(f.cacheLookups).toHaveLength(1);
+    expect(f.retrieved).toHaveLength(1);
+    expect(result).toMatchObject({
+      answer: "Fresh answer [1].",
+      cached: false,
+    });
+  });
+
+  it("does not look in the cache at all when there is none (an edited copy, the evals)", async () => {
+    const f = fakeChatDeps({ found: [ranked()] });
+    expect(f.deps.lookupCache).toBeUndefined();
+    const result = await askGuide(input, () => {}, f.deps);
+    expect(f.cacheLookups).toEqual([]);
+    expect(result.cached).toBe(false);
+  });
+
+  it("does not look in the cache for a greeting", async () => {
+    const f = fakeChatDeps({ cached: saved, intent: "greeting" });
+    const result = await askGuide(input, () => {}, f.deps);
+    expect(f.cacheLookups).toEqual([]);
+    expect(result).toMatchObject({ origin: "none", cached: false });
+  });
+});
+
+describe("what askGuide reports for the cache to save", () => {
+  it("gives the rewritten question and the final grade", async () => {
+    const f = fakeChatDeps({
+      found: [ranked()],
+      standalone: "How do I validate a URL with Zod?",
+      grade: { verdict: "PARTIAL", missing: "options" },
+      regrade: { verdict: "GOOD", missing: "" },
+    });
+    const result = await askGuide(
+      {
+        technology: chatStateWith().technology,
+        guideId: "g1",
+        history: [],
+        question: "and a URL?",
+      },
+      () => {},
+      f.deps,
+    );
+    expect(result).toMatchObject({
+      standaloneQuery: "How do I validate a URL with Zod?",
+      grade: "GOOD", // after the outside lookups, not the first grade
     });
   });
 });
